@@ -1,7 +1,7 @@
 #pragma once
 
-#define defer(code) defer_function([&]() { code })
-#define defer_function(function) cz::Deferer defer_##__LINE__(code);
+#define CZ_DEFER(code) CZ_DEFER_FUNCTION([&]() { code })
+#define CZ_DEFER_FUNCTION(function) cz::Deferer defer_##__LINE__(code);
 
 namespace cz {
 
