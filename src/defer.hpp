@@ -1,16 +1,18 @@
 #pragma once
 
-#define CZ_DEFER(code) CZ_DEFER_FUNCTION([&]() { code })
-#define CZ_DEFER_FUNCTION(function) cz::Deferer defer_##__LINE__(code);
+#include <utility>
+#include <functional>
+
+#define CZ_DEFER(code) CZ_DEFER_FUNCTION([&]() { code; })
+#define CZ_DEFER_FUNCTION(function) cz::Deferer defer_##__LINE__(function);
 
 namespace cz {
 
-template <class F>
 class Deferer {
-    F function;
+    std::function<void()> function;
 
 public:
-    Deferer(F function) : function(function) {}
+    Deferer(std::function<void()> function) : function(std::move(function)) {}
     Deferer(const Deferer&) = delete;
     Deferer& operator=(const Deferer&) = delete;
     ~Deferer() { function(); }
