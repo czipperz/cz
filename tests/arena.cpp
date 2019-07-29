@@ -3,13 +3,13 @@
 #include "../src/allocator.hpp"
 #include "../src/arena.hpp"
 
-TEST_CASE("Arena alloc fails when no space left") {
+TEST_CASE("Arena::alloc fails when no space left") {
     char buffer[1] = {0};
     cz::Arena arena(buffer, 0);
     REQUIRE(arena.alloc(1) == NULL);
 }
 
-TEST_CASE("Arena alloc succeeds when exactly enough space left") {
+TEST_CASE("Arena::alloc succeeds when exactly enough space left") {
     char buffer[8] = {0};
     cz::Arena arena(buffer, 8);
     REQUIRE(arena.alloc(8) == buffer);
@@ -23,6 +23,15 @@ TEST_CASE("Arena allocates at an offset") {
     REQUIRE(arena.alloc(2) == buffer + 6);
 }
 
+TEST_CASE("Arena::alloc succeeds after first failure") {
+    char buffer[8] = {0};
+    cz::Arena arena(buffer, 8);
+    REQUIRE(arena.alloc(2) == buffer);
+    REQUIRE(arena.alloc(4) == buffer + 2);
+    REQUIRE(arena.alloc(4) == NULL);
+    REQUIRE(arena.alloc(2) == buffer + 6);
+}
+
 struct TestRealloc {
     void* buffer;
     void* expected_old_ptr;
@@ -31,7 +40,10 @@ struct TestRealloc {
     bool called;
 };
 
-void* test_realloc(void* _data, void* old_ptr, size_t old_size, size_t new_size) {
+void* test_realloc(void* _data,
+                   void* old_ptr,
+                   size_t old_size,
+                   size_t new_size) {
     TestRealloc* data = static_cast<TestRealloc*>(_data);
     REQUIRE(data->expected_old_ptr == old_ptr);
     REQUIRE(data->expected_old_size == old_size);
@@ -42,10 +54,32 @@ void* test_realloc(void* _data, void* old_ptr, size_t old_size, size_t new_size)
 
 TEST_CASE("Arena::sized allocates memory") {
     char buffer[8];
-    auto test = TestRealloc{buffer, NULL, 0, 8, false};
+    TestRealloc test = {buffer, NULL, 0, 8, false};
     cz::allocator = {test_realloc, &test};
 
     auto arena = cz::Arena::sized(8);
+    REQUIRE(arena.alloc(8) == buffer);
 
     REQUIRE(test.called);
+}
+
+TEST_CASE("Arena::drop deallocates memory") {
+    char buffer[8];
+    cz::Arena arena(buffer, 8);
+    TestRealloc test = {NULL, buffer, 8, 0, false};
+    cz::allocator = {test_realloc, &test};
+
+    arena.drop();
+
+    REQUIRE(test.called);
+}
+
+TEST_CASE("Arena::allocator works") {
+    char buffer[8];
+    cz::Arena arena(buffer, 8);
+
+    auto allocator = arena.allocator();
+
+    REQUIRE(allocator.alloc(6) == buffer);
+    REQUIRE(allocator.alloc(4) == NULL);
 }
