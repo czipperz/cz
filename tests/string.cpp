@@ -4,16 +4,18 @@
 
 using cz::Str;
 
-TEST_CASE("Str::cstr run time"){
-    const char* cstr = "abc";
+TEST_CASE("Str::Str(const char*)"){
+    Str str("abc");
 
-    auto str = Str::from(cstr);
-
+    REQUIRE(str == "abc");
     REQUIRE(str.len == 3);
 }
 
-TEST_CASE("Str::cstr compile time") {
+TEST_CASE("Str::cstr") {
     auto str = Str::cstr("abc");
 
+    REQUIRE(str == "abc");
     REQUIRE(str.len == 3);
 }
+
+
