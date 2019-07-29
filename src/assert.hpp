@@ -12,5 +12,7 @@
 #define CZ_ASSERT(val) cz::assert_(CZ_SOURCE_LOCATION, CZ_STRINGIFY(val), (val))
 
 namespace cz {
+
 void assert_(SourceLocation, const char* expression_string, bool value);
+
 }

@@ -3,6 +3,7 @@
 #include <stddef.h>
 
 namespace cz {
+
 struct Sized {
     size_t size;
     size_t alignment;
@@ -13,4 +14,5 @@ const Sized* sized();
 
 template <>
 const Sized* sized<int>();
+
 }

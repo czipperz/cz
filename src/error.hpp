@@ -14,6 +14,7 @@
     } while (0)
 
 namespace cz {
+
 template <class T>
 inline bool is_ok(T&& t) {
     return !is_err(t);
@@ -26,4 +27,5 @@ inline bool is_err(int e) {
 inline bool is_err(void* v) {
     return v == 0;
 }
+
 }
