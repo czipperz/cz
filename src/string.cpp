@@ -8,10 +8,6 @@ namespace cz {
 
 Str::Str(const char* str) : buffer(str), len(strlen(str)) {}
 
-String::String() : _buffer(0), _len(0), _cap(0) {}
-String::String(char* buffer, size_t _len)
-    : _buffer(buffer), _len(_len), _cap(_len) {}
-
 static size_t max(size_t a, size_t b) {
     if (a > b) {
         return a;
@@ -37,26 +33,6 @@ void String::append(Str str) {
 
 void String::drop() {
     mem::dealloc(_buffer, _cap);
-}
-
-char* String::buffer() {
-    return _buffer;
-}
-const char* String::buffer() const {
-    return _buffer;
-}
-size_t String::len() const {
-    return _len;
-}
-size_t String::cap() const {
-    return _cap;
-}
-
-Str String::as_str() const {
-    return {_buffer, _len};
-}
-Buf String::as_buf() {
-    return {_buffer, _len};
 }
 
 bool Str::operator==(const Str& other) const {

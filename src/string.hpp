@@ -19,34 +19,28 @@ struct Str {
     bool operator!=(const Str& other) const { return !(*this == other); }
 };
 
-struct Buf {
-    char* buffer;
-    size_t len;
-};
-
 class String {
     char* _buffer;
     size_t _len;
     size_t _cap;
 
 public:
-    String();
-    String(char* buffer, size_t len);
+    constexpr String() : _buffer(NULL), _len(0), _cap(0) {}
+    constexpr String(char* buffer, size_t len) : _buffer(buffer), _len(len), _cap(len) {}
 
     void reserve(size_t extra);
     void append(Str str);
 
     void drop();
 
-    char* buffer();
-    const char* buffer() const;
-    size_t len() const;
-    size_t cap() const;
+    constexpr char* buffer() { return _buffer; }
+    constexpr const char* buffer() const { return _buffer; }
+    constexpr size_t len() const { return _len; }
+    constexpr size_t cap() const { return _cap; }
 
-    Str as_str() const;
-    Buf as_buf();
+    constexpr Str as_str() const { return {_buffer, _len}; }
 
-    operator Str() const { return as_str(); }
+    constexpr operator Str() const { return as_str(); }
 
     bool operator==(const Str& other) const { return this->as_str() == other; }
     bool operator!=(const Str& other) const { return this->as_str() != other; }
