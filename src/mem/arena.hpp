@@ -19,10 +19,6 @@ struct Arena {
     /// Allocate memory.  Returns null if there isn't enough space.
     void* alloc(size_t size);
 
-    /// Allocate memory of \c new_size.  Doesn't deallocate memory until \c drop
-    /// is called.
-    void* realloc(void* old_ptr, size_t old_size, size_t new_size);
-
     /// Free the memory controlled by this \c Arena.
     ///
     /// This calls \c dealloc.

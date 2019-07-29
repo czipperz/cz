@@ -38,25 +38,22 @@ void* Arena::alloc(size_t size) {
     }
 }
 
-void* Arena::realloc(void* old_ptr, size_t old_size, size_t new_size) {
-    if (new_size <= old_size) {
-        return old_ptr;
-    } else {
-        void* new_ptr = this->alloc(new_size);
-        memcpy(new_ptr, old_ptr, old_size);
-        return new_ptr;
-    }
-}
-
 void Arena::drop() {
     dealloc(start, end - start);
 }
 
-static void* arena_realloc(void* arena,
+static void* arena_realloc(void* _arena,
                            void* old_ptr,
                            size_t old_size,
                            size_t new_size) {
-    return static_cast<Arena*>(arena)->realloc(old_ptr, old_size, new_size);
+    auto arena = static_cast<Arena*>(_arena);
+    if (new_size <= old_size) {
+        return old_ptr;
+    } else {
+        void* new_ptr = arena->alloc(new_size);
+        memcpy(new_ptr, old_ptr, old_size);
+        return new_ptr;
+    }
 }
 
 Allocator Arena::allocator() {
