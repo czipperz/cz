@@ -25,21 +25,21 @@ class String {
     size_t _cap;
 
 public:
-    String() : _buffer(NULL), _len(0), _cap(0) {}
-    String(char* buffer, size_t len) : _buffer(buffer), _len(len), _cap(len) {}
-    String(char* buffer, size_t len, size_t cap) : _buffer(buffer), _len(len), _cap(cap) {}
+    String();
+    String(char* buffer, size_t len);
+    String(char* buffer, size_t len, size_t cap);
 
     void reserve(size_t extra);
     void append(Str str);
 
     void drop();
 
-    char* buffer() { return _buffer; }
-    const char* buffer() const { return _buffer; }
-    size_t len() const { return _len; }
-    size_t cap() const { return _cap; }
+    char* buffer();
+    const char* buffer() const;
+    size_t len() const;
+    size_t cap() const;
 
-    Str as_str() const { return {_buffer, _len}; }
+    Str as_str() const;
 
     operator Str() const { return as_str(); }
 

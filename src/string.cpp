@@ -8,6 +8,17 @@ namespace cz {
 
 Str::Str(const char* str) : buffer(str), len(strlen(str)) {}
 
+String::String() : _buffer(NULL), _len(0), _cap(0) {}
+String::String(char* buffer, size_t len) : _buffer(buffer), _len(len), _cap(len) {}
+String::String(char* buffer, size_t len, size_t cap) : _buffer(buffer), _len(len), _cap(cap) {}
+
+char* String::buffer() { return _buffer; }
+const char* String::buffer() const { return _buffer; }
+size_t String::len() const { return _len; }
+size_t String::cap() const { return _cap; }
+
+Str String::as_str() const { return {_buffer, _len}; }
+
 static size_t max(size_t a, size_t b) {
     if (a > b) {
         return a;
