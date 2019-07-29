@@ -1,10 +1,10 @@
 #pragma once
 
 #include <stddef.h>
+#include "allocator.hpp"
 
 namespace cz {
-
-struct Allocator;
+namespace mem {
 
 struct Arena {
     /// Allocate a chunck of memory and make an \c cz::Arena out of it.
@@ -37,4 +37,5 @@ private:
     char* end;
 };
 
+}
 }

@@ -3,21 +3,24 @@
 #include "../src/allocator.hpp"
 #include "../src/arena.hpp"
 
+using cz::mem::Arena;
+using cz::mem::global_allocator;
+
 TEST_CASE("Arena::alloc fails when no space left") {
     char buffer[1] = {0};
-    cz::Arena arena(buffer, 0);
+    Arena arena(buffer, 0);
     REQUIRE(arena.alloc(1) == NULL);
 }
 
 TEST_CASE("Arena::alloc succeeds when exactly enough space left") {
     char buffer[8] = {0};
-    cz::Arena arena(buffer, 8);
+    Arena arena(buffer, 8);
     REQUIRE(arena.alloc(8) == buffer);
 }
 
 TEST_CASE("Arena allocates at an offset") {
     char buffer[8] = {0};
-    cz::Arena arena(buffer, 8);
+    Arena arena(buffer, 8);
     REQUIRE(arena.alloc(2) == buffer);
     REQUIRE(arena.alloc(4) == buffer + 2);
     REQUIRE(arena.alloc(2) == buffer + 6);
@@ -25,7 +28,7 @@ TEST_CASE("Arena allocates at an offset") {
 
 TEST_CASE("Arena::alloc succeeds after first failure") {
     char buffer[8] = {0};
-    cz::Arena arena(buffer, 8);
+    Arena arena(buffer, 8);
     REQUIRE(arena.alloc(2) == buffer);
     REQUIRE(arena.alloc(4) == buffer + 2);
     REQUIRE(arena.alloc(4) == NULL);
@@ -55,9 +58,9 @@ void* test_realloc(void* _data,
 TEST_CASE("Arena::sized allocates memory") {
     char buffer[8];
     TestRealloc test = {buffer, NULL, 0, 8, false};
-    cz::allocator = {test_realloc, &test};
+    global_allocator = {test_realloc, &test};
 
-    auto arena = cz::Arena::sized(8);
+    auto arena = Arena::sized(8);
     REQUIRE(arena.alloc(8) == buffer);
 
     REQUIRE(test.called);
@@ -65,9 +68,9 @@ TEST_CASE("Arena::sized allocates memory") {
 
 TEST_CASE("Arena::drop deallocates memory") {
     char buffer[8];
-    cz::Arena arena(buffer, 8);
+    Arena arena(buffer, 8);
     TestRealloc test = {NULL, buffer, 8, 0, false};
-    cz::allocator = {test_realloc, &test};
+    global_allocator = {test_realloc, &test};
 
     arena.drop();
 
@@ -76,7 +79,7 @@ TEST_CASE("Arena::drop deallocates memory") {
 
 TEST_CASE("Arena::allocator works") {
     char buffer[8];
-    cz::Arena arena(buffer, 8);
+    Arena arena(buffer, 8);
 
     auto allocator = arena.allocator();
 

@@ -5,8 +5,10 @@
 #include "assert.hpp"
 
 namespace cz {
+namespace mem {
+
 Arena Arena::sized(size_t size) {
-    return Arena(cz::alloc(size), size);
+    return Arena(cz::mem::alloc(size), size);
 }
 
 Arena::Arena(void* _buffer, size_t size) {
@@ -61,5 +63,7 @@ Allocator Arena::allocator() {
         arena_realloc,
         this,
     };
+}
+
 }
 }
