@@ -46,7 +46,7 @@ void* test_realloc(void* _data,
                    void* old_ptr,
                    size_t old_size,
                    size_t new_size) {
-    TestRealloc* data = static_cast<TestRealloc*>(_data);
+    auto data = static_cast<TestRealloc*>(_data);
     REQUIRE(data->expected_old_ptr == old_ptr);
     REQUIRE(data->expected_old_size == old_size);
     REQUIRE(data->expected_new_size == new_size);

@@ -13,7 +13,7 @@ Arena Arena::sized(size_t size) {
 }
 
 Arena::Arena(void* _buffer, size_t size) {
-    char* buffer = static_cast<char*>(_buffer);
+    auto buffer = static_cast<char*>(_buffer);
     start = buffer;
     point = buffer;
     end = buffer + size;
