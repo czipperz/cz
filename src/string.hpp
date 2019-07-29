@@ -25,22 +25,23 @@ class String {
     size_t _cap;
 
 public:
-    constexpr String() : _buffer(NULL), _len(0), _cap(0) {}
-    constexpr String(char* buffer, size_t len) : _buffer(buffer), _len(len), _cap(len) {}
+    String() : _buffer(NULL), _len(0), _cap(0) {}
+    String(char* buffer, size_t len) : _buffer(buffer), _len(len), _cap(len) {}
+    String(char* buffer, size_t len, size_t cap) : _buffer(buffer), _len(len), _cap(cap) {}
 
     void reserve(size_t extra);
     void append(Str str);
 
     void drop();
 
-    constexpr char* buffer() { return _buffer; }
-    constexpr const char* buffer() const { return _buffer; }
-    constexpr size_t len() const { return _len; }
-    constexpr size_t cap() const { return _cap; }
+    char* buffer() { return _buffer; }
+    const char* buffer() const { return _buffer; }
+    size_t len() const { return _len; }
+    size_t cap() const { return _cap; }
 
-    constexpr Str as_str() const { return {_buffer, _len}; }
+    Str as_str() const { return {_buffer, _len}; }
 
-    constexpr operator Str() const { return as_str(); }
+    operator Str() const { return as_str(); }
 
     bool operator==(const Str& other) const { return this->as_str() == other; }
     bool operator!=(const Str& other) const { return this->as_str() != other; }
