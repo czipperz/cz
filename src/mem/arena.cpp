@@ -2,7 +2,8 @@
 
 #include <string.h>
 #include "allocator.hpp"
-#include "assert.hpp"
+#include "global_allocator.hpp"
+#include "../assert.hpp"
 
 namespace cz {
 namespace mem {

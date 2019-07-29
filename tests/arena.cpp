@@ -1,7 +1,6 @@
 #include "catch.hpp"
 
-#include "../src/allocator.hpp"
-#include "../src/arena.hpp"
+#include "../src/mem.hpp"
 
 using cz::mem::Arena;
 using cz::mem::global_allocator;
