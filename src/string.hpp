@@ -15,8 +15,8 @@ struct Str {
         return {str, len - 1};
     }
 
-    bool operator==(const char*) const;
-    friend bool operator==(const char*, const Str&);
+    bool operator==(const Str& other) const;
+    bool operator!=(const Str& other) const { return !(*this == other); }
 };
 
 struct Buf {
@@ -46,11 +46,10 @@ public:
     Str as_str() const;
     Buf as_buf();
 
-    bool operator==(const char*) const;
-    friend bool operator==(const char*, const String&);
+    operator Str() const { return as_str(); }
 
-    bool operator==(const Str&) const;
-    friend bool operator==(const Str&, const String&);
+    bool operator==(const Str& other) const { return this->as_str() == other; }
+    bool operator!=(const Str& other) const { return this->as_str() != other; }
 };
 
 }

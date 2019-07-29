@@ -59,25 +59,8 @@ Buf String::as_buf() {
     return {_buffer, _len};
 }
 
-bool Str::operator==(const char* str) const {
-    return strncmp(buffer, str, len) == 0;
-}
-bool operator==(const char* a, const Str& b) {
-    return b == a;
-}
-
-bool String::operator==(const char* str) const {
-    return strncmp(_buffer, str, len()) == 0;
-}
-bool operator==(const char* a, const String& b) {
-    return b == a;
-}
-
-bool String::operator==(const Str& str) const {
-    return strncmp(_buffer, str.buffer, len()) == 0;
-}
-bool operator==(const Str& a, const String& b) {
-    return b == a;
+bool Str::operator==(const Str& other) const {
+    return len == other.len && memcmp(buffer, other.buffer, len) == 0;
 }
 
 }
