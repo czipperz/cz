@@ -12,4 +12,9 @@ void assert_(SourceLocation loc, const char* expression_string, bool value) {
     }
 }
 
+void panic_(SourceLocation loc, const char* message) {
+    fprintf(stderr, "%s:%u: %s", loc.file, loc.line, message);
+    abort();
+}
+
 }
