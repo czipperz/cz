@@ -2,6 +2,7 @@
 
 #include "../src/defer.hpp"
 #include "../src/mem.hpp"
+#include "mock_allocator.hpp"
 
 using namespace cz::mem;
 
@@ -34,27 +35,10 @@ TEST_CASE("Arena::alloc succeeds after first failure") {
     REQUIRE(arena.alloc(2) == buffer + 6);
 }
 
-struct TestRealloc {
-    void* buffer;
-    void* expected_old_ptr;
-    size_t expected_old_size;
-    size_t expected_new_size;
-    bool called;
-};
-
-void* test_realloc(void* _data, void* old_ptr, size_t old_size, size_t new_size) {
-    auto data = static_cast<TestRealloc*>(_data);
-    REQUIRE(data->expected_old_ptr == old_ptr);
-    REQUIRE(data->expected_old_size == old_size);
-    REQUIRE(data->expected_new_size == new_size);
-    data->called = true;
-    return data->buffer;
-}
-
 TEST_CASE("Arena::sized allocates memory") {
     char buffer[8];
-    TestRealloc test = {buffer, NULL, 0, 8, false};
-    global_allocator = {test_realloc, &test};
+    test::MockAllocator test = {buffer, NULL, 0, 8};
+    global_allocator = test;
     CZ_DEFER(global_allocator = heap::allocator());
 
     auto arena = Arena::sized(8);
@@ -66,8 +50,8 @@ TEST_CASE("Arena::sized allocates memory") {
 TEST_CASE("Arena::drop deallocates memory") {
     char buffer[8];
     Arena arena(buffer, 8);
-    TestRealloc test = {NULL, buffer, 8, 0, false};
-    global_allocator = {test_realloc, &test};
+    test::MockAllocator test = {NULL, buffer, 8, 0};
+    global_allocator = test;
     CZ_DEFER(global_allocator = heap::allocator());
 
     arena.drop();
