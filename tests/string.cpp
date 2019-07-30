@@ -5,7 +5,13 @@
 using cz::Str;
 using cz::String;
 
-TEST_CASE("Str::Str(const char*)"){
+TEST_CASE("Str::Str() is empty") {
+    Str str;
+
+    REQUIRE(str == "");
+}
+
+TEST_CASE("Str::Str(const char*)") {
     Str str("abc");
 
     REQUIRE(str == "abc");
@@ -17,6 +23,28 @@ TEST_CASE("Str::cstr") {
 
     REQUIRE(str == "abc");
     REQUIRE(str.len == 3);
+}
+
+TEST_CASE("String::String() is empty") {
+    String string;
+
+    REQUIRE(string == "");
+}
+
+TEST_CASE("String::String(char*, size_t)") {
+    char buffer[4] = "abc";
+    String string(buffer, 2);
+
+    REQUIRE(string == "ab");
+    REQUIRE(string.cap() == 2);
+}
+
+TEST_CASE("String::String(char*, size_t, size_t)") {
+    char buffer[4] = "abc";
+    String string(buffer, 2, 4);
+
+    REQUIRE(string == "ab");
+    REQUIRE(string.cap() == 4);
 }
 
 TEST_CASE("String==Str same length") {
