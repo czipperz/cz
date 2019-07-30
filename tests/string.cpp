@@ -1,5 +1,6 @@
 #include "catch.hpp"
 
+#include "../src/defer.hpp"
 #include "../src/mem.hpp"
 #include "../src/string.hpp"
 #include "mock_allocator.hpp"
@@ -59,17 +60,17 @@ TEST_CASE("String::String(Str) clones") {
 
 TEST_CASE("String::append from empty string") {
     String string;
+    CZ_DEFER(string.drop());
     string.append("abc");
     REQUIRE(string == "abc");
-    string.drop();
 }
 
 TEST_CASE("String::append from non-empty string and reallocates") {
     String string;
+    CZ_DEFER(string.drop());
     string.append("abc");
     string.append("defghijklmnopqrstuvwxyz0123456789");
     REQUIRE(string == "abcdefghijklmnopqrstuvwxyz0123456789");
-    string.drop();
 }
 
 TEST_CASE("String::append no realloc") {
