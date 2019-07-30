@@ -1,6 +1,5 @@
 #include "catch.hpp"
 
-#include "../src/defer.hpp"
 #include "../src/mem.hpp"
 #include "mock_allocator.hpp"
 
@@ -38,25 +37,25 @@ TEST_CASE("Arena::alloc succeeds after first failure") {
 TEST_CASE("Arena::sized allocates memory") {
     char buffer[8];
     test::MockAllocator test = {buffer, NULL, 0, 8};
-    global_allocator = test;
-    CZ_DEFER(global_allocator = heap::allocator());
 
-    auto arena = Arena::sized(8);
-    REQUIRE(arena.alloc(8) == buffer);
+    with_global_allocator(test, [&]() {
+        auto arena = Arena::sized(8);
+        REQUIRE(arena.alloc(8) == buffer);
 
-    REQUIRE(test.called);
+        REQUIRE(test.called);
+    });
 }
 
 TEST_CASE("Arena::drop deallocates memory") {
     char buffer[8];
     Arena arena(buffer, 8);
     test::MockAllocator test = {NULL, buffer, 8, 0};
-    global_allocator = test;
-    CZ_DEFER(global_allocator = heap::allocator());
 
-    arena.drop();
+    with_global_allocator(test, [&]() {
+        arena.drop();
 
-    REQUIRE(test.called);
+        REQUIRE(test.called);
+    });
 }
 
 TEST_CASE("Arena::allocator works") {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../util.hpp"
+#include "../defer.hpp"
 #include "allocator.hpp"
 
 namespace cz {
@@ -16,6 +18,13 @@ void dealloc(void* ptr, size_t size);
 
 /// Reallocate memory allocated using the global allocator.
 void* realloc(void* old_ptr, size_t old_size, size_t new_size);
+
+template <class F>
+void with_global_allocator(Allocator allocator, F f) {
+    swap(global_allocator, allocator);
+    CZ_DEFER(global_allocator = allocator);
+    f();
+}
 
 }
 }
