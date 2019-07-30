@@ -47,8 +47,11 @@ static size_t max(size_t a, size_t b) {
 
 void String::reserve(size_t extra) {
     if (_cap - _len < extra) {
-        _buffer = static_cast<char*>(mem::realloc(_buffer, _cap, max(_cap + extra, _cap * 2)));
-        CZ_ASSERT(_buffer != NULL);
+        size_t new_cap = max(_cap + extra, _cap * 2);
+        auto new_buffer = static_cast<char*>(mem::realloc(_buffer, _cap, new_cap));
+        CZ_ASSERT(new_buffer != NULL);
+        _buffer = new_buffer;
+        _cap = new_cap;
     }
 }
 

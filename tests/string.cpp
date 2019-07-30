@@ -57,6 +57,42 @@ TEST_CASE("String::String(Str) clones") {
     with_global_allocator(test, [&]() { String string("abc"); });
 }
 
+TEST_CASE("String::append from empty string") {
+    String string;
+    string.append("abc");
+    REQUIRE(string == "abc");
+    string.drop();
+}
+
+TEST_CASE("String::append from non-empty string and reallocates") {
+    String string;
+    string.append("abc");
+    string.append("defghijklmnopqrstuvwxyz0123456789");
+    REQUIRE(string == "abcdefghijklmnopqrstuvwxyz0123456789");
+    string.drop();
+}
+
+TEST_CASE("String::append no realloc") {
+    char buffer[64];
+    test::MockAllocator test = {buffer, NULL, 0, 64};
+    with_global_allocator(test, [&]() {
+        String string;
+        string.reserve(64);
+        string.append("abc");
+        string.append("defghijklmnopqrstuvwxyz0123456789");
+        REQUIRE(string == "abcdefghijklmnopqrstuvwxyz0123456789");
+    });
+}
+
+TEST_CASE("String::reserve allocates") {
+    char buffer[64];
+    test::MockAllocator test = {buffer, NULL, 0, 64};
+    with_global_allocator(test, [&]() {
+        String string;
+        string.reserve(64);
+    });
+}
+
 TEST_CASE("String==Str same length") {
     char buffer[5] = "abcd";
     String string(buffer, 4);
