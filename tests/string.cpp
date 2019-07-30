@@ -1,9 +1,12 @@
 #include "catch.hpp"
 
+#include "../src/mem.hpp"
 #include "../src/string.hpp"
+#include "mock_allocator.hpp"
 
 using cz::Str;
 using cz::String;
+using namespace cz::mem;
 
 TEST_CASE("Str::Str() is empty") {
     Str str;
@@ -45,6 +48,13 @@ TEST_CASE("String::String(char*, size_t, size_t)") {
 
     REQUIRE(string == "ab");
     REQUIRE(string.cap() == 4);
+}
+
+TEST_CASE("String::String(Str) clones") {
+    char buffer[3];
+
+    test::MockAllocator test = {buffer, NULL, 0, 3};
+    with_global_allocator(test, [&]() { String string("abc"); });
 }
 
 TEST_CASE("String==Str same length") {

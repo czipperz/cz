@@ -31,6 +31,8 @@ public:
     String(char* buffer, size_t len);
     String(char* buffer, size_t len, size_t cap);
 
+    explicit String(Str str_to_copy);
+
     void reserve(size_t extra);
     void append(Str str);
 
