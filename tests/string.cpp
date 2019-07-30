@@ -101,6 +101,85 @@ TEST_CASE("String::reserve allocates") {
     });
 }
 
+TEST_CASE("String::insert empty string") {
+    String string;
+
+    string.insert(0, "");
+
+    CHECK(string.buffer() == NULL);
+    REQUIRE(string == "");
+}
+
+TEST_CASE("String::insert into empty string") {
+    String string;
+    CZ_DEFER(string.drop());
+
+    string.insert(0, "abc");
+
+    CHECK(string.buffer() != NULL);
+    CHECK(string.len() == 3);
+    CHECK(string.cap() >= 3);
+    REQUIRE(string == "abc");
+}
+
+TEST_CASE("String::insert beginning") {
+    char buffer[10] = "xyz";
+    String string(buffer, 3, 10);
+
+    string.insert(0, "abc");
+
+    CHECK(string.buffer() == buffer);
+    CHECK(string.len() == 6);
+    CHECK(string.cap() >= 6);
+    REQUIRE(string == "abcxyz");
+}
+
+TEST_CASE("String::insert middle") {
+    char buffer[10] = "xyz";
+    String string(buffer, 3, 10);
+
+    string.insert(1, "abc");
+
+    CHECK(string.buffer() == buffer);
+    CHECK(string.len() == 6);
+    CHECK(string.cap() >= 6);
+    REQUIRE(string == "xabcyz");
+}
+
+TEST_CASE("String::insert end") {
+    char buffer[10] = "xyz";
+    String string(buffer, 3, 10);
+
+    string.insert(3, "abc");
+
+    CHECK(string.buffer() == buffer);
+    CHECK(string.len() == 6);
+    CHECK(string.cap() >= 6);
+    REQUIRE(string == "xyzabc");
+}
+
+TEST_CASE("String::insert with resize") {
+    String string;
+
+    string.insert(0, "abc");
+
+    CZ_DEFER(string.drop());
+    CHECK(string.buffer() != NULL);
+    REQUIRE(string == "abc");
+}
+
+TEST_CASE("String::insert resize boundary") {
+    char buffer[10] = "xyz";
+    String string(buffer, 3, 6);
+
+    string.insert(3, "abc");
+
+    CHECK(string.buffer() == buffer);
+    CHECK(string.len() == 6);
+    CHECK(string.cap() == 6);
+    REQUIRE(string == "xyzabc");
+}
+
 TEST_CASE("String::clear sets len to 0 but doesn't drop") {
     char buffer[3] = "ab";
     String string(buffer, 2, 3);

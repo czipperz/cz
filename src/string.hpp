@@ -41,6 +41,8 @@ public:
     void reserve(size_t extra);
     /// Append the \c Str to the buffer.
     void append(Str str);
+    /// Insert the \c Str into the middle of the buffer.  Panics if \c index is greater than \c len.
+    void insert(size_t index, Str str);
 
     /// Set the \c len to \c 0.
     void clear();
