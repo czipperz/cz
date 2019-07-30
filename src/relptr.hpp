@@ -1,3 +1,5 @@
+#pragma once
+
 namespace cz {
 
 template <class T, class I>
