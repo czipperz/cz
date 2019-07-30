@@ -1,5 +1,6 @@
 #include "catch.hpp"
 
+#include "../src/assert.hpp"
 #include "../src/defer.hpp"
 #include "../src/mem.hpp"
 #include "../src/string.hpp"
@@ -98,6 +99,22 @@ TEST_CASE("String::reserve allocates") {
         REQUIRE(string == "");
         REQUIRE(test.called);
     });
+}
+
+TEST_CASE("String::clear sets len to 0 but doesn't drop") {
+    char buffer[3] = "ab";
+    String string(buffer, 2, 3);
+
+    Allocator allocator = {[](void*, void*, size_t, size_t) -> void* {
+                               CZ_PANIC("called allocator");
+                               return NULL;
+                           },
+                           NULL};
+    with_global_allocator(allocator, [&]() { string.clear(); });
+
+    CHECK(string.buffer() == buffer);
+    CHECK(string.len() == 0);
+    REQUIRE(string.cap() == 3);
 }
 
 TEST_CASE("String==Str same length") {

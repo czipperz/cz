@@ -62,6 +62,26 @@ void String::append(Str str) {
     CZ_DEBUG_ASSERT(_len <= _cap);
 }
 
+void String::clear() {
+    set_len(0);
+}
+
+void String::shrink_to(size_t new_len) {
+    if (new_len <= len()) {
+        set_len(new_len);
+    } else {
+        CZ_PANIC("String::shrink_to(): new_len > String::len()");
+    }
+}
+
+void String::set_len(size_t new_len) {
+    if (new_len <= cap()) {
+        _len = new_len;
+    } else {
+        CZ_PANIC("String::set_len(): new_len > String::cap()");
+    }
+}
+
 void String::drop() {
     mem::dealloc(_buffer, _cap);
 }
