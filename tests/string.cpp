@@ -56,6 +56,7 @@ TEST_CASE("String::String(Str) clones") {
 
     test::MockAllocator test = {buffer, NULL, 0, 3};
     with_global_allocator(test, [&]() { String string("abc"); });
+    REQUIRE(test.called);
 }
 
 TEST_CASE("String::append from empty string") {
@@ -81,7 +82,9 @@ TEST_CASE("String::append no realloc") {
         string.reserve(64);
         string.append("abc");
         string.append("defghijklmnopqrstuvwxyz0123456789");
+
         REQUIRE(string == "abcdefghijklmnopqrstuvwxyz0123456789");
+        REQUIRE(test.called);
     });
 }
 
@@ -91,6 +94,9 @@ TEST_CASE("String::reserve allocates") {
     with_global_allocator(test, [&]() {
         String string;
         string.reserve(64);
+
+        REQUIRE(string == "");
+        REQUIRE(test.called);
     });
 }
 
