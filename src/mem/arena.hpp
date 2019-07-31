@@ -16,9 +16,6 @@ struct Arena {
     /// Create an uninitialized Arena.
     Arena();
 
-    /// Allocate memory.  Returns null if there isn't enough space.
-    void* alloc(size_t size);
-
     /// Free the memory controlled by this \c Arena.
     ///
     /// This calls \c dealloc.
