@@ -70,6 +70,9 @@ public:
 
     bool operator==(const Str& other) const { return this->as_str() == other; }
     bool operator!=(const Str& other) const { return this->as_str() != other; }
+
+    char operator[](size_t i) const { return buffer()[i]; }
+    char& operator[](size_t i) { return buffer()[i]; }
 };
 
 }
