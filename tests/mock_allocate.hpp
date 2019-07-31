@@ -7,18 +7,18 @@ namespace cz {
 namespace mem {
 namespace test {
 
-struct MockAllocator {
+struct MockAllocate {
     void* buffer;
     MemSlice expected_old_mem;
     AllocInfo expected_new_info;
     bool called = false;
 
-    MockAllocator(void* buffer, MemSlice expected_old_mem, AllocInfo expected_new_info)
+    MockAllocate(void* buffer, MemSlice expected_old_mem, AllocInfo expected_new_info)
         : buffer(buffer),
           expected_old_mem(expected_old_mem),
           expected_new_info(expected_new_info) {}
 
-    operator Allocator();
+    Allocator allocator();
 };
 
 }

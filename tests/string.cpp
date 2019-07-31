@@ -4,7 +4,7 @@
 #include "../src/defer.hpp"
 #include "../src/mem.hpp"
 #include "../src/string.hpp"
-#include "mock_allocator.hpp"
+#include "mock_allocate.hpp"
 
 using namespace cz;
 using namespace cz::mem;
@@ -54,8 +54,8 @@ TEST_CASE("String::String(char*, size_t, size_t)") {
 TEST_CASE("String::String(Str) clones") {
     char buffer[3];
 
-    test::MockAllocator test = {buffer, {NULL, 0}, {3, 1}};
-    with_global_allocator(test, [&]() { String string("abc"); });
+    test::MockAllocate test = {buffer, {NULL, 0}, {3, 1}};
+    with_global_allocator(test.allocator(), [&]() { String string("abc"); });
     REQUIRE(test.called);
 }
 
@@ -76,28 +76,28 @@ TEST_CASE("String::append from non-empty string and reallocates") {
 
 TEST_CASE("String::append no realloc") {
     char buffer[64];
-    test::MockAllocator test = {buffer, {NULL, 0}, {64, 1}};
-    with_global_allocator(test, [&]() {
+    test::MockAllocate test = {buffer, {NULL, 0}, {64, 1}};
+    with_global_allocator(test.allocator(), [&]() {
         String string;
         string.reserve(64);
         string.append("abc");
         string.append("defghijklmnopqrstuvwxyz0123456789");
 
         REQUIRE(string == "abcdefghijklmnopqrstuvwxyz0123456789");
-        REQUIRE(test.called);
     });
+    REQUIRE(test.called);
 }
 
 TEST_CASE("String::reserve allocates") {
     char buffer[64];
-    test::MockAllocator test = {buffer, {NULL, 0}, {64, 1}};
-    with_global_allocator(test, [&]() {
+    test::MockAllocate test = {buffer, {NULL, 0}, {64, 1}};
+    with_global_allocator(test.allocator(), [&]() {
         String string;
         string.reserve(64);
 
         REQUIRE(string == "");
-        REQUIRE(test.called);
     });
+    REQUIRE(test.called);
 }
 
 TEST_CASE("String::insert empty string") {

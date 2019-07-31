@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
 #include "../src/mem.hpp"
-#include "mock_allocator.hpp"
+#include "mock_allocate.hpp"
 
 using namespace cz::mem;
 
@@ -37,13 +37,13 @@ TEST_CASE("Arena::alloc succeeds after first failure") {
 TEST_CASE("Arena::drop deallocates memory") {
     char buffer[8];
     Arena arena({buffer, 8});
-    test::MockAllocator test = {NULL, {buffer, 8}, {0, 0}};
+    test::MockAllocate test = {NULL, {buffer, 8}, {0, 0}};
 
-    with_global_allocator(test, [&]() {
+    with_global_allocator(test.allocator(), [&]() {
         arena.drop();
-
-        REQUIRE(test.called);
     });
+
+    REQUIRE(test.called);
 }
 
 TEST_CASE("Arena::allocator works") {
