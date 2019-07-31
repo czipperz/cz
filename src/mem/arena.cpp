@@ -1,5 +1,6 @@
 #include "arena.hpp"
 
+#include <memory>
 #include <string.h>
 #include "allocator.hpp"
 #include "global_allocator.hpp"
@@ -23,11 +24,11 @@ Arena::Arena() {
 #endif
 }
 
-void* Arena::alloc(size_t size) {
-    CZ_DEBUG_ASSERT(start != NULL);
-    if (point + size <= end) {
-        void* result = point;
-        point += size;
+static void* alloc(Arena* arena, AllocInfo info) {
+    CZ_DEBUG_ASSERT(arena->start != NULL);
+    if (arena->point + info.size <= arena->end) {
+        void* result = arena->point;
+        arena->point += info.size;
         return result;
     } else {
         return NULL;
@@ -35,18 +36,23 @@ void* Arena::alloc(size_t size) {
 }
 
 void Arena::drop() {
-    dealloc(start, end - start);
+    global_allocator.dealloc(start, end - start);
+}
+
+static void* advance_ptr_to_alignment(void* old_ptr, size_t old_size, AllocInfo info) {
+    return std::align(info.alignment, info.size, old_ptr, old_size);
 }
 
 static void* arena_realloc(void* _arena,
                            void* old_ptr,
                            size_t old_size,
-                           size_t new_size) {
+                           AllocInfo info) {
     auto arena = static_cast<Arena*>(_arena);
-    if (new_size <= old_size) {
+    void* new_ptr = advance_ptr_to_alignment(old_ptr, old_size, info);
+    if (info.size <= old_size) {
         return old_ptr;
     } else {
-        void* new_ptr = arena->alloc(new_size);
+        new_ptr = alloc(arena, info);
         memcpy(new_ptr, old_ptr, old_size);
         return new_ptr;
     }
