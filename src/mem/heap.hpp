@@ -10,7 +10,7 @@ namespace heap {
 Allocator allocator();
 
 /// Allocate memory.  The data parameter is ignored.
-void* allocate(void* data, void* old_ptr, size_t old_size, size_t new_size);
+void* allocate(void* _data, void* old_ptr, size_t old_size, AllocInfo new_info);
 
 }
 }

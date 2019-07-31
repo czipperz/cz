@@ -11,7 +11,7 @@ struct MockAllocator {
     void* buffer;
     void* expected_old_ptr;
     size_t expected_old_size;
-    size_t expected_new_size;
+    AllocInfo expected_new_info;
     bool called = false;
 
     operator Allocator();

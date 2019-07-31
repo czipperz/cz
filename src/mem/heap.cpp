@@ -10,11 +10,12 @@ Allocator allocator() {
     return {allocate, NULL};
 }
 
-void* allocate(void*, void* old_ptr, size_t old_size, size_t new_size) {
+void* allocate(void*, void* old_ptr, size_t old_size, AllocInfo info) {
+    // TODO make alignment work
     if (old_size == 0) {
-        return malloc(new_size);
+        return malloc(info.size);
     } else {
-        return ::realloc(old_ptr, new_size);
+        return ::realloc(old_ptr, info.size);
     }
 }
 
