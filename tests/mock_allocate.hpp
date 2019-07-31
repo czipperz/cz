@@ -13,13 +13,21 @@ struct MockAllocate {
     AllocInfo expected_new_info;
     bool called = false;
 
-    MockAllocate(void* buffer, MemSlice expected_old_mem, AllocInfo expected_new_info)
-        : buffer(buffer),
-          expected_old_mem(expected_old_mem),
-          expected_new_info(expected_new_info) {}
-
     Allocator allocator();
+
+private:
+    MockAllocate(void* buffer, MemSlice expected_old_mem, AllocInfo expected_new_info);
+
+    friend MockAllocate mock_alloc(void* buffer, AllocInfo expected_new_info);
+    friend MockAllocate mock_dealloc(MemSlice expected_old_mem);
+    friend MockAllocate mock_realloc(void* buffer,
+                                     AllocInfo expected_new_info,
+                                     MemSlice expected_old_mem);
 };
+
+MockAllocate mock_alloc(void* buffer, AllocInfo expected_new_info);
+MockAllocate mock_dealloc(MemSlice expected_old_mem);
+MockAllocate mock_realloc(void* buffer, AllocInfo expected_new_info, MemSlice expected_old_mem);
 
 }
 }
