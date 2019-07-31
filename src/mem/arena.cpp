@@ -8,10 +8,6 @@
 namespace cz {
 namespace mem {
 
-Arena Arena::sized(size_t size) {
-    return Arena(cz::mem::alloc(size), size);
-}
-
 Arena::Arena(void* _buffer, size_t size) {
     auto buffer = static_cast<char*>(_buffer);
     start = buffer;
