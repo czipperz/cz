@@ -10,7 +10,19 @@ static Result string_writer_write_str(void* _string, Str str) {
 }
 
 Writer string_writer(String* string) {
-    return {string_writer_write_str, string};
+    return {{string_writer_write_str}, string};
+}
+
+Result Writer::write_char(char c) {
+    return write_str({&c, 1});
+}
+
+Result Writer::write_str(Str str) {
+    return write.write_str(data, str);
+}
+
+Result write(Writer writer, Str str) {
+    return writer.write_str(str);
 }
 
 }

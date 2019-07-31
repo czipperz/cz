@@ -34,6 +34,7 @@ struct Writer {
     Write write;
     void* data;
 
+    Result write_char(char c);
     Result write_str(Str str);
 };
 
@@ -47,7 +48,6 @@ String format(const char* format, Ts... ts) {
     return string;
 }
 
-Result write(Writer writer, const char*);
 Result write(Writer writer, Str);
 
 }
