@@ -7,9 +7,7 @@ struct RelPtr {
     I offset;
 
     constexpr T* get() const {
-        auto self = reinterpret_cast<const char*>(this);
-        auto elem = self + offset;
-        return const_cast<T*>(reinterpret_cast<const T*>(elem));
+        return const_cast<T*>(reinterpret_cast<const T*>(reinterpret_cast<const char*>(this) + offset));
     }
 
     constexpr T* operator->() const {
