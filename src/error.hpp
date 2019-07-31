@@ -1,12 +1,12 @@
 #pragma once
 
-#define err(err)                 \
-    do {                         \
-        auto error_##__LINE__ = err; \
-        err_var(error_##__LINE__);   \
+#define CZ_TRY(err)                    \
+    do {                               \
+        auto error_##__LINE__ = (err); \
+        CZ_TRY_VAR(error_##__LINE__);  \
     } while (0)
 
-#define err_var(error)           \
+#define CZ_TRY_VAR(error)        \
     do {                         \
         if (cz::is_err(error)) { \
             return error;        \
