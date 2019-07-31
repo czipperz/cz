@@ -8,4 +8,6 @@ struct Slice {
     size_t len;
 };
 
+using MemSlice = Slice<void>;
+
 }
