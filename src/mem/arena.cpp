@@ -9,26 +9,11 @@
 namespace cz {
 namespace mem {
 
-Arena::Arena(void* _buffer, size_t size) {
-    auto buffer = static_cast<char*>(_buffer);
-    start = buffer;
-    point = buffer;
-    end = buffer + size;
-}
-
-Arena::Arena() {
-#ifndef NDEBUG
-    start = NULL;
-    point = NULL;
-    end = NULL;
-#endif
-}
-
 static void* alloc(Arena* arena, AllocInfo info) {
-    CZ_DEBUG_ASSERT(arena->start != NULL);
-    if (arena->point + info.size <= arena->end) {
-        void* result = arena->point;
-        arena->point += info.size;
+    CZ_DEBUG_ASSERT(arena->mem.buffer != NULL);
+    if (arena->offset + info.size <= arena->mem.len) {
+        void* result = static_cast<char*>(arena->mem.buffer) + arena->offset;
+        arena->offset += info.size;
         return result;
     } else {
         return NULL;
@@ -36,7 +21,7 @@ static void* alloc(Arena* arena, AllocInfo info) {
 }
 
 void Arena::drop() {
-    global_allocator.dealloc({start, static_cast<size_t>(end - start)});
+    global_allocator.dealloc(mem);
 }
 
 static void* advance_ptr_to_alignment(MemSlice old_mem, AllocInfo new_info) {

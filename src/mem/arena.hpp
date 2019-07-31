@@ -7,11 +7,11 @@ namespace cz {
 namespace mem {
 
 struct Arena {
-    /// Make an \c cz::Arena from the buffer and of the given size.
-    Arena(void* buffer, size_t size);
+    MemSlice mem;
+    size_t offset = 0;
 
-    /// Create an uninitialized Arena.
-    Arena();
+    Arena() = default;
+    constexpr explicit Arena(MemSlice mem) : mem(mem) {}
 
     /// Free the memory controlled by this \c Arena.
     ///
@@ -20,10 +20,6 @@ struct Arena {
 
     /// Create an \c cz::Allocator allocating memory in the \c Arena.
     Allocator allocator();
-
-    char* start;
-    char* point;
-    char* end;
 };
 
 }
