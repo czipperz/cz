@@ -60,6 +60,16 @@ Result write(Writer writer, unsigned long);
 Result write(Writer writer, long long);
 Result write(Writer writer, unsigned long long);
 
+struct Address {
+    void* val;
+};
+
+inline Address addr(void* val) {
+    return {val};
+}
+
+Result write(Writer writer, Address addr);
+
 }
 
 inline bool is_err(format::Result r) {

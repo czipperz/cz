@@ -1,4 +1,6 @@
 #include "format.hpp"
+
+#include <stdint.h>
 #include "error.hpp"
 
 namespace cz {
@@ -66,7 +68,29 @@ define_write_unsigned_numeric(short)
 define_write_unsigned_numeric(int)
 define_write_unsigned_numeric(long)
 define_write_unsigned_numeric(long long)
-// clang-format on
+
+Result write(Writer writer, Address addr) {
+    // clang-format on
+    if (addr.val == NULL) {
+        return write(writer, "NULL");
+    }
+
+    CZ_TRY(write(writer, '0'));
+    CZ_TRY(write(writer, 'x'));
+
+    auto v = (intptr_t)addr.val;
+    char buffer[32];
+    size_t index;
+    for (index = 0; v != 0; ++index) {
+        buffer[index] = '0' + v % 16;
+        v /= 16;
+    }
+    while (index > 0) {
+        --index;
+        CZ_TRY(write(writer, buffer[index]));
+    }
+    return Result::Ok;
+}
 
 }
 }

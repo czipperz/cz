@@ -64,3 +64,27 @@ TEST_CASE("write(int = 9)") {
     REQUIRE(string == "9");
     REQUIRE(result == Result::Ok);
 }
+
+TEST_CASE("write(Address(NULL))") {
+    String string;
+    CZ_DEFER(string.drop());
+
+    Writer writer = string_writer(&string);
+    Result result = write(writer, addr(NULL));
+
+    REQUIRE(string == "NULL");
+    REQUIRE(result == Result::Ok);
+}
+
+TEST_CASE("write(Address(arbitrary) starts with 0x)") {
+    String string;
+    CZ_DEFER(string.drop());
+
+    Writer writer = string_writer(&string);
+    Result result = write(writer, addr(&string));
+
+    REQUIRE(string[0] == '0');
+    REQUIRE(string[1] == 'x');
+    REQUIRE(string.len() > 2);
+    REQUIRE(result == Result::Ok);
+}
