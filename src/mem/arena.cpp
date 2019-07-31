@@ -36,25 +36,25 @@ static void* alloc(Arena* arena, AllocInfo info) {
 }
 
 void Arena::drop() {
-    global_allocator.dealloc(start, end - start);
+    global_allocator.dealloc({start, static_cast<size_t>(end - start)});
 }
 
-static void* advance_ptr_to_alignment(void* old_ptr, size_t old_size, AllocInfo info) {
+static void* advance_ptr_to_alignment(MemSlice old_mem, AllocInfo new_info) {
     // std::align uses references to modify the old variables inplace so is
     // difficult to correctly inline.  This returns true if there is enough room
     // after aligning.
-    return std::align(info.alignment, info.size, old_ptr, old_size);
+    return std::align(new_info.alignment, new_info.size, old_mem.buffer, old_mem.len);
 }
 
-static void* arena_realloc(void* _arena, void* old_ptr, size_t old_size, AllocInfo info) {
+static void* arena_realloc(void* _arena, MemSlice old_mem, AllocInfo new_info) {
     auto arena = static_cast<Arena*>(_arena);
-    auto new_ptr = advance_ptr_to_alignment(old_ptr, old_size, info);
+    auto new_ptr = advance_ptr_to_alignment(old_mem, new_info);
     if (new_ptr) {
         return new_ptr;
     }
 
-    new_ptr = alloc(arena, info);
-    memcpy(new_ptr, old_ptr, old_size);
+    new_ptr = alloc(arena, new_info);
+    memcpy(new_ptr, old_mem.buffer, old_mem.len);
     return new_ptr;
 }
 

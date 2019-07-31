@@ -6,8 +6,7 @@
 #include "../src/string.hpp"
 #include "mock_allocator.hpp"
 
-using cz::Str;
-using cz::String;
+using namespace cz;
 using namespace cz::mem;
 
 TEST_CASE("Str::Str() is empty") {
@@ -55,7 +54,7 @@ TEST_CASE("String::String(char*, size_t, size_t)") {
 TEST_CASE("String::String(Str) clones") {
     char buffer[3];
 
-    test::MockAllocator test = {buffer, NULL, 0, {3, 1}};
+    test::MockAllocator test = {buffer, {NULL, 0}, {3, 1}};
     with_global_allocator(test, [&]() { String string("abc"); });
     REQUIRE(test.called);
 }
@@ -77,7 +76,7 @@ TEST_CASE("String::append from non-empty string and reallocates") {
 
 TEST_CASE("String::append no realloc") {
     char buffer[64];
-    test::MockAllocator test = {buffer, NULL, 0, {64, 1}};
+    test::MockAllocator test = {buffer, {NULL, 0}, {64, 1}};
     with_global_allocator(test, [&]() {
         String string;
         string.reserve(64);
@@ -91,7 +90,7 @@ TEST_CASE("String::append no realloc") {
 
 TEST_CASE("String::reserve allocates") {
     char buffer[64];
-    test::MockAllocator test = {buffer, NULL, 0, {64, 1}};
+    test::MockAllocator test = {buffer, {NULL, 0}, {64, 1}};
     with_global_allocator(test, [&]() {
         String string;
         string.reserve(64);
@@ -184,7 +183,7 @@ TEST_CASE("String::clear sets len to 0 but doesn't drop") {
     char buffer[3] = "ab";
     String string(buffer, 2, 3);
 
-    Allocator allocator = {[](void*, void*, size_t, AllocInfo) -> void* {
+    Allocator allocator = {[](void*, MemSlice, AllocInfo) -> void* {
                                CZ_PANIC("called allocator");
                                return NULL;
                            },

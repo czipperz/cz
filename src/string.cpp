@@ -49,7 +49,7 @@ void String::reserve(size_t extra) {
     if (_cap - _len < extra) {
         size_t new_cap = max(_cap + extra, _cap * 2);
         auto new_buffer = static_cast<char*>(
-            mem::global_allocator.realloc(_buffer, _cap, {new_cap, alignof(char)}));
+            mem::global_allocator.realloc({_buffer, _cap}, {new_cap, alignof(char)}));
         CZ_ASSERT(new_buffer != NULL);
         _buffer = new_buffer;
         _cap = new_cap;
@@ -93,7 +93,7 @@ void String::set_len(size_t new_len) {
 }
 
 void String::drop() {
-    mem::global_allocator.dealloc(_buffer, _cap);
+    mem::global_allocator.dealloc({_buffer, _cap});
 }
 
 bool Str::operator==(const Str& other) const {

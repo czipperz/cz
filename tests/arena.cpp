@@ -37,7 +37,7 @@ TEST_CASE("Arena::alloc succeeds after first failure") {
 TEST_CASE("Arena::drop deallocates memory") {
     char buffer[8];
     Arena arena(buffer, 8);
-    test::MockAllocator test = {NULL, buffer, 8, {0, 0}};
+    test::MockAllocator test = {NULL, {buffer, 8}, {0, 0}};
 
     with_global_allocator(test, [&]() {
         arena.drop();

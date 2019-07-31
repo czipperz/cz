@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+#include "../slice.hpp"
 #include "alloc_info.hpp"
 
 namespace cz {
@@ -8,9 +9,11 @@ namespace mem {
 
 /// Allocate, deallocate, or reallocate memory.
 ///
-/// If \c old_size is \c 0 it can be assumed the pointer is \c NULL.
-/// If \c new_size is \c 0 the user is trying to deallocate memory.
-typedef void* (*Allocate)(void* data, void* old_ptr, size_t old_size, AllocInfo new_info);
+/// If \c old_mem.size is \c 0 it can be assumed that \c old_mem.buffer is \c NULL.
+///
+/// If \c old_mem.buffer is \c NULL the user is trying to allocate memory.
+/// If \c new_info.size is \c 0 the user is trying to deallocate memory.
+typedef void* (*Allocate)(void* data, MemSlice old_mem, AllocInfo new_info);
 
 /// A memory allocator.
 struct Allocator {
@@ -27,10 +30,10 @@ struct Allocator {
     }
 
     /// Deallocate memory allocated using this allocator.
-    void dealloc(void* ptr, size_t size);
+    void dealloc(MemSlice mem);
 
     /// Reallocate memory allocated using this allocator.
-    void* realloc(void* old_ptr, size_t old_size, AllocInfo new_info);
+    void* realloc(MemSlice old_mem, AllocInfo new_info);
 
     /// Reallocate memory alloceted using this allocator to store a value of the
     /// given type.

@@ -9,18 +9,13 @@ namespace test {
 
 struct MockAllocator {
     void* buffer;
-    void* expected_old_ptr;
-    size_t expected_old_size;
+    MemSlice expected_old_mem;
     AllocInfo expected_new_info;
     bool called = false;
 
-    MockAllocator(void* buffer,
-                  void* expected_old_ptr,
-                  size_t expected_old_size,
-                  AllocInfo expected_new_info)
+    MockAllocator(void* buffer, MemSlice expected_old_mem, AllocInfo expected_new_info)
         : buffer(buffer),
-          expected_old_ptr(expected_old_ptr),
-          expected_old_size(expected_old_size),
+          expected_old_mem(expected_old_mem),
           expected_new_info(expected_new_info) {}
 
     operator Allocator();
