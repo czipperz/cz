@@ -1,10 +1,10 @@
 #include "arena.hpp"
 
-#include <memory>
 #include <string.h>
+#include <memory>
+#include "../assert.hpp"
 #include "allocator.hpp"
 #include "global_allocator.hpp"
-#include "../assert.hpp"
 
 namespace cz {
 namespace mem {
@@ -40,22 +40,22 @@ void Arena::drop() {
 }
 
 static void* advance_ptr_to_alignment(void* old_ptr, size_t old_size, AllocInfo info) {
+    // std::align uses references to modify the old variables inplace so is
+    // difficult to correctly inline.  This returns true if there is enough room
+    // after aligning.
     return std::align(info.alignment, info.size, old_ptr, old_size);
 }
 
-static void* arena_realloc(void* _arena,
-                           void* old_ptr,
-                           size_t old_size,
-                           AllocInfo info) {
+static void* arena_realloc(void* _arena, void* old_ptr, size_t old_size, AllocInfo info) {
     auto arena = static_cast<Arena*>(_arena);
-    void* new_ptr = advance_ptr_to_alignment(old_ptr, old_size, info);
-    if (info.size <= old_size) {
-        return old_ptr;
-    } else {
-        new_ptr = alloc(arena, info);
-        memcpy(new_ptr, old_ptr, old_size);
+    auto new_ptr = advance_ptr_to_alignment(old_ptr, old_size, info);
+    if (new_ptr) {
         return new_ptr;
     }
+
+    new_ptr = alloc(arena, info);
+    memcpy(new_ptr, old_ptr, old_size);
+    return new_ptr;
 }
 
 Allocator Arena::allocator() {
