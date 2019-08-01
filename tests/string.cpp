@@ -216,6 +216,15 @@ TEST_CASE("Str==Str different lengths") {
     REQUIRE(y != x);
 }
 
+TEST_CASE("Str==Str same different addresses") {
+    char buffer1[5] = "abcd", buffer2[5] = "abcd";
+    Str x(buffer1, 4);
+    Str y(buffer2, 4);
+
+    REQUIRE(x == y);
+    REQUIRE(y == x);
+}
+
 TEST_CASE("Str==Str completely different") {
     Str x = "abc";
     Str y = "def";
