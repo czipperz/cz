@@ -1,7 +1,7 @@
 #include "write.hpp"
 
 #include <stdint.h>
-#include "../error.hpp"
+#include "../try.hpp"
 
 namespace cz {
 namespace io {
