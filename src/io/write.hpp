@@ -1,14 +1,12 @@
 #pragma once
 
-#include "error.hpp"
+#include "../error.hpp"
+#include "../slice.hpp"
+#include "../string.hpp"
 #include "result.hpp"
-#include "slice.hpp"
-#include "string.hpp"
 
 namespace cz {
-namespace format {
-
-using Result = cz::io::Result;
+namespace io {
 
 struct Write {
     Result (*write_str)(void* data, Str str);

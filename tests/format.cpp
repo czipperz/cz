@@ -1,10 +1,10 @@
 #include "catch.hpp"
 
 #include "../src/defer.hpp"
-#include "../src/format.hpp"
+#include "../src/io/write.hpp"
 
 using namespace cz;
-using namespace cz::format;
+using namespace cz::io;
 
 TEST_CASE("concat works") {
     auto string = concat(123, " + ", 456);

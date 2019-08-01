@@ -1,10 +1,10 @@
-#include "format.hpp"
+#include "write.hpp"
 
 #include <stdint.h>
-#include "error.hpp"
+#include "../error.hpp"
 
 namespace cz {
-namespace format {
+namespace io {
 
 static Result string_writer_write_str(void* _string, Str str) {
     auto string = static_cast<String*>(_string);
