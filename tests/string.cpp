@@ -198,31 +198,30 @@ TEST_CASE("String::clear sets len to 0 but doesn't drop") {
     REQUIRE(string.cap() == 3);
 }
 
-TEST_CASE("String==Str same length") {
+TEST_CASE("Str==Str same length") {
     char buffer[5] = "abcd";
-    String string(buffer, 4);
+    Str string(buffer, 4);
     Str str(buffer, 4);
 
     REQUIRE(string == str);
     REQUIRE(str == string);
 }
 
-TEST_CASE("String==Str shorter string") {
+TEST_CASE("Str==Str different lengths") {
     char buffer[5] = "abcd";
-    String string(buffer, 3);
-    Str str(buffer, 4);
+    Str x(buffer, 4);
+    Str y(buffer, 3);
 
-    REQUIRE(string != str);
-    REQUIRE(str != string);
+    REQUIRE(x != y);
+    REQUIRE(y != x);
 }
 
-TEST_CASE("String==Str longer string") {
-    char buffer[5] = "abcd";
-    String string(buffer, 4);
-    Str str(buffer, 3);
+TEST_CASE("Str==Str completely different") {
+    Str x = "abc";
+    Str y = "def";
 
-    REQUIRE(string != str);
-    REQUIRE(str != string);
+    REQUIRE(x != y);
+    REQUIRE(y != x);
 }
 
 TEST_CASE("Str<Str same") {
