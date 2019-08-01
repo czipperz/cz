@@ -76,7 +76,8 @@ Result write(Writer writer, Debug<T> debug) {
 }
 
 template <class T>
-Result write(Writer writer, Debug<Slice<T>> slice) {
+Result write(Writer writer, Debug<Slice<T>> debug_slice) {
+    auto slice = debug_slice.val;
     CZ_TRY(write(writer, '['));
 
     for (size_t i = 0; i < slice.len; ++i) {
