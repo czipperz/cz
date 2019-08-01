@@ -1,6 +1,7 @@
 #pragma once
 
 namespace cz {
+namespace io {
 
 enum Result {
     Ok = 0,
@@ -23,8 +24,10 @@ enum Result {
     ErrorOther,
 };
 
-inline bool is_err(Result r) {
-    return r != Ok;
+}
+
+inline bool is_err(io::Result r) {
+    return r != io::Ok;
 }
 
 }

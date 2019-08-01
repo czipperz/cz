@@ -6,6 +6,8 @@
 namespace cz {
 namespace format {
 
+using Result = cz::io::Result;
+
 struct Write {
     Result (*write_str)(void* data, Str str);
 };

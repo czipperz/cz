@@ -3,7 +3,7 @@
 #include "../src/defer.hpp"
 #include "../src/format.hpp"
 
-using cz::String;
+using namespace cz;
 using namespace cz::format;
 
 TEST_CASE("write str") {
