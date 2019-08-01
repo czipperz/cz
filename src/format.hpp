@@ -1,30 +1,10 @@
 #pragma once
 
 #include "string.hpp"
+#include "result.hpp"
 
 namespace cz {
 namespace format {
-
-enum class Result {
-    Ok = 0,
-    NotFound,
-    PermissionDenied,
-    ConnectionRefused,
-    ConnectionReset,
-    ConnectionAborted,
-    NotConnected,
-    AddrInUse,
-    AddrNotAvailable,
-    BrokenPipe,
-    AlreadyExists,
-    WouldBlock,
-    InvalidData,
-    TimedOut,
-    WriteZero,
-    Interrupted,
-    UnexpectedEof,
-    Other,
-};
 
 struct Write {
     Result (*write_str)(void* data, Str str);
