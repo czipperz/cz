@@ -1,9 +1,11 @@
 #pragma once
 
-#define CZ_TRY(err)                    \
-    do {                               \
-        auto error_##__LINE__ = (err); \
-        CZ_TRY_VAR(error_##__LINE__);  \
+#include "token_concat.hpp"
+
+#define CZ_TRY(err)                                     \
+    do {                                                \
+        auto CZ_TOKEN_CONCAT(error_, __LINE__) = (err); \
+        CZ_TRY_VAR(CZ_TOKEN_CONCAT(error_, __LINE__));  \
     } while (0)
 
 #define CZ_TRY_VAR(error)        \

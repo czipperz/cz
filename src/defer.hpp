@@ -2,9 +2,10 @@
 
 #include <utility>
 #include <functional>
+#include "token_concat.hpp"
 
 #define CZ_DEFER(code) CZ_DEFER_FUNCTION([&]() { code; })
-#define CZ_DEFER_FUNCTION(function) cz::Deferer defer_##__LINE__(function);
+#define CZ_DEFER_FUNCTION(function) cz::Deferer CZ_TOKEN_CONCAT(defer_, __LINE__)(function);
 
 namespace cz {
 
