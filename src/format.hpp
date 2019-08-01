@@ -1,7 +1,9 @@
 #pragma once
 
-#include "string.hpp"
+#include "error.hpp"
 #include "result.hpp"
+#include "slice.hpp"
+#include "string.hpp"
 
 namespace cz {
 namespace format {
@@ -51,6 +53,36 @@ inline Address addr(void* val) {
 }
 
 Result write(Writer writer, Address addr);
+
+template <class T>
+struct Debug {
+    T val;
+};
+
+template <class T>
+inline Debug<T> debug(T val) {
+    return {val};
+}
+
+template <class T>
+Result write(Writer writer, Debug<T> debug) {
+    return write(writer, debug.val);
+}
+
+template <class T>
+Result write(Writer writer, Debug<Slice<T>> slice) {
+    CZ_TRY(write(writer, '['));
+
+    for (size_t i = 0; i < slice.len; ++i) {
+        if (i != 0) {
+            CZ_TRY(write(writer, ", "));
+        }
+
+        CZ_TRY(write(writer, debug(slice.buffer[i])));
+    }
+
+    return write(writer, ']');
+}
 
 }
 }
