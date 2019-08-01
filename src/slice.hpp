@@ -15,6 +15,16 @@ struct Slice {
     constexpr T& operator[](size_t index) const { return buffer[index]; }
 };
 
+template <class T, size_t len>
+constexpr Slice<T> slice(T (&arr)[len]) {
+    return {arr, len};
+}
+
+template <class T>
+constexpr Slice<T> slice(T* buffer, size_t len) {
+    return {buffer, len};
+}
+
 /// A slice of memory with an unspecified type.
 ///
 /// Since \c void* cannot be indexed to because the type of the data cannot be
