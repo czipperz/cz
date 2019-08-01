@@ -12,7 +12,7 @@ struct Slice {
     T* buffer;
     size_t len;
 
-    T& operator[](size_t index) const { return buffer[index]; }
+    constexpr T& operator[](size_t index) const { return buffer[index]; }
 };
 
 /// A slice of memory with an unspecified type.
