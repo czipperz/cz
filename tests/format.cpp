@@ -23,6 +23,17 @@ TEST_CASE("write multiple arguments works") {
     REQUIRE(string == "123 + 456");
 }
 
+TEST_CASE("write multiple arguments with debug") {
+    String string;
+    CZ_DEFER(string.drop());
+
+    Writer writer = string_writer(&string);
+    int elems[3] = {10, 30, 40};
+    write(writer, "  ", debug(slice(elems)));
+
+    REQUIRE(string == "  [10, 30, 40]");
+}
+
 TEST_CASE("write str") {
     String string;
     CZ_DEFER(string.drop());
