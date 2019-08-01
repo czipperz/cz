@@ -24,12 +24,18 @@ struct Writer {
 
 Writer string_writer(String* string);
 
-template <class... Ts>
-String format(const char* format, Ts... ts) {
+template <class T1, class... Ts>
+String concat(T1 t1, Ts... ts) {
     String string;
     auto writer = string_writer(&string);
-    write(writer, format, ts...);
+    write(writer, t1, ts...);
     return string;
+}
+
+template <class T1, class T2, class... Ts>
+Result write(Writer writer, T1 t1, T2 t2, Ts... ts) {
+    CZ_TRY(write(writer, t1));
+    return write(writer, t2, ts...);
 }
 
 Result write(Writer writer, char);

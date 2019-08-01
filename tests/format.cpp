@@ -6,6 +6,23 @@
 using namespace cz;
 using namespace cz::format;
 
+TEST_CASE("concat works") {
+    auto string = concat(123, " + ", 456);
+    CZ_DEFER(string.drop());
+
+    REQUIRE(string == "123 + 456");
+}
+
+TEST_CASE("write multiple arguments works") {
+    String string;
+    CZ_DEFER(string.drop());
+
+    Writer writer = string_writer(&string);
+    write(writer, 123, " + ", 456);
+
+    REQUIRE(string == "123 + 456");
+}
+
 TEST_CASE("write str") {
     String string;
     CZ_DEFER(string.drop());
