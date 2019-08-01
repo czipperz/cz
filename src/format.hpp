@@ -53,9 +53,4 @@ inline Address addr(void* val) {
 Result write(Writer writer, Address addr);
 
 }
-
-inline bool is_err(format::Result r) {
-    return r != format::Result::Ok;
-}
-
 }
