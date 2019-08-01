@@ -182,6 +182,15 @@ TEST_CASE("String::insert resize boundary") {
     REQUIRE(string == "xyzabc");
 }
 
+TEST_CASE("String::insert into long string") {
+    char buffer[128] = "once upoa time in a land far far away";
+    String string(buffer, strlen(buffer), 128);
+
+    string.insert(8, "n ");
+
+    CHECK(string == "once upon a time in a land far far away");
+}
+
 TEST_CASE("String::clear sets len to 0 but doesn't drop") {
     char buffer[3] = "ab";
     String string(buffer, 2, 3);

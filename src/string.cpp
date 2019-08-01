@@ -64,7 +64,7 @@ void String::append(Str str) {
 void String::insert(size_t index, Str str) {
     CZ_ASSERT(index <= _len);
     reserve(str.len);
-    memmove(_buffer + index + str.len, _buffer + index, str.len);
+    memmove(_buffer + index + str.len, _buffer + index, len());
     memcpy(_buffer + index, str.buffer, str.len);
     _len += str.len;
     CZ_DEBUG_ASSERT(_len <= _cap);
