@@ -1,7 +1,7 @@
-#include "catch.hpp"
+#include "../catch.hpp"
 
-#include "../src/defer.hpp"
-#include "../src/io/write.hpp"
+#include "../../src/defer.hpp"
+#include "../../src/io/write.hpp"
 
 using namespace cz;
 using namespace cz::io;

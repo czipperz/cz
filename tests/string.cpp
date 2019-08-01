@@ -4,7 +4,7 @@
 #include "../src/defer.hpp"
 #include "../src/mem.hpp"
 #include "../src/string.hpp"
-#include "mock_allocate.hpp"
+#include "mem/mock_allocate.hpp"
 
 using namespace cz;
 using namespace cz::mem;

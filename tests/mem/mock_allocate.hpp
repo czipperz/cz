@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stddef.h>
-#include "../src/mem/allocator.hpp"
+#include "../../src/mem/allocator.hpp"
 
 namespace cz {
 namespace mem {

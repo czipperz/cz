@@ -1,6 +1,6 @@
-#include "catch.hpp"
+#include "../catch.hpp"
 
-#include "../src/mem.hpp"
+#include "../../src/mem.hpp"
 #include "mock_allocate.hpp"
 
 using namespace cz::mem;
