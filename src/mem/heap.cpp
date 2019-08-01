@@ -12,7 +12,7 @@ Allocator allocator() {
 
 void* allocate(void*, MemSlice old_mem, AllocInfo new_info) {
     // TODO make alignment work
-    if (old_mem.len == 0) {
+    if (old_mem.size == 0) {
         return malloc(new_info.size);
     } else {
         return ::realloc(old_mem.buffer, new_info.size);

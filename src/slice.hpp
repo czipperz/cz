@@ -18,11 +18,11 @@ struct Slice {
 /// A slice of memory with an unspecified type.
 ///
 /// Since \c void* cannot be indexed to because the type of the data cannot be
-/// statically determined, \c MemSlice doesn't support as much functionality as
-/// \c Slice.
+/// statically determined, \c MemSlice doesn't support indexing as \c Slice
+/// does.
 struct MemSlice {
     void* buffer;
-    size_t len;
+    size_t size;
 };
 
 }

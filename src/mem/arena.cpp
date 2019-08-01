@@ -11,7 +11,7 @@ namespace mem {
 
 static void* alloc(Arena* arena, AllocInfo info) {
     CZ_DEBUG_ASSERT(arena->mem.buffer != NULL);
-    if (arena->offset + info.size <= arena->mem.len) {
+    if (arena->offset + info.size <= arena->mem.size) {
         void* result = static_cast<char*>(arena->mem.buffer) + arena->offset;
         arena->offset += info.size;
         return result;
@@ -28,7 +28,7 @@ static void* advance_ptr_to_alignment(MemSlice old_mem, AllocInfo new_info) {
     // std::align uses references to modify the old variables inplace so is
     // difficult to correctly inline.  This returns true if there is enough room
     // after aligning.
-    return std::align(new_info.alignment, new_info.size, old_mem.buffer, old_mem.len);
+    return std::align(new_info.alignment, new_info.size, old_mem.buffer, old_mem.size);
 }
 
 static void* arena_realloc(void* _arena, MemSlice old_mem, AllocInfo new_info) {
@@ -39,7 +39,7 @@ static void* arena_realloc(void* _arena, MemSlice old_mem, AllocInfo new_info) {
     }
 
     new_ptr = alloc(arena, new_info);
-    memcpy(new_ptr, old_mem.buffer, old_mem.len);
+    memcpy(new_ptr, old_mem.buffer, old_mem.size);
     return new_ptr;
 }
 
