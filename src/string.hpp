@@ -1,23 +1,24 @@
 #pragma once
 
 #include <stddef.h>
+#include <string.h>
+#include "slice.hpp"
 
 namespace cz {
 
-struct Str {
-    const char* buffer;
-    size_t len;
-
-    constexpr Str() : buffer(NULL), len(0) {}
-    Str(const char* cstr);
-    constexpr Str(const char* buffer, size_t len) : buffer(buffer), len(len) {}
+struct Str : public Slice<const char> {
+    constexpr Str() : Slice({NULL, 0}) {}
+    Str(const char* cstr) : Slice({cstr, strlen(cstr)}) {}
+    constexpr Str(const char* buffer, size_t len) : Slice({buffer, len}) {}
 
     template <size_t len>
     static constexpr Str cstr(const char (&str)[len]) {
         return {str, len - 1};
     }
 
-    bool operator==(const Str& other) const;
+    bool operator==(const Str& other) const {
+        return len == other.len && memcmp(buffer, other.buffer, len) == 0;
+    }
     bool operator!=(const Str& other) const { return !(*this == other); }
 };
 

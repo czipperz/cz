@@ -6,8 +6,6 @@
 
 namespace cz {
 
-Str::Str(const char* str) : buffer(str), len(strlen(str)) {}
-
 String::String() : _buffer(NULL), _len(0), _cap(0) {}
 String::String(char* buffer, size_t len) : _buffer(buffer), _len(len), _cap(len) {}
 String::String(char* buffer, size_t len, size_t cap) : _buffer(buffer), _len(len), _cap(cap) {}
@@ -94,10 +92,6 @@ void String::set_len(size_t new_len) {
 
 void String::drop() {
     mem::global_allocator.dealloc({_buffer, _cap});
-}
-
-bool Str::operator==(const Str& other) const {
-    return len == other.len && memcmp(buffer, other.buffer, len) == 0;
 }
 
 }
