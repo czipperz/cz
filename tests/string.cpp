@@ -224,3 +224,35 @@ TEST_CASE("String==Str longer string") {
     REQUIRE(string != str);
     REQUIRE(str != string);
 }
+
+TEST_CASE("Str<Str same") {
+    REQUIRE_FALSE(Str("abc") < "abc");
+}
+
+TEST_CASE("Str<Str empty left") {
+    REQUIRE(Str("") < "abc");
+}
+
+TEST_CASE("Str<Str empty right") {
+    REQUIRE_FALSE(Str("abc") < "");
+}
+
+TEST_CASE("Str<Str lesser left") {
+    REQUIRE(Str("abc") < "b");
+}
+
+TEST_CASE("Str<Str lesser right") {
+    REQUIRE_FALSE(Str("b") < "abc");
+}
+
+TEST_CASE("Str<Str substring on left") {
+    REQUIRE(Str("ab") < "abc");
+}
+
+TEST_CASE("Str<Str substring on right") {
+    REQUIRE_FALSE(Str("abc") < "ab");
+}
+
+TEST_CASE("Str<Str both empty") {
+    REQUIRE_FALSE(Str("") < "");
+}

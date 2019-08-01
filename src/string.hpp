@@ -20,6 +20,17 @@ struct Str : public Slice<const char> {
         return len == other.len && memcmp(buffer, other.buffer, len) == 0;
     }
     bool operator!=(const Str& other) const { return !(*this == other); }
+
+    bool operator<(const Str& other) const {
+        auto x = memcmp(buffer, other.buffer, len < other.len ? len : other.len);
+        if (x == 0) {
+            return len < other.len;
+        }
+        return x < 0;
+    }
+    bool operator>(const Str& other) const { return other < *this; }
+    bool operator<=(const Str& other) const { return !(other < *this); }
+    bool operator>=(const Str& other) const { return !(*this < other); }
 };
 
 class String {
