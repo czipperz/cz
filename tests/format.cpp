@@ -52,9 +52,7 @@ TEST_CASE("write char") {
     CZ_DEFER(string.drop());
 
     Writer writer = string_writer(&string);
-    Result result;
-    SECTION("use Writer::write_char") { result = writer.write_char('a'); }
-    SECTION("use write(char)") { result = write(writer, 'a'); }
+    Result result = write(writer, 'a');
 
     REQUIRE(string == "a");
     REQUIRE(result == Result::Ok);

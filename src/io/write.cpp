@@ -16,22 +16,6 @@ Writer string_writer(String* string) {
     return {{string_writer_write_str}, string};
 }
 
-Result Writer::write_char(char c) {
-    return write_str({&c, 1});
-}
-
-Result Writer::write_str(Str str) {
-    return write.write_str(data, str);
-}
-
-Result write(Writer writer, char c) {
-    return writer.write_char(c);
-}
-
-Result write(Writer writer, Str str) {
-    return writer.write_str(str);
-}
-
 #define define_write_signed_numeric(type)       \
     Result write(Writer writer, type v) {       \
         if (v < 0) {                            \

@@ -16,8 +16,7 @@ struct Writer {
     Write write;
     void* data;
 
-    Result write_char(char c);
-    Result write_str(Str str);
+    Result write_str(Str str) { return write.write_str(data, str); }
 };
 
 Writer string_writer(String* string);
@@ -36,8 +35,12 @@ Result write(Writer writer, T1 t1, T2 t2, Ts... ts) {
     return write(writer, t2, ts...);
 }
 
-Result write(Writer writer, char);
-Result write(Writer writer, Str);
+inline Result write(Writer writer, char c) {
+    return writer.write_str({&c, 1});
+}
+inline Result write(Writer writer, Str str) {
+    return writer.write_str(str);
+}
 
 Result write(Writer writer, short);
 Result write(Writer writer, unsigned short);
