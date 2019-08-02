@@ -1,8 +1,9 @@
 #pragma once
 
-#include "../try.hpp"
+#include <stdio.h>
 #include "../slice.hpp"
 #include "../string.hpp"
+#include "../try.hpp"
 #include "result.hpp"
 
 namespace cz {
@@ -19,6 +20,7 @@ struct Writer {
     Result write_str(Str str) { return write.write_str(data, str); }
 };
 
+Writer file_writer(FILE* file);
 Writer string_writer(String* string);
 
 template <class T1, class... Ts>

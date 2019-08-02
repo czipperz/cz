@@ -16,6 +16,21 @@ Writer string_writer(String* string) {
     return {{string_writer_write_str}, string};
 }
 
+static Result file_writer_write_str(void* _file, Str str) {
+    auto file = static_cast<FILE*>(_file);
+    auto ret = fwrite(str.buffer, sizeof(char), str.len, file);
+
+    if (ret == str.len) {
+        return Result::ok();
+    } else {
+        return Result::from_errno();
+    }
+}
+
+Writer file_writer(FILE* file) {
+    return {{file_writer_write_str}, file};
+}
+
 #define define_write_signed_numeric(type)       \
     Result write(Writer writer, type v) {       \
         if (v < 0) {                            \
