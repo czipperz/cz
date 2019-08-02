@@ -9,7 +9,7 @@ namespace io {
 static Result string_writer_write_str(void* _string, Str str) {
     auto string = static_cast<String*>(_string);
     string->append(str);
-    return Result::Ok;
+    return Result::ok();
 }
 
 Writer string_writer(String* string) {
@@ -39,7 +39,7 @@ Writer string_writer(String* string) {
             --index;                               \
             CZ_TRY(write(writer, buffer[index]));  \
         }                                          \
-        return Result::Ok;                         \
+        return Result::ok();                       \
     }
 
 // clang-format off
@@ -73,7 +73,7 @@ Result write(Writer writer, Address addr) {
         --index;
         CZ_TRY(write(writer, buffer[index]));
     }
-    return Result::Ok;
+    return Result::ok();
 }
 
 }

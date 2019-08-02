@@ -44,7 +44,7 @@ TEST_CASE("write str") {
     SECTION("use Writer::write_str") { result = write(writer, "abc"); }
 
     REQUIRE(string == "abc");
-    REQUIRE(result == Result::Ok);
+    REQUIRE(result.is_ok());
 }
 
 TEST_CASE("write char") {
@@ -55,7 +55,7 @@ TEST_CASE("write char") {
     Result result = write(writer, 'a');
 
     REQUIRE(string == "a");
-    REQUIRE(result == Result::Ok);
+    REQUIRE(result.is_ok());
 }
 
 TEST_CASE("write(int = 123)") {
@@ -66,7 +66,7 @@ TEST_CASE("write(int = 123)") {
     Result result = write(writer, 123);
 
     REQUIRE(string == "123");
-    REQUIRE(result == Result::Ok);
+    REQUIRE(result.is_ok());
 }
 
 TEST_CASE("write(int = 0)") {
@@ -77,7 +77,7 @@ TEST_CASE("write(int = 0)") {
     Result result = write(writer, 0);
 
     REQUIRE(string == "0");
-    REQUIRE(result == Result::Ok);
+    REQUIRE(result.is_ok());
 }
 
 TEST_CASE("write(int = 9)") {
@@ -88,7 +88,7 @@ TEST_CASE("write(int = 9)") {
     Result result = write(writer, 9);
 
     REQUIRE(string == "9");
-    REQUIRE(result == Result::Ok);
+    REQUIRE(result.is_ok());
 }
 
 TEST_CASE("write(Address(NULL))") {
@@ -99,7 +99,7 @@ TEST_CASE("write(Address(NULL))") {
     Result result = write(writer, addr(NULL));
 
     REQUIRE(string == "NULL");
-    REQUIRE(result == Result::Ok);
+    REQUIRE(result.is_ok());
 }
 
 TEST_CASE("write(Address(arbitrary) starts with 0x)") {
@@ -112,5 +112,5 @@ TEST_CASE("write(Address(arbitrary) starts with 0x)") {
     REQUIRE(string[0] == '0');
     REQUIRE(string[1] == 'x');
     REQUIRE(string.len() > 2);
-    REQUIRE(result == Result::Ok);
+    REQUIRE(result.is_ok());
 }
