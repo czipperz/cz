@@ -31,13 +31,13 @@ Writer file_writer(FILE* file) {
     return {{file_writer_write_str}, file};
 }
 
-#define define_write_signed_numeric(type)       \
-    Result write(Writer writer, type v) {       \
-        if (v < 0) {                            \
-            CZ_TRY(write(writer, '-'));         \
-            v = -v;                             \
-        }                                       \
-        return write(writer, (unsigned type)v); \
+#define define_write_signed_numeric(type)                    \
+    Result write(Writer writer, type v) {                    \
+        if (v < 0) {                                         \
+            CZ_TRY(write(writer, '-'));                      \
+            v = -v;                                          \
+        }                                                    \
+        return write(writer, static_cast<unsigned type>(v)); \
     }
 
 #define define_write_unsigned_numeric(type)                              \
