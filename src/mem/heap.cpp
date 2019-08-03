@@ -10,7 +10,7 @@ Allocator allocator() {
     return {allocate, NULL};
 }
 
-void* allocate(void*, MemSlice old_mem, AllocInfo new_info) {
+void* allocate(C*, void*, MemSlice old_mem, AllocInfo new_info) {
     // TODO make alignment work
     if (old_mem.size == 0) {
         return malloc(new_info.size);

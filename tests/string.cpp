@@ -9,6 +9,14 @@
 using namespace cz;
 using namespace cz::mem;
 
+Allocator panic_allocator() {
+    return {[](C* c, void*, MemSlice, AllocInfo) -> void* {
+                CZ_PANIC(c, "Allocator cannot be called in this context");
+                return NULL;
+            },
+            NULL};
+}
+
 TEST_CASE("Str::Str() is empty") {
     Str str;
 
@@ -53,49 +61,59 @@ TEST_CASE("String::String(char*, size_t, size_t)") {
 
 TEST_CASE("String::String(Str) clones") {
     char buffer[3];
-
     auto mock = test::mock_alloc(buffer, 3);
-    with_global_allocator(mock.allocator(), [&]() { String string("abc"); });
+    C c = {mock.allocator()};
+
+    String string(&c, "abc");
+
     REQUIRE(mock.called);
 }
 
 TEST_CASE("String::append from empty string") {
+    mem::StackArena<32> arena;
+    C c = {arena.allocator()};
+
     String string;
-    CZ_DEFER(string.drop());
-    string.append("abc");
+    string.append(&c, "abc");
+
     REQUIRE(string == "abc");
 }
 
 TEST_CASE("String::append from non-empty string and reallocates") {
+    mem::StackArena<64> arena;
+    C c = {arena.allocator()};
+
     String string;
-    CZ_DEFER(string.drop());
-    string.append("abc");
-    string.append("defghijklmnopqrstuvwxyz0123456789");
+    string.append(&c, "abc");
+    string.append(&c, "defghijklmnopqrstuvwxyz0123456789");
+
     REQUIRE(string == "abcdefghijklmnopqrstuvwxyz0123456789");
 }
 
 TEST_CASE("String::append no realloc") {
     char buffer[64];
     auto mock = test::mock_alloc(buffer, 64);
-    with_global_allocator(mock.allocator(), [&]() {
-        String string;
-        string.reserve(64);
-        string.append("abc");
-        string.append("defghijklmnopqrstuvwxyz0123456789");
+    C c = {mock.allocator()};
 
-        REQUIRE(string == "abcdefghijklmnopqrstuvwxyz0123456789");
-    });
-    REQUIRE(mock.called);
+    String string;
+    string.reserve(&c, 64);
+    mock.called = false;
+
+    string.append(&c, "abc");
+    REQUIRE(!mock.called);
+    string.append(&c, "defghijklmnopqrstuvwxyz0123456789");
+    REQUIRE(!mock.called);
+
+    REQUIRE(string == "abcdefghijklmnopqrstuvwxyz0123456789");
 }
 
 TEST_CASE("String::reserve allocates") {
     char buffer[64];
     auto mock = test::mock_alloc(buffer, 64);
+    C c = {mock.allocator()};
     String string;
 
-    with_global_allocator(mock.allocator(), [&]() {
-        string.reserve(64);
-    });
+    string.reserve(&c, 64);
 
     CHECK(string.buffer() == buffer);
     CHECK(string.len() == 0);
@@ -104,19 +122,22 @@ TEST_CASE("String::reserve allocates") {
 }
 
 TEST_CASE("String::insert empty string") {
+    auto mock = test::mock_alloc(NULL, 0);
+    C c = {mock.allocator()};
     String string;
 
-    string.insert(0, "");
+    string.insert(&c, 0, "");
 
     CHECK(string.buffer() == NULL);
     REQUIRE(string == "");
 }
 
 TEST_CASE("String::insert into empty string") {
+    mem::StackArena<32> arena;
+    C c = {arena.allocator()};
     String string;
-    CZ_DEFER(string.drop());
 
-    string.insert(0, "abc");
+    string.insert(&c, 0, "abc");
 
     CHECK(string.buffer() != NULL);
     CHECK(string.len() == 3);
@@ -128,7 +149,7 @@ TEST_CASE("String::insert beginning") {
     char buffer[10] = "xyz";
     String string(buffer, 3, 10);
 
-    string.insert(0, "abc");
+    string.insert(NULL, 0, "abc");
 
     CHECK(string.buffer() == buffer);
     CHECK(string.len() == 6);
@@ -140,7 +161,7 @@ TEST_CASE("String::insert middle") {
     char buffer[10] = "xyz";
     String string(buffer, 3, 10);
 
-    string.insert(1, "abc");
+    string.insert(NULL, 1, "abc");
 
     CHECK(string.buffer() == buffer);
     CHECK(string.len() == 6);
@@ -152,7 +173,7 @@ TEST_CASE("String::insert end") {
     char buffer[10] = "xyz";
     String string(buffer, 3, 10);
 
-    string.insert(3, "abc");
+    string.insert(NULL, 3, "abc");
 
     CHECK(string.buffer() == buffer);
     CHECK(string.len() == 6);
@@ -161,12 +182,13 @@ TEST_CASE("String::insert end") {
 }
 
 TEST_CASE("String::insert with resize") {
+    StackArena<8> arena;
+    C c = {arena.allocator()};
     String string;
 
-    string.insert(0, "abc");
+    string.insert(&c, 0, "abc");
 
-    CZ_DEFER(string.drop());
-    CHECK(string.buffer() != NULL);
+    CHECK(string.buffer() == arena.mem.buffer);
     REQUIRE(string == "abc");
 }
 
@@ -174,7 +196,7 @@ TEST_CASE("String::insert resize boundary") {
     char buffer[10] = "xyz";
     String string(buffer, 3, 6);
 
-    string.insert(3, "abc");
+    string.insert(NULL, 3, "abc");
 
     CHECK(string.buffer() == buffer);
     CHECK(string.len() == 6);
@@ -186,7 +208,7 @@ TEST_CASE("String::insert into long string") {
     char buffer[128] = "once upoa time in a land far far away";
     String string(buffer, strlen(buffer), 128);
 
-    string.insert(8, "n ");
+    string.insert(NULL, 8, "n ");
 
     CHECK(string == "once upon a time in a land far far away");
 }
@@ -195,12 +217,7 @@ TEST_CASE("String::clear sets len to 0 but doesn't drop") {
     char buffer[3] = "ab";
     String string(buffer, 2, 3);
 
-    Allocator allocator = {[](void*, MemSlice, AllocInfo) -> void* {
-                               CZ_PANIC("called allocator");
-                               return NULL;
-                           },
-                           NULL};
-    with_global_allocator(allocator, [&]() { string.clear(); });
+    string.clear();
 
     CHECK(string.buffer() == buffer);
     CHECK(string.len() == 0);

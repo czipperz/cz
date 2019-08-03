@@ -10,11 +10,11 @@ String::String() : _buffer(NULL), _len(0), _cap(0) {}
 String::String(char* buffer, size_t len) : _buffer(buffer), _len(len), _cap(len) {}
 String::String(char* buffer, size_t len, size_t cap) : _buffer(buffer), _len(len), _cap(cap) {}
 
-String::String(Str str_to_clone)
-    : _buffer(static_cast<char*>(mem::global_allocator.alloc(str_to_clone.len))),
+String::String(C* c, Str str_to_clone)
+    : _buffer(static_cast<char*>(c->alloc(str_to_clone.len))),
       _len(str_to_clone.len),
       _cap(str_to_clone.len) {
-    CZ_ASSERT(_buffer);
+    CZ_ASSERT(c, _buffer);
     memcpy(_buffer, str_to_clone.buffer, str_to_clone.len);
 }
 
@@ -43,55 +43,54 @@ static size_t max(size_t a, size_t b) {
     }
 }
 
-void String::reserve(size_t extra) {
+void String::reserve(C* c, size_t extra) {
     if (_cap - _len < extra) {
         size_t new_cap = max(_cap + extra, _cap * 2);
-        auto new_buffer = static_cast<char*>(
-            mem::global_allocator.realloc({_buffer, _cap}, new_cap));
-        CZ_ASSERT(new_buffer != NULL);
+        auto new_buffer = static_cast<char*>(c->realloc({_buffer, _cap}, new_cap));
+        CZ_ASSERT(c, new_buffer != NULL);
         _buffer = new_buffer;
         _cap = new_cap;
     }
 }
 
-void String::append(Str str) {
-    reserve(str.len);
+void String::append(C* c, Str str) {
+    reserve(c, str.len);
     memcpy(_buffer + _len, str.buffer, str.len);
     _len += str.len;
-    CZ_DEBUG_ASSERT(_len <= _cap);
+    CZ_DEBUG_ASSERT(c, _len <= _cap);
 }
 
-void String::insert(size_t index, Str str) {
-    CZ_ASSERT(index <= _len);
-    reserve(str.len);
+void String::insert(C* c, size_t index, Str str) {
+    CZ_ASSERT(c, index <= _len);
+    reserve(c, str.len);
     memmove(_buffer + index + str.len, _buffer + index, len());
     memcpy(_buffer + index, str.buffer, str.len);
     _len += str.len;
-    CZ_DEBUG_ASSERT(_len <= _cap);
+    CZ_DEBUG_ASSERT(c, _len <= _cap);
 }
 
 void String::clear() {
-    set_len(0);
+    set_len(NULL, 0);
 }
 
-void String::shrink_to(size_t new_len) {
+void String::shrink_to(C* c, size_t new_len) {
     if (new_len <= len()) {
-        set_len(new_len);
+        set_len(c, new_len);
     } else {
-        CZ_PANIC("String::shrink_to(): new_len > String::len()");
+        CZ_PANIC(c, "String::shrink_to(): new_len > String::len()");
     }
 }
 
-void String::set_len(size_t new_len) {
+void String::set_len(C* c, size_t new_len) {
     if (new_len <= cap()) {
         _len = new_len;
     } else {
-        CZ_PANIC("String::set_len(): new_len > String::cap()");
+        CZ_PANIC(c, "String::set_len(): new_len > String::cap()");
     }
 }
 
-void String::drop() {
-    mem::global_allocator.dealloc({_buffer, _cap});
+void String::drop(C* c) {
+    c->dealloc({_buffer, _cap});
 }
 
 }

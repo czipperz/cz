@@ -1,6 +1,7 @@
 #pragma once
 
 #include <errno.h>
+#include "../context.hpp"
 #include "../string.hpp"
 
 namespace cz {
@@ -13,10 +14,9 @@ struct Result {
     bool is_err() { return message.buffer != 0; }
 
     constexpr static Result ok() { return {}; }
-    constexpr static Result err(Str message) { return {message}; }
 
-    static Result from_errno() { return from_errno(errno); }
-    static Result from_errno(int e);
+    static Result from_errno(C* c) { return from_errno(c, errno); }
+    static Result from_errno(C* c, int e);
 };
 
 }

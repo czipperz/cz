@@ -19,13 +19,13 @@ enum LogLevel {
 }
 using LogLevel_::LogLevel;
 
-using Log = void (*)(void* data, LogLevel level, Str str);
+using Log = void (*)(C* c, void* data, LogLevel level, Str str);
 
 struct Logger {
     Log impl;
     void* data;
 
-    void log(LogLevel level, Str str) { return impl(data, level, str); }
+    void log(C* c, LogLevel level, Str str) { return impl(c, data, level, str); }
 };
 
 extern Logger global_logger;

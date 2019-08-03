@@ -9,7 +9,7 @@ namespace test {
 MockAllocate::MockAllocate(void* buffer, MemSlice expected_old_mem, AllocInfo expected_new_info)
     : buffer(buffer), expected_old_mem(expected_old_mem), expected_new_info(expected_new_info) {}
 
-static void* test_realloc(void* _data, MemSlice old_mem, AllocInfo new_info) {
+static void* test_realloc(C*, void* _data, MemSlice old_mem, AllocInfo new_info) {
     auto data = static_cast<MockAllocate*>(_data);
     CHECK(data->expected_old_mem.buffer == old_mem.buffer);
     CHECK(data->expected_old_mem.size == old_mem.size);

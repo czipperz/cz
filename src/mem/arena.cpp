@@ -4,14 +4,9 @@
 #include <memory>
 #include "../assert.hpp"
 #include "allocator.hpp"
-#include "global_allocator.hpp"
 
 namespace cz {
 namespace mem {
-
-void Arena::drop() {
-    global_allocator.dealloc(mem);
-}
 
 static void* advance_ptr_to_alignment(MemSlice old_mem, AllocInfo new_info) {
     // std::align uses references to modify the old variables inplace so is
@@ -20,8 +15,8 @@ static void* advance_ptr_to_alignment(MemSlice old_mem, AllocInfo new_info) {
     return std::align(new_info.alignment, new_info.size, old_mem.buffer, old_mem.size);
 }
 
-static void* alloc(Arena* arena, AllocInfo info) {
-    CZ_DEBUG_ASSERT(arena->mem.buffer != NULL);
+static void* alloc(C* c, Arena* arena, AllocInfo info) {
+    CZ_DEBUG_ASSERT(c, arena->mem.buffer != NULL);
     void* result = advance_ptr_to_alignment(
         {(char*)arena->mem.buffer + arena->offset, arena->mem.size - arena->offset}, info);
     if (result) {
@@ -30,7 +25,7 @@ static void* alloc(Arena* arena, AllocInfo info) {
     return result;
 }
 
-static void* arena_realloc(void* _arena, MemSlice old_mem, AllocInfo new_info) {
+static void* arena_realloc(C* c, void* _arena, MemSlice old_mem, AllocInfo new_info) {
     auto arena = static_cast<Arena*>(_arena);
 
     // In place if most recent
@@ -59,10 +54,10 @@ static void* arena_realloc(void* _arena, MemSlice old_mem, AllocInfo new_info) {
     }
 
     // Allocate a fresh copy
-    auto new_ptr = alloc(arena, new_info);
+    auto new_ptr = alloc(c, arena, new_info);
     if (new_ptr && old_mem.buffer) {
         // Must have a greater new size as smaller sizes are handled above
-        CZ_DEBUG_ASSERT(new_info.size <= old_mem.size);
+        CZ_DEBUG_ASSERT(c, new_info.size <= old_mem.size);
         memcpy(new_ptr, old_mem.buffer, old_mem.size);
     }
     return new_ptr;
@@ -73,6 +68,17 @@ Allocator Arena::allocator() {
         arena_realloc,
         this,
     };
+}
+
+HeapArena::HeapArena(C* c, AllocInfo info) {
+    auto buffer = c->alloc(info);
+    CZ_ASSERT(c, buffer != NULL);
+    mem.buffer = buffer;
+    mem.size = info.size;
+}
+
+void HeapArena::drop(C* c) {
+    c->allocator.dealloc(c, mem);
 }
 
 }

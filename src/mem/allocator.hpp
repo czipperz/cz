@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+#include "../context_decl.hpp"
 #include "../slice.hpp"
 #include "alloc_info.hpp"
 
@@ -13,7 +14,7 @@ namespace mem {
 ///
 /// If \c old_mem.buffer is \c NULL the user is trying to allocate memory.
 /// If \c new_info.size is \c 0 the user is trying to deallocate memory.
-typedef void* (*Allocate)(void* data, MemSlice old_mem, AllocInfo new_info);
+using Allocate = void* (*)(C* c, void* data, MemSlice old_mem, AllocInfo new_info);
 
 /// A memory allocator.
 struct Allocator {
@@ -21,25 +22,25 @@ struct Allocator {
     void* data;
 
     /// Allocate memory using this allocator.
-    void* alloc(AllocInfo new_info);
+    void* alloc(C* c, AllocInfo new_info);
 
     /// Allocate memory to store a value of the given type.
     template <class T>
-    T* alloc() {
-        return (T*)alloc(alloc_info<T>());
+    T* alloc(C* c) {
+        return (T*)alloc(c, alloc_info<T>());
     }
 
     /// Deallocate memory allocated using this allocator.
-    void dealloc(MemSlice mem);
+    void dealloc(C* c, MemSlice mem);
 
     /// Reallocate memory allocated using this allocator.
-    void* realloc(MemSlice old_mem, AllocInfo new_info);
+    void* realloc(C* c, MemSlice old_mem, AllocInfo new_info);
 
     /// Reallocate memory alloceted using this allocator to store a value of the
     /// given type.
     template <class T>
-    T* realloc(void* old_ptr, size_t old_size) {
-        return (T*)realloc(old_ptr, old_size, alloc_info<T>());
+    T* realloc(C* c, void* old_ptr, size_t old_size) {
+        return (T*)realloc(c, old_ptr, old_size, alloc_info<T>());
     }
 };
 

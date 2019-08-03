@@ -6,19 +6,12 @@
 namespace cz {
 namespace log {
 
-static thread_local LogLevel thread_local_level;
-io::Result thread_local_level_write(void* _logger, Str str) {
-    auto logger = static_cast<Logger*>(_logger);
-    logger->log(thread_local_level, str);
-    return io::Result::ok();
-}
-
 struct LogWriter {
     Logger* logger;
     LogLevel level;
 };
 
-static void default_log(void*, LogLevel level, Str str) {
+static void default_log(C*, void*, LogLevel level, Str str) {
     if (level > global_max_log_level) {
         return;
     }
@@ -40,8 +33,8 @@ Logger global_logger = {
 LogLevel global_max_log_level = LogLevel::Information;
 
 template <LogLevel level>
-static io::Result global_logger_write(void*, Str str) {
-    global_logger.log(level, str);
+static io::Result global_logger_write(C* c, void*, Str str) {
+    global_logger.log(c, level, str);
     return io::Result::ok();
 }
 

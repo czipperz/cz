@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <cstddef>
+#include "context.hpp"
 #include "slice.hpp"
 
 namespace cz {
@@ -49,24 +50,24 @@ public:
     String(char* buffer, size_t len, size_t cap);
 
     /// Create a new \c String allocating a new buffer as a copy of the inputted string.
-    explicit String(Str str_to_copy);
+    explicit String(C* c, Str str_to_copy);
 
     /// Ensure there are \c extra bytes available in the buffer.
-    void reserve(size_t extra);
+    void reserve(C* c, size_t extra);
     /// Append the \c Str to the buffer.
-    void append(Str str);
+    void append(C* c, Str str);
     /// Insert the \c Str into the middle of the buffer.  Panics if \c index is greater than \c len.
-    void insert(size_t index, Str str);
+    void insert(C* c, size_t index, Str str);
 
     /// Set the \c len to \c 0.
     void clear();
     /// Set the \c len to \c new_len.  Panics if \c new_len is greater than \c len.
-    void shrink_to(size_t new_len);
+    void shrink_to(C* c, size_t new_len);
     /// Set the \c len to \c new_len.  Panics if \c new_len is greater than \c cap.
-    void set_len(size_t new_len);
+    void set_len(C* c, size_t new_len);
 
     /// Dealloc the \c buffer.
-    void drop();
+    void drop(C* c);
 
     /// Get the byte buffer backing the string.
     char* buffer();

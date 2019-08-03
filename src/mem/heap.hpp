@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../context.hpp"
 #include "allocator.hpp"
 
 namespace cz {
@@ -10,7 +11,7 @@ namespace heap {
 Allocator allocator();
 
 /// Allocate memory.  The data parameter is ignored.
-void* allocate(void* _data, MemSlice old_mem, AllocInfo new_info);
+void* allocate(C* c, void* _data, MemSlice old_mem, AllocInfo new_info);
 
 }
 }
