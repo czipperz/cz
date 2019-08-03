@@ -33,12 +33,12 @@ static void* advance_ptr_to_alignment(MemSlice old_mem, AllocInfo new_info) {
 
 static void* arena_realloc(void* _arena, MemSlice old_mem, AllocInfo new_info) {
     auto arena = static_cast<Arena*>(_arena);
-    auto new_ptr = advance_ptr_to_alignment(old_mem, new_info);
-    if (new_ptr) {
-        return new_ptr;
+    auto old_aligned = advance_ptr_to_alignment(old_mem, new_info);
+    if (old_aligned) {
+        return old_aligned;
     }
 
-    new_ptr = alloc(arena, new_info);
+    auto new_ptr = alloc(arena, new_info);
     memcpy(new_ptr, old_mem.buffer, old_mem.size);
     return new_ptr;
 }
