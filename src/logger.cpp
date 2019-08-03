@@ -13,39 +13,16 @@ io::Result thread_local_level_write(void* _logger, Str str) {
     return io::Result::ok();
 }
 
-io::Writer Logger::writer_local(LogLevel level) {
-    thread_local_level = level;
-    return {
-        {thread_local_level_write},
-        this,
-    };
-}
-
 struct LogWriter {
     Logger* logger;
     LogLevel level;
 };
 
-io::Result write_log_writer(void* _log_writer, Str str) {
-    auto log_writer = static_cast<LogWriter*>(_log_writer);
-    log_writer->logger->log(log_writer->level, str);
-    return io::Result::ok();
-}
-
-io::Writer Logger::writer_alloc(LogLevel level) {
-    auto log_writer = mem::global_allocator.alloc<LogWriter>();
-    *log_writer = {this, level};
-    return {
-        {write_log_writer},
-        log_writer,
-    };
-}
-
-void Logger::writer_dealloc(io::Writer log_writer) {
-    mem::global_allocator.dealloc({log_writer.data, sizeof(LogWriter)});
-}
-
 static void default_log(void*, LogLevel level, Str str) {
+    if (level > global_max_log_level) {
+        return;
+    }
+
     FILE* stream;
     if (level <= LogLevel::Error) {
         stream = stderr;
@@ -60,6 +37,26 @@ Logger global_logger = {
     default_log,
     NULL,
 };
+LogLevel global_max_log_level = LogLevel::Information;
+
+template <LogLevel level>
+static io::Result global_logger_write(void*, Str str) {
+    global_logger.log(level, str);
+    return io::Result::ok();
+}
+
+#define define_log_writer(name, level) \
+    io::Writer name() { return {{global_logger_write<LogLevel::level>}, NULL}; }
+
+// clang-format off
+define_log_writer(fatal, Fatal)
+define_log_writer(error, Error)
+define_log_writer(warning, Warning)
+define_log_writer(important, Important)
+define_log_writer(information, Information)
+define_log_writer(debug, Debug)
+define_log_writer(trace, Trace)
+// clang-format on
 
 }
 }
