@@ -33,6 +33,11 @@ constexpr Slice<T> slice(T* buffer, size_t len) {
 struct MemSlice {
     void* buffer;
     size_t size;
+
+    constexpr MemSlice() : buffer(NULL), size(0) {}
+    template <size_t size>
+    constexpr MemSlice(char (&buffer)[size]) : buffer(buffer), size(size) {}
+    constexpr MemSlice(void* buffer, size_t size) : buffer(buffer), size(size) {}
 };
 
 }

@@ -14,13 +14,13 @@ TEST_CASE("Arena alloc returns null when no space left") {
 
 TEST_CASE("Arena alloc succeeds when exactly enough space left") {
     char buffer[8] = {0};
-    Arena arena({buffer, 8});
+    Arena arena(buffer);
     REQUIRE(arena.allocator().alloc({8, 1}) == buffer);
 }
 
 TEST_CASE("Arena allocates at an offset") {
     char buffer[8] = {0};
-    Arena arena({buffer, 8});
+    Arena arena(buffer);
     REQUIRE(arena.allocator().alloc({2, 1}) == buffer);
     REQUIRE(arena.allocator().alloc({4, 1}) == buffer + 2);
     REQUIRE(arena.allocator().alloc({2, 1}) == buffer + 6);
@@ -28,7 +28,7 @@ TEST_CASE("Arena allocates at an offset") {
 
 TEST_CASE("Arena alloc succeeds after first failure") {
     char buffer[8] = {0};
-    Arena arena({buffer, 8});
+    Arena arena(buffer);
     REQUIRE(arena.allocator().alloc({2, 1}) == buffer);
     REQUIRE(arena.allocator().alloc({4, 1}) == buffer + 2);
     REQUIRE(arena.allocator().alloc({4, 1}) == NULL);
@@ -37,7 +37,7 @@ TEST_CASE("Arena alloc succeeds after first failure") {
 
 TEST_CASE() {
     char buffer[8] = {0};
-    Arena arena({buffer, 8});
+    Arena arena(buffer);
 
     auto start = arena.allocator().alloc({1, 2});
     REQUIRE(start);
@@ -47,7 +47,7 @@ TEST_CASE() {
 
 TEST_CASE("Arena dealloc move pointer back when most recent allocation") {
     char buffer[8] = {0};
-    Arena arena({buffer, 8});
+    Arena arena(buffer);
     arena.allocator().alloc({2, 1});
     void* ptr = arena.allocator().alloc({2, 1});
 
@@ -58,7 +58,7 @@ TEST_CASE("Arena dealloc move pointer back when most recent allocation") {
 
 TEST_CASE("Arena realloc in place expanding") {
     char buffer[8] = {0};
-    Arena arena({buffer, 8});
+    Arena arena(buffer);
 
     auto buf = arena.allocator().alloc({4, 1});
     REQUIRE(buf == buffer);
@@ -74,7 +74,7 @@ TEST_CASE("Arena realloc in place expanding") {
 
 TEST_CASE("Arena realloc not enough space returns null") {
     char buffer[8] = {0};
-    Arena arena({buffer, 8});
+    Arena arena(buffer);
 
     auto buf = arena.allocator().alloc({4, 1});
     REQUIRE(arena.allocator().realloc({buf, 4}, {10, 1}) == NULL);
@@ -84,7 +84,7 @@ TEST_CASE("Arena realloc not enough space returns null") {
 
 TEST_CASE("Arena realloc smaller size") {
     char buffer[8] = {0};
-    Arena arena({buffer, 8});
+    Arena arena(buffer);
 
     auto buf = arena.allocator().alloc({4, 1});
     buf = arena.allocator().realloc({buf, 4}, {2, 1});
@@ -95,7 +95,7 @@ TEST_CASE("Arena realloc smaller size") {
 
 TEST_CASE("Arena::drop deallocates memory") {
     char buffer[8];
-    Arena arena({buffer, 8});
+    Arena arena(buffer);
     auto mock = test::mock_dealloc({buffer, 8});
 
     with_global_allocator(mock.allocator(), [&]() { arena.drop(); });
