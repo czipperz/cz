@@ -11,15 +11,15 @@ struct LogWriter {
     LogLevel level;
 };
 
-static void log_ignore(C*, void*, LogLevel, Str) {
+static void log_ignore(C*, MemSlice, LogLevel, Str) {
     return;
 }
 
-Target ignore_target() {
-    return {log_ignore};
+Logger ignore() {
+    return {log_ignore, {}};
 }
 
-static void log_console(C*, void*, LogLevel level, Str str) {
+static void log_console(C*, MemSlice, LogLevel level, Str str) {
     FILE* stream;
     if (level <= LogLevel::Error) {
         stream = stderr;
@@ -30,8 +30,8 @@ static void log_console(C*, void*, LogLevel level, Str str) {
     fwrite(str.buffer, sizeof(char), str.len, stream);
 }
 
-Target console_target() {
-    return {log_console};
+Logger console() {
+    return {log_console, {}};
 }
 
 template <LogLevel level>

@@ -8,7 +8,7 @@ using namespace cz;
 using namespace cz::io;
 
 static Context ctxt(mem::Allocator allocator) {
-    return {allocator, {log::ignore_target(), NULL}, log::LogLevel::Off};
+    return {allocator, log::ignore(), log::LogLevel::Off};
 }
 
 TEST_CASE("concat works") {

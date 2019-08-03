@@ -20,15 +20,11 @@ enum LogLevel {
 }
 using LogLevel_::LogLevel;
 
-struct Target {
-    void (*log)(C* c, void* data, LogLevel level, Str str);
-};
-
 struct Logger {
-    Target target;
-    void* data;
+    void (*target)(C* c, MemSlice data, LogLevel level, Str str);
+    MemSlice data;
 
-    void log(C* c, LogLevel level, Str str) { return target.log(c, data, level, str); }
+    void log(C* c, LogLevel level, Str str) { return target(c, data, level, str); }
 };
 
 io::Writer fatal();
@@ -39,8 +35,8 @@ io::Writer information();
 io::Writer debug();
 io::Writer trace();
 
-Target ignore_target();
-Target console_target(LogLevel max_log_level = LogLevel::Information);
+Logger ignore();
+Logger console();
 
 }
 }
