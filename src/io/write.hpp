@@ -22,6 +22,8 @@ struct Writer {
 
 Writer file_writer(FILE* file);
 Writer string_writer(String* string);
+inline Writer cout() { return file_writer(stdout); }
+inline Writer cerr() { return file_writer(stderr); }
 
 template <class T1, class... Ts>
 String concat(T1 t1, Ts... ts) {
@@ -35,6 +37,11 @@ template <class T1, class T2, class... Ts>
 Result write(Writer writer, T1 t1, T2 t2, Ts... ts) {
     CZ_TRY(write(writer, t1));
     return write(writer, t2, ts...);
+}
+
+template <class... Ts>
+Result put(Ts... ts) {
+    return write(cout(), ts..., '\n');
 }
 
 inline Result write(Writer writer, char c) {
