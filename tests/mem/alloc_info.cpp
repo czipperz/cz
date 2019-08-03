@@ -23,7 +23,7 @@ TEST_CASE("alloc_info<int>()") {
 TEST_CASE("AllocInfo(size_t)") {
     cz::mem::AllocInfo info(4);
     REQUIRE(info.size == 4);
-    REQUIRE(info.alignment == 1);
+    REQUIRE(info.alignment == alignof(char));
 }
 
 TEST_CASE("AllocInfo(size_t, size_t)") {

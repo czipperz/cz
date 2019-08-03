@@ -10,7 +10,7 @@ struct AllocInfo {
     size_t alignment;
 
     constexpr AllocInfo() : size(0), alignment(0) {}
-    constexpr AllocInfo(size_t size) : size(size), alignment(1) {}
+    constexpr AllocInfo(size_t size) : size(size), alignment(alignof(char)) {}
     constexpr AllocInfo(size_t size, size_t alignment) : size(size), alignment(alignment) {}
 
     constexpr bool operator==(const AllocInfo& other) const {
