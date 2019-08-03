@@ -31,41 +31,37 @@ Writer file_writer(FILE* file) {
     return {{file_writer_write_str}, file};
 }
 
-#define define_write_signed_numeric(type)                    \
-    Result write(Writer writer, type v) {                    \
-        if (v < 0) {                                         \
-            CZ_TRY(write(writer, '-'));                      \
-            v = -v;                                          \
-        }                                                    \
-        return write(writer, static_cast<unsigned type>(v)); \
-    }
-
-#define define_write_unsigned_numeric(type)                              \
-    Result write(Writer writer, unsigned type v) {                       \
-        if (v == 0) {                                                    \
-            return write(writer, '0');                                   \
-        }                                                                \
-        char buffer[32];                                                 \
-        size_t index;                                                    \
-        for (index = sizeof(buffer) - 1; v != 0; --index) {              \
-            buffer[index] = '0' + v % 10;                                \
-            v /= 10;                                                     \
-        }                                                                \
-        ++index;                                                         \
-        CZ_TRY(write(writer, {buffer + index, sizeof(buffer) - index})); \
-        return Result::ok();                                             \
+#define define_numeric_write(type)                                      \
+    Result write(Writer writer, type v) {                               \
+        if (v < 0) {                                                    \
+            CZ_TRY(write(writer, '-'));                                 \
+            v = -v;                                                     \
+        }                                                               \
+                                                                        \
+        return write(writer, static_cast<unsigned type>(v));            \
+    }                                                                   \
+                                                                        \
+    Result write(Writer writer, unsigned type v) {                      \
+        if (v == 0) {                                                   \
+            return write(writer, '0');                                  \
+        }                                                               \
+                                                                        \
+        char buffer[32];                                                \
+        size_t index;                                                   \
+        for (index = sizeof(buffer) - 1; v != 0; --index) {             \
+            buffer[index] = '0' + v % 10;                               \
+            v /= 10;                                                    \
+        }                                                               \
+        ++index;                                                        \
+                                                                        \
+        return write(writer, {buffer + index, sizeof(buffer) - index}); \
     }
 
 // clang-format off
-define_write_signed_numeric(short)
-define_write_signed_numeric(int)
-define_write_signed_numeric(long)
-define_write_signed_numeric(long long)
-
-define_write_unsigned_numeric(short)
-define_write_unsigned_numeric(int)
-define_write_unsigned_numeric(long)
-define_write_unsigned_numeric(long long)
+define_numeric_write(short)
+define_numeric_write(int)
+define_numeric_write(long)
+define_numeric_write(long long)
 
 Result write(Writer writer, Address addr) {
     // clang-format on
