@@ -4,7 +4,7 @@ namespace cz {
 namespace mem {
 
 void* Allocator::alloc(AllocInfo info) {
-    return realloc({NULL, 0}, info);
+    return realloc({}, info);
 }
 
 void Allocator::dealloc(MemSlice old_mem) {
