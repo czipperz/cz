@@ -2,12 +2,14 @@
 
 #include <stddef.h>
 #include <string.h>
+#include <cstddef>
 #include "slice.hpp"
 
 namespace cz {
 
 struct Str : public Slice<const char> {
     constexpr Str() : Slice({NULL, 0}) {}
+    Str(std::nullptr_t) : Slice({NULL, 0}) {}
     Str(const char* cstr) : Slice({cstr, strlen(cstr)}) {}
     constexpr Str(const char* buffer, size_t len) : Slice({buffer, len}) {}
 
