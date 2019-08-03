@@ -35,6 +35,7 @@ Writer file_writer(FILE* file) {
     Result write(Writer writer, type v) {       \
         if (v < 0) {                            \
             CZ_TRY(write(writer, '-'));         \
+            v = -v;                             \
         }                                       \
         return write(writer, (unsigned type)v); \
     }

@@ -91,6 +91,17 @@ TEST_CASE("write(int = 9)") {
     REQUIRE(result.is_ok());
 }
 
+TEST_CASE("write(int = -47)") {
+    String string;
+    CZ_DEFER(string.drop());
+
+    Writer writer = string_writer(&string);
+    Result result = write(writer, -47);
+
+    REQUIRE(string == "-47");
+    REQUIRE(result.is_ok());
+}
+
 TEST_CASE("write(Address(NULL))") {
     String string;
     CZ_DEFER(string.drop());
