@@ -25,6 +25,7 @@ struct Logger {
     MemSlice data;
 
     void log(C* c, LogLevel level, Str str) { return target(c, data, level, str); }
+    void drop(C* c);
 };
 
 io::Writer fatal();

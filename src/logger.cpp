@@ -34,6 +34,10 @@ Logger console() {
     return {log_console, {}};
 }
 
+void Logger::drop(C* c) {
+    c->dealloc(data);
+}
+
 template <LogLevel level>
 static io::Result context_logger_write(C* c, void*, Str str) {
     if (level <= c->max_log_level) {
