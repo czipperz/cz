@@ -54,7 +54,7 @@ TEST_CASE("String::String(char*, size_t, size_t)") {
 TEST_CASE("String::String(Str) clones") {
     char buffer[3];
 
-    auto mock = test::mock_alloc(buffer, {3, 1});
+    auto mock = test::mock_alloc(buffer, 3);
     with_global_allocator(mock.allocator(), [&]() { String string("abc"); });
     REQUIRE(mock.called);
 }
@@ -76,7 +76,7 @@ TEST_CASE("String::append from non-empty string and reallocates") {
 
 TEST_CASE("String::append no realloc") {
     char buffer[64];
-    auto mock = test::mock_alloc(buffer, {64, 1});
+    auto mock = test::mock_alloc(buffer, 64);
     with_global_allocator(mock.allocator(), [&]() {
         String string;
         string.reserve(64);
@@ -90,7 +90,7 @@ TEST_CASE("String::append no realloc") {
 
 TEST_CASE("String::reserve allocates") {
     char buffer[64];
-    auto mock = test::mock_alloc(buffer, {64, 1});
+    auto mock = test::mock_alloc(buffer, 64);
     String string;
 
     with_global_allocator(mock.allocator(), [&]() {

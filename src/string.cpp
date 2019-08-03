@@ -11,7 +11,7 @@ String::String(char* buffer, size_t len) : _buffer(buffer), _len(len), _cap(len)
 String::String(char* buffer, size_t len, size_t cap) : _buffer(buffer), _len(len), _cap(cap) {}
 
 String::String(Str str_to_clone)
-    : _buffer(static_cast<char*>(mem::global_allocator.alloc({str_to_clone.len, alignof(char)}))),
+    : _buffer(static_cast<char*>(mem::global_allocator.alloc(str_to_clone.len))),
       _len(str_to_clone.len),
       _cap(str_to_clone.len) {
     CZ_ASSERT(_buffer);
@@ -47,7 +47,7 @@ void String::reserve(size_t extra) {
     if (_cap - _len < extra) {
         size_t new_cap = max(_cap + extra, _cap * 2);
         auto new_buffer = static_cast<char*>(
-            mem::global_allocator.realloc({_buffer, _cap}, {new_cap, alignof(char)}));
+            mem::global_allocator.realloc({_buffer, _cap}, new_cap));
         CZ_ASSERT(new_buffer != NULL);
         _buffer = new_buffer;
         _cap = new_cap;
