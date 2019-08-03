@@ -19,11 +19,7 @@ Target ignore_target() {
     return {log_ignore};
 }
 
-static void log_console(C* c, void*, LogLevel level, Str str) {
-    if (level > c->max_log_level) {
-        return;
-    }
-
+static void log_console(C*, void*, LogLevel level, Str str) {
     FILE* stream;
     if (level <= LogLevel::Error) {
         stream = stderr;
@@ -40,7 +36,9 @@ Target console_target() {
 
 template <LogLevel level>
 static io::Result context_logger_write(C* c, void*, Str str) {
-    c->logger.log(c, level, str);
+    if (level <= c->max_log_level) {
+        c->logger.log(c, level, str);
+    }
     return io::Result::ok();
 }
 
