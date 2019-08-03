@@ -1,5 +1,6 @@
 #include "../catch.hpp"
 
+#include <string.h>
 #include "../../src/mem.hpp"
 #include "mock_allocate.hpp"
 
@@ -34,24 +35,70 @@ TEST_CASE("Arena alloc succeeds after first failure") {
     REQUIRE(arena.allocator().alloc({2, 1}) == buffer + 6);
 }
 
+TEST_CASE() {
+    char buffer[8] = {0};
+    Arena arena({buffer, 8});
+
+    auto start = arena.allocator().alloc({1, 2});
+    REQUIRE(start);
+    auto offset = arena.allocator().alloc({1, 2});
+    REQUIRE(offset == (void*)((char*)start + 2));
+}
+
+TEST_CASE("Arena dealloc move pointer back when most recent allocation") {
+    char buffer[8] = {0};
+    Arena arena({buffer, 8});
+    arena.allocator().alloc({2, 1});
+    void* ptr = arena.allocator().alloc({2, 1});
+
+    arena.allocator().dealloc({ptr, 2});
+
+    REQUIRE(arena.allocator().alloc({3, 1}) == ptr);
+}
+
+TEST_CASE("Arena realloc in place expanding") {
+    char buffer[8] = {0};
+    Arena arena({buffer, 8});
+
+    auto buf = arena.allocator().alloc({4, 1});
+    REQUIRE(buf == buffer);
+    memset(buf, '*', 4);
+
+    buf = arena.allocator().realloc({buf, 4}, {6, 1});
+    REQUIRE(buf == buffer);
+    REQUIRE(buffer[0] == '*');
+    REQUIRE(buffer[1] == '*');
+    REQUIRE(buffer[2] == '*');
+    REQUIRE(buffer[3] == '*');
+}
+
+TEST_CASE("Arena realloc not enough space returns null") {
+    char buffer[8] = {0};
+    Arena arena({buffer, 8});
+
+    auto buf = arena.allocator().alloc({4, 1});
+    REQUIRE(arena.allocator().realloc({buf, 4}, {10, 1}) == NULL);
+
+    REQUIRE(arena.offset == 4);
+}
+
+TEST_CASE("Arena realloc smaller size") {
+    char buffer[8] = {0};
+    Arena arena({buffer, 8});
+
+    auto buf = arena.allocator().alloc({4, 1});
+    buf = arena.allocator().realloc({buf, 4}, {2, 1});
+
+    REQUIRE(buf == arena.mem.buffer);
+    REQUIRE(arena.offset == 2);
+}
+
 TEST_CASE("Arena::drop deallocates memory") {
     char buffer[8];
     Arena arena({buffer, 8});
     auto mock = test::mock_dealloc({buffer, 8});
 
-    with_global_allocator(mock.allocator(), [&]() {
-        arena.drop();
-    });
+    with_global_allocator(mock.allocator(), [&]() { arena.drop(); });
 
     REQUIRE(mock.called);
-}
-
-TEST_CASE("Arena::allocator works") {
-    char buffer[8];
-    Arena arena({buffer, 8});
-
-    auto allocator = arena.allocator();
-
-    REQUIRE(allocator.alloc({6, 1}) == buffer);
-    REQUIRE(allocator.alloc({4, 1}) == NULL);
 }
