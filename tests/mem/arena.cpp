@@ -5,13 +5,13 @@
 
 using namespace cz::mem;
 
-TEST_CASE("Arena::alloc fails when no space left") {
+TEST_CASE("Arena alloc returns null when no space left") {
     char buffer[1] = {0};
     Arena arena({buffer, 0});
     REQUIRE(arena.allocator().alloc({1, 1}) == NULL);
 }
 
-TEST_CASE("Arena::alloc succeeds when exactly enough space left") {
+TEST_CASE("Arena alloc succeeds when exactly enough space left") {
     char buffer[8] = {0};
     Arena arena({buffer, 8});
     REQUIRE(arena.allocator().alloc({8, 1}) == buffer);
@@ -25,7 +25,7 @@ TEST_CASE("Arena allocates at an offset") {
     REQUIRE(arena.allocator().alloc({2, 1}) == buffer + 6);
 }
 
-TEST_CASE("Arena::alloc succeeds after first failure") {
+TEST_CASE("Arena alloc succeeds after first failure") {
     char buffer[8] = {0};
     Arena arena({buffer, 8});
     REQUIRE(arena.allocator().alloc({2, 1}) == buffer);
