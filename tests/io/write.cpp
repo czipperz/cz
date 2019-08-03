@@ -3,13 +3,11 @@
 #include "../../src/defer.hpp"
 #include "../../src/io/write.hpp"
 #include "../../src/mem.hpp"
+#include "../context.hpp"
 
 using namespace cz;
 using namespace cz::io;
-
-static Context ctxt(mem::Allocator allocator) {
-    return {allocator, log::ignore(), log::LogLevel::Off};
-}
+using cz::test::ctxt;
 
 TEST_CASE("concat works") {
     mem::StackArena<32> arena;

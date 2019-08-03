@@ -2,9 +2,11 @@
 
 #include <string.h>
 #include "../../src/mem.hpp"
+#include "../context.hpp"
 #include "mock_allocate.hpp"
 
 using cz::C;
+using namespace cz::test;
 using namespace cz::mem;
 
 TEST_CASE("Arena alloc returns null when no space left") {
@@ -96,8 +98,8 @@ TEST_CASE("Arena realloc smaller size") {
 
 TEST_CASE("HeapArena constructor allocates memory") {
     char buffer[8];
-    auto mock = test::mock_alloc(buffer, {4, 2});
-    C c = {mock.allocator()};
+    auto mock = mock_alloc(buffer, {4, 2});
+    C c = ctxt(mock.allocator());
 
     HeapArena arena(&c, {4, 2});
 
@@ -109,11 +111,11 @@ TEST_CASE("HeapArena constructor allocates memory") {
 
 TEST_CASE("HeapArena::drop deallocates memory") {
     StackArena<8> stack_arena;
-    C sc = {stack_arena.allocator()};
+    C sc = ctxt(stack_arena.allocator());
     HeapArena arena(&sc, {4, 2});
 
-    auto mock = test::mock_dealloc({stack_arena.buffer, 4});
-    C mc = {mock.allocator()};
+    auto mock = mock_dealloc({stack_arena.buffer, 4});
+    C mc = ctxt(mock.allocator());
 
     arena.drop(&mc);
 

@@ -4,10 +4,12 @@
 #include "../src/defer.hpp"
 #include "../src/mem.hpp"
 #include "../src/string.hpp"
+#include "context.hpp"
 #include "mem/mock_allocate.hpp"
 
 using namespace cz;
 using namespace cz::mem;
+using namespace cz::test;
 
 Allocator panic_allocator() {
     return {[](C* c, void*, MemSlice, AllocInfo) -> void* {
@@ -41,8 +43,8 @@ TEST_CASE("String::String(char*, size_t, size_t)") {
 
 TEST_CASE("String::String(Str) clones") {
     char buffer[3];
-    auto mock = test::mock_alloc(buffer, 3);
-    C c = {mock.allocator()};
+    auto mock = mock_alloc(buffer, 3);
+    C c = ctxt(mock.allocator());
 
     String string(&c, "abc");
 
@@ -51,7 +53,7 @@ TEST_CASE("String::String(Str) clones") {
 
 TEST_CASE("String::append from empty string") {
     mem::StackArena<32> arena;
-    C c = {arena.allocator()};
+    C c = ctxt(arena.allocator());
 
     String string;
     string.append(&c, "abc");
@@ -61,7 +63,7 @@ TEST_CASE("String::append from empty string") {
 
 TEST_CASE("String::append from non-empty string and reallocates") {
     mem::StackArena<64> arena;
-    C c = {arena.allocator()};
+    C c = ctxt(arena.allocator());
 
     String string;
     string.append(&c, "abc");
@@ -72,8 +74,8 @@ TEST_CASE("String::append from non-empty string and reallocates") {
 
 TEST_CASE("String::append no realloc") {
     char buffer[64];
-    auto mock = test::mock_alloc(buffer, 64);
-    C c = {mock.allocator()};
+    auto mock = mock_alloc(buffer, 64);
+    C c = ctxt(mock.allocator());
 
     String string;
     string.reserve(&c, 64);
@@ -89,8 +91,8 @@ TEST_CASE("String::append no realloc") {
 
 TEST_CASE("String::reserve allocates") {
     char buffer[64];
-    auto mock = test::mock_alloc(buffer, 64);
-    C c = {mock.allocator()};
+    auto mock = mock_alloc(buffer, 64);
+    C c = ctxt(mock.allocator());
     String string;
 
     string.reserve(&c, 64);
@@ -102,8 +104,8 @@ TEST_CASE("String::reserve allocates") {
 }
 
 TEST_CASE("String::insert empty string") {
-    auto mock = test::mock_alloc(NULL, 0);
-    C c = {mock.allocator()};
+    auto mock = mock_alloc(NULL, 0);
+    C c = ctxt(mock.allocator());
     String string;
 
     string.insert(&c, 0, "");
@@ -114,7 +116,7 @@ TEST_CASE("String::insert empty string") {
 
 TEST_CASE("String::insert into empty string") {
     mem::StackArena<32> arena;
-    C c = {arena.allocator()};
+    C c = ctxt(arena.allocator());
     String string;
 
     string.insert(&c, 0, "abc");
@@ -163,7 +165,7 @@ TEST_CASE("String::insert end") {
 
 TEST_CASE("String::insert with resize") {
     StackArena<8> arena;
-    C c = {arena.allocator()};
+    C c = ctxt(arena.allocator());
     String string;
 
     string.insert(&c, 0, "abc");

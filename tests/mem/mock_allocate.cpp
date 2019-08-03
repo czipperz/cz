@@ -3,8 +3,9 @@
 #include "../catch.hpp"
 
 namespace cz {
-namespace mem {
 namespace test {
+
+using namespace cz::mem;
 
 MockAllocate::MockAllocate(void* buffer, MemSlice expected_old_mem, AllocInfo expected_new_info)
     : buffer(buffer), expected_old_mem(expected_old_mem), expected_new_info(expected_new_info) {}
@@ -32,6 +33,5 @@ MockAllocate mock_realloc(void* buffer, AllocInfo expected_new_info, MemSlice ex
     return {buffer, expected_old_mem, expected_new_info};
 }
 
-}
 }
 }
