@@ -7,9 +7,13 @@
 using namespace cz;
 using namespace cz::io;
 
+static Context ctxt(mem::Allocator allocator) {
+    return {allocator, {log::ignore_target(), NULL}, log::LogLevel::Off};
+}
+
 TEST_CASE("concat works") {
     mem::StackArena<32> arena;
-    C c = {arena.allocator()};
+    C c = ctxt(arena.allocator());
 
     auto string = concat(&c, 123, " + ", 456);
     CZ_DEFER(string.drop(&c));
@@ -19,7 +23,7 @@ TEST_CASE("concat works") {
 
 TEST_CASE("write multiple arguments works") {
     mem::StackArena<32> arena;
-    C c = {arena.allocator()};
+    C c = ctxt(arena.allocator());
 
     String string;
     CZ_DEFER(string.drop(&c));
@@ -32,7 +36,7 @@ TEST_CASE("write multiple arguments works") {
 
 TEST_CASE("write multiple arguments with debug") {
     mem::StackArena<32> arena;
-    C c = {arena.allocator()};
+    C c = ctxt(arena.allocator());
 
     String string;
     CZ_DEFER(string.drop(&c));
@@ -46,7 +50,7 @@ TEST_CASE("write multiple arguments with debug") {
 
 TEST_CASE("write str") {
     mem::StackArena<32> arena;
-    C c = {arena.allocator()};
+    C c = ctxt(arena.allocator());
 
     String string;
     CZ_DEFER(string.drop(&c));
@@ -62,7 +66,7 @@ TEST_CASE("write str") {
 
 TEST_CASE("write char") {
     mem::StackArena<32> arena;
-    C c = {arena.allocator()};
+    C c = ctxt(arena.allocator());
 
     String string;
     CZ_DEFER(string.drop(&c));
@@ -76,7 +80,7 @@ TEST_CASE("write char") {
 
 TEST_CASE("write(int = 123)") {
     mem::StackArena<32> arena;
-    C c = {arena.allocator()};
+    C c = ctxt(arena.allocator());
 
     String string;
     CZ_DEFER(string.drop(&c));
@@ -90,7 +94,7 @@ TEST_CASE("write(int = 123)") {
 
 TEST_CASE("write(int = 0)") {
     mem::StackArena<32> arena;
-    C c = {arena.allocator()};
+    C c = ctxt(arena.allocator());
 
     String string;
     CZ_DEFER(string.drop(&c));
@@ -104,7 +108,7 @@ TEST_CASE("write(int = 0)") {
 
 TEST_CASE("write(int = 9)") {
     mem::StackArena<32> arena;
-    C c = {arena.allocator()};
+    C c = ctxt(arena.allocator());
 
     String string;
     CZ_DEFER(string.drop(&c));
@@ -118,7 +122,7 @@ TEST_CASE("write(int = 9)") {
 
 TEST_CASE("write(int = -47)") {
     mem::StackArena<32> arena;
-    C c = {arena.allocator()};
+    C c = ctxt(arena.allocator());
 
     String string;
     CZ_DEFER(string.drop(&c));
@@ -132,7 +136,7 @@ TEST_CASE("write(int = -47)") {
 
 TEST_CASE("write(Address(NULL))") {
     mem::StackArena<32> arena;
-    C c = {arena.allocator()};
+    C c = ctxt(arena.allocator());
 
     String string;
     CZ_DEFER(string.drop(&c));
@@ -146,7 +150,7 @@ TEST_CASE("write(Address(NULL))") {
 
 TEST_CASE("write(Address(arbitrary) starts with 0x)") {
     mem::StackArena<32> arena;
-    C c = {arena.allocator()};
+    C c = ctxt(arena.allocator());
 
     String string;
     CZ_DEFER(string.drop(&c));

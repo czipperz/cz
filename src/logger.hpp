@@ -1,13 +1,14 @@
 #pragma once
 
-#include "str.hpp"
 #include "io/write.hpp"
+#include "str.hpp"
 
 namespace cz {
 namespace log {
 
 namespace LogLevel_ {
 enum LogLevel {
+    Off = -1,
     Fatal,
     Error,
     Warning,
@@ -19,17 +20,16 @@ enum LogLevel {
 }
 using LogLevel_::LogLevel;
 
-using Log = void (*)(C* c, void* data, LogLevel level, Str str);
-
-struct Logger {
-    Log impl;
-    void* data;
-
-    void log(C* c, LogLevel level, Str str) { return impl(c, data, level, str); }
+struct Target {
+    void (*log)(C* c, void* data, LogLevel level, Str str);
 };
 
-extern Logger global_logger;
-extern LogLevel global_max_log_level;
+struct Logger {
+    Target target;
+    void* data;
+
+    void log(C* c, LogLevel level, Str str) { return target.log(c, data, level, str); }
+};
 
 io::Writer fatal();
 io::Writer error();
@@ -38,6 +38,9 @@ io::Writer important();
 io::Writer information();
 io::Writer debug();
 io::Writer trace();
+
+Target ignore_target();
+Target console_target(LogLevel max_log_level = LogLevel::Information);
 
 }
 }

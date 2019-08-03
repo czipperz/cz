@@ -1,11 +1,15 @@
 #pragma once
 
 #include "context_decl.hpp"
+#include "logger.hpp"
 #include "mem/allocator.hpp"
 
 namespace cz {
+
 struct Context {
     mem::Allocator allocator;
+    log::Logger logger;
+    log::LogLevel max_log_level;
 
     /// Allocate memory using this allocator.
     void* alloc(mem::AllocInfo new_info) { return allocator.alloc(this, new_info); }
@@ -31,4 +35,5 @@ struct Context {
         return allocator.realloc<T>(this, old_ptr, old_size);
     }
 };
+
 }

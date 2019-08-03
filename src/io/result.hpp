@@ -1,7 +1,7 @@
 #pragma once
 
 #include <errno.h>
-#include "../context.hpp"
+#include "../context_decl.hpp"
 #include "../str.hpp"
 
 namespace cz {

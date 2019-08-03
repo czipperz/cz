@@ -11,8 +11,16 @@ struct LogWriter {
     LogLevel level;
 };
 
-static void default_log(C*, void*, LogLevel level, Str str) {
-    if (level > global_max_log_level) {
+static void log_ignore(C*, void*, LogLevel, Str) {
+    return;
+}
+
+Target ignore_target() {
+    return {log_ignore};
+}
+
+static void log_console(C* c, void*, LogLevel level, Str str) {
+    if (level > c->max_log_level) {
         return;
     }
 
@@ -26,20 +34,18 @@ static void default_log(C*, void*, LogLevel level, Str str) {
     fwrite(str.buffer, sizeof(char), str.len, stream);
 }
 
-Logger global_logger = {
-    default_log,
-    NULL,
-};
-LogLevel global_max_log_level = LogLevel::Information;
+Target console_target() {
+    return {log_console};
+}
 
 template <LogLevel level>
-static io::Result global_logger_write(C* c, void*, Str str) {
-    global_logger.log(c, level, str);
+static io::Result context_logger_write(C* c, void*, Str str) {
+    c->logger.log(c, level, str);
     return io::Result::ok();
 }
 
 #define define_log_writer(name, level) \
-    io::Writer name() { return {{global_logger_write<LogLevel::level>}, NULL}; }
+    io::Writer name() { return {{context_logger_write<LogLevel::level>}, NULL}; }
 
 // clang-format off
 define_log_writer(fatal, Fatal)
