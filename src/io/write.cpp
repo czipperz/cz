@@ -39,22 +39,20 @@ Writer file_writer(FILE* file) {
         return write(writer, (unsigned type)v); \
     }
 
-#define define_write_unsigned_numeric(type)        \
-    Result write(Writer writer, unsigned type v) { \
-        if (v == 0) {                              \
-            return write(writer, '0');             \
-        }                                          \
-        char buffer[32];                           \
-        size_t index;                              \
-        for (index = 0; v != 0; ++index) {         \
-            buffer[index] = '0' + v % 10;          \
-            v /= 10;                               \
-        }                                          \
-        while (index > 0) {                        \
-            --index;                               \
-            CZ_TRY(write(writer, buffer[index]));  \
-        }                                          \
-        return Result::ok();                       \
+#define define_write_unsigned_numeric(type)                              \
+    Result write(Writer writer, unsigned type v) {                       \
+        if (v == 0) {                                                    \
+            return write(writer, '0');                                   \
+        }                                                                \
+        char buffer[32];                                                 \
+        size_t index;                                                    \
+        for (index = sizeof(buffer) - 1; v != 0; --index) {              \
+            buffer[index] = '0' + v % 10;                                \
+            v /= 10;                                                     \
+        }                                                                \
+        ++index;                                                         \
+        CZ_TRY(write(writer, {buffer + index, sizeof(buffer) - index})); \
+        return Result::ok();                                             \
     }
 
 // clang-format off
