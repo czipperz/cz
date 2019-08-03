@@ -2,7 +2,7 @@
 
 #include <errno.h>
 #include "../context.hpp"
-#include "../string.hpp"
+#include "../str.hpp"
 
 namespace cz {
 namespace io {
