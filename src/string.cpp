@@ -38,7 +38,7 @@ Str String::as_str() const {
 
 void String::reserve(C* c, size_t extra) {
     if (_cap - _len < extra) {
-        size_t new_cap = max(_cap + extra, _cap * 2);
+        size_t new_cap = max(_len + extra, _cap * 2);
         auto new_buffer = static_cast<char*>(c->realloc({_buffer, _cap}, new_cap).buffer);
         CZ_ASSERT(c, new_buffer != NULL);
         _buffer = new_buffer;
@@ -56,7 +56,7 @@ void String::append(C* c, Str str) {
 void String::insert(C* c, size_t index, Str str) {
     CZ_ASSERT(c, index <= _len);
     reserve(c, str.len);
-    memmove(_buffer + index + str.len, _buffer + index, len());
+    memmove(_buffer + index + str.len, _buffer + index, len() - index);
     memcpy(_buffer + index, str.buffer, str.len);
     _len += str.len;
     CZ_DEBUG_ASSERT(c, _len <= _cap);
