@@ -45,8 +45,8 @@ struct Allocator {
     /// Reallocate memory alloceted using this allocator to store a value of the
     /// given type.
     template <class T>
-    T* realloc(C* c, void* old_ptr, size_t old_size) const {
-        return (T*)realloc(c, old_ptr, old_size, alloc_info<T>());
+    T* realloc(C* c, MemSlice old_mem) const {
+        return (T*)realloc(c, old_mem, alloc_info<T>());
     }
 };
 

@@ -32,8 +32,8 @@ struct Context {
     /// Reallocate memory alloceted using this allocator to store a value of the
     /// given type.
     template <class T>
-    T* realloc(void* old_ptr, size_t old_size) const {
-        return allocator.realloc<T>(this, old_ptr, old_size);
+    T* realloc(MemSlice old_mem) const {
+        return allocator.realloc<T>(this, old_mem);
     }
 
     /// Log the following information.
