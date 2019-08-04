@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include "../../src/mem/allocator.hpp"
+#include "../../src/vector.hpp"
 
 namespace cz {
 namespace test {
@@ -41,6 +42,9 @@ struct MockAllocateMultiple {
 };
 
 mem::Allocator panic_allocator();
+
+mem::Allocator capturing_heap_allocator(BaseArray<MemSlice>* mems);
+void heap_dealloc_all(Slice<MemSlice> mems);
 
 }
 }

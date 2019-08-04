@@ -30,33 +30,6 @@ TEST_CASE("MultiArena::drop does nothing when no memory") {
     multi_arena.drop(&c);
 }
 
-static MemSlice capturing_heap_realloc(C* c, void* _mems, MemSlice old_mem, AllocInfo new_info) {
-    auto mems = static_cast<BaseArray<MemSlice>*>(_mems);
-    auto mem = heap_allocator().realloc(NULL, old_mem, new_info);
-    REQUIRE(mem.buffer != NULL);
-    mems->push(c, mem);
-    return mem;
-}
-
-static MemSlice capturing_heap_alloc(C* c, void* _mocks, AllocInfo new_info) {
-    return capturing_heap_realloc(c, _mocks, {NULL, 0}, new_info);
-}
-
-static void capturing_heap_dealloc(C* c, void* _mocks, MemSlice old_mem) {
-    capturing_heap_realloc(c, _mocks, old_mem, {0, 0});
-}
-
-static Allocator capturing_heap_allocator(BaseArray<MemSlice>* mems) {
-    return {{capturing_heap_alloc, capturing_heap_dealloc, capturing_heap_realloc}, mems};
-}
-
-static void heap_dealloc_all(Slice<MemSlice> mems) {
-    auto allocator = heap_allocator();
-    for (size_t i = 0; i < mems.len; ++i) {
-        allocator.dealloc(NULL, mems[i]);
-    }
-}
-
 TEST_CASE("MultiArena::drop drops the buffer when there is memory") {
     Array<MemSlice, 1> mems;
     CZ_DEFER(heap_dealloc_all(mems));
