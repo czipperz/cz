@@ -41,5 +41,18 @@ Allocator panic_allocator() {
             NULL};
 }
 
+MockAllocateMultiple::MockAllocateMultiple(Slice<MockAllocate> mocks) : mocks(mocks) {}
+
+mem::Allocator MockAllocateMultiple::allocator() {
+    return {[](C* c, void* _mocks, MemSlice old_mem, AllocInfo new_info) {
+                auto mocks = static_cast<MockAllocateMultiple*>(_mocks);
+                REQUIRE(mocks->index < mocks->mocks.len);
+                auto mem = mocks->mocks[mocks->index].allocator().realloc(c, old_mem, new_info);
+                ++mocks->index;
+                return mem;
+            },
+            this};
+}
+
 }
 }

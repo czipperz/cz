@@ -30,6 +30,16 @@ MockAllocate mock_realloc(void* buffer,
                           mem::AllocInfo expected_new_info,
                           MemSlice expected_old_mem);
 
+struct MockAllocateMultiple {
+    Slice<MockAllocate> mocks;
+    size_t index = 0;
+
+    MockAllocateMultiple(Slice<MockAllocate> mocks);
+
+    mem::Allocator allocator();
+    void verify();
+};
+
 mem::Allocator panic_allocator();
 
 }
