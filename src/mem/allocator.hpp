@@ -22,24 +22,30 @@ struct Allocator {
     void* data;
 
     /// Allocate memory using this allocator.
-    void* alloc(C* c, AllocInfo new_info);
+    void* alloc(C* c, AllocInfo info) const {
+        return realloc(c, {}, info);
+    }
 
     /// Allocate memory to store a value of the given type.
     template <class T>
-    T* alloc(C* c) {
+    T* alloc(C* c) const {
         return (T*)alloc(c, alloc_info<T>());
     }
 
     /// Deallocate memory allocated using this allocator.
-    void dealloc(C* c, MemSlice mem);
+    void dealloc(C* c, MemSlice mem) const {
+        realloc(c, mem, {});
+    }
 
     /// Reallocate memory allocated using this allocator.
-    void* realloc(C* c, MemSlice old_mem, AllocInfo new_info);
+    void* realloc(C* c, MemSlice old_mem, AllocInfo new_info) const {
+        return allocate(c, data, old_mem, new_info);
+    }
 
     /// Reallocate memory alloceted using this allocator to store a value of the
     /// given type.
     template <class T>
-    T* realloc(C* c, void* old_ptr, size_t old_size) {
+    T* realloc(C* c, void* old_ptr, size_t old_size) const {
         return (T*)realloc(c, old_ptr, old_size, alloc_info<T>());
     }
 };

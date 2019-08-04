@@ -39,7 +39,7 @@ struct Logger {
     void (*impl)(C* c, void* data, LogInfo info);
     void* data;
 
-    void log(C* c, LogInfo info) { return impl(c, data, info); }
+    void log(C* c, LogInfo info) const { return impl(c, data, info); }
 };
 
 }

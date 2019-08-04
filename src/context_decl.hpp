@@ -3,5 +3,5 @@
 namespace cz {
 struct Context;
 
-using C = Context;
+using C = const Context;
 }

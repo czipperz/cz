@@ -8,35 +8,36 @@ namespace cz {
 
 struct Context {
     mem::Allocator allocator;
+
     log::Logger logger;
     log::LogLevel max_log_level;
 
     /// Allocate memory using this allocator.
-    void* alloc(mem::AllocInfo new_info) { return allocator.alloc(this, new_info); }
+    void* alloc(mem::AllocInfo new_info) const { return allocator.alloc(this, new_info); }
 
     /// Allocate memory to store a value of the given type.
     template <class T>
-    T* alloc() {
+    T* alloc() const {
         return allocator.alloc<T>(this);
     }
 
     /// Deallocate memory allocated using this allocator.
-    void dealloc(MemSlice mem) { return allocator.dealloc(this, mem); }
+    void dealloc(MemSlice mem) const { return allocator.dealloc(this, mem); }
 
     /// Reallocate memory allocated using this allocator.
-    void* realloc(MemSlice old_mem, mem::AllocInfo new_info) {
+    void* realloc(MemSlice old_mem, mem::AllocInfo new_info) const {
         return allocator.realloc(this, old_mem, new_info);
     }
 
     /// Reallocate memory alloceted using this allocator to store a value of the
     /// given type.
     template <class T>
-    T* realloc(void* old_ptr, size_t old_size) {
+    T* realloc(void* old_ptr, size_t old_size) const {
         return allocator.realloc<T>(this, old_ptr, old_size);
     }
 
     /// Log the following information.
-    void log(log::LogInfo info) {
+    void log(log::LogInfo info) const {
         if (info.level <= max_log_level) {
             return logger.log(this, info);
         } else {
