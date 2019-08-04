@@ -2,6 +2,7 @@
 
 #include "context.hpp"
 #include "defer.hpp"
+#include "format.hpp"
 #include "logger_decl.hpp"
 
 namespace cz {
@@ -9,7 +10,7 @@ namespace log {
 
 template <LogLevel level, class... Ts>
 void log(C* c, Ts... ts) {
-    String message = cz::io::concat(c, ts...);
+    String message = cz::format::sprint(c, ts...);
     CZ_DEFER(message.drop(c));
     c->log(LogInfo(level, message));
 }

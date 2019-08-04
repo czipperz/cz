@@ -25,14 +25,6 @@ Writer string_writer(String* string);
 inline Writer cout() { return file_writer(stdout); }
 inline Writer cerr() { return file_writer(stderr); }
 
-template <class T1, class... Ts>
-String concat(C* c, T1 t1, Ts... ts) {
-    String string;
-    auto writer = string_writer(&string);
-    write(c, writer, t1, ts...);
-    return string;
-}
-
 template <class T1, class T2, class... Ts>
 Result write(C* c, Writer writer, T1 t1, T2 t2, Ts... ts) {
     CZ_TRY(write(c, writer, t1));

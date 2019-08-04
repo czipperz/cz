@@ -9,16 +9,6 @@ using namespace cz;
 using namespace cz::io;
 using cz::test::ctxt;
 
-TEST_CASE("concat works") {
-    mem::StackArena<32> arena;
-    C c = ctxt(arena.allocator());
-
-    auto string = concat(&c, 123, " + ", 456);
-    CZ_DEFER(string.drop(&c));
-
-    REQUIRE(string == "123 + 456");
-}
-
 TEST_CASE("write multiple arguments works") {
     mem::StackArena<32> arena;
     C c = ctxt(arena.allocator());
