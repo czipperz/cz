@@ -29,13 +29,6 @@ struct Context {
         return allocator.realloc(this, old_mem, new_info);
     }
 
-    /// Reallocate memory alloceted using this allocator to store a value of the
-    /// given type.
-    template <class T>
-    MemSlice realloc(MemSlice old_mem) const {
-        return allocator.realloc<T>(this, old_mem);
-    }
-
     /// Log the following information.
     void log(log::LogInfo info) const {
         if (info.level <= max_log_level) {
