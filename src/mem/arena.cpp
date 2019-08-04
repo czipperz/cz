@@ -9,7 +9,9 @@ namespace cz {
 namespace mem {
 
 static void* alloc(C* c, Arena* arena, AllocInfo info) {
+    (void)c;
     CZ_DEBUG_ASSERT(c, arena->mem.buffer != NULL);
+
     void* result = advance_ptr_to_alignment(
         {(char*)arena->mem.buffer + arena->offset, arena->mem.size - arena->offset}, info);
     if (result) {
