@@ -80,7 +80,7 @@ struct BaseArray : public impl::VectorBase<T, BaseArray<T>> {
 };
 
 template <class T, size_t static_len>
-class Array : public BaseArray<T> {
+class alignas(T) Array : public BaseArray<T> {
     char buffer[sizeof(T) * static_len];
 
 public:
