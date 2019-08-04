@@ -48,11 +48,18 @@ TEST_CASE("MemSlice(char*, size_t)") {
     REQUIRE(slice.size == 6);
 }
 
-TEST_CASE("MemSlice(int*, size_t)") {
+TEST_CASE("MemSlice(int*, size_t) acts as buffer size") {
     int buffer[8];
     cz::MemSlice slice(buffer, 6);
     REQUIRE(slice.buffer == buffer);
-    REQUIRE(slice.size == 6 * sizeof(int));
+    REQUIRE(slice.size == 6);
+}
+
+TEST_CASE("MemSlice(Slice<int>) acts as logical len") {
+    int buffer[8];
+    cz::MemSlice slice(cz::slice(buffer));
+    REQUIRE(slice.buffer == buffer);
+    REQUIRE(slice.size == 8 * sizeof(int));
 }
 
 TEST_CASE("MemSlice(void*, size_t)") {
