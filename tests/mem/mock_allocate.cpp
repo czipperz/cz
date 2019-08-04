@@ -33,5 +33,13 @@ MockAllocate mock_realloc(void* buffer, AllocInfo expected_new_info, MemSlice ex
     return {buffer, expected_old_mem, expected_new_info};
 }
 
+Allocator panic_allocator() {
+    return {[](C*, void*, MemSlice, AllocInfo) -> MemSlice {
+                FAIL("Allocator cannot be called in this context");
+                return {NULL, 0};
+            },
+            NULL};
+}
+
 }
 }

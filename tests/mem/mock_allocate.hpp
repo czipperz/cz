@@ -30,5 +30,7 @@ MockAllocate mock_realloc(void* buffer,
                           mem::AllocInfo expected_new_info,
                           MemSlice expected_old_mem);
 
+mem::Allocator panic_allocator();
+
 }
 }

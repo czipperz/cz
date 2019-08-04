@@ -11,14 +11,6 @@ using namespace cz;
 using namespace cz::mem;
 using namespace cz::test;
 
-Allocator panic_allocator() {
-    return {[](C* c, void*, MemSlice, AllocInfo) -> MemSlice {
-                CZ_PANIC(c, "Allocator cannot be called in this context");
-                return {NULL, 0};
-            },
-            NULL};
-}
-
 TEST_CASE("String::String() is empty") {
     String string;
 
