@@ -83,3 +83,35 @@ TEST_CASE("MultiArena::drop drops all buffers") {
 
     REQUIRE(mock.index == 2);
 }
+
+TEST_CASE("MultiArena realloc as subset works") {
+    Array<MemSlice, 1> mems;
+    CZ_DEFER(heap_dealloc_all(mems));
+    C alloc_context = ctxt(capturing_heap_allocator(&mems));
+
+    MultiArena multi_arena;
+    auto init = multi_arena.allocator().alloc(&alloc_context, 32);
+    REQUIRE(init.size == 32);
+
+    auto re = multi_arena.allocator().realloc(&alloc_context, init, 24);
+
+    REQUIRE(init.buffer == re.buffer);
+    REQUIRE(re.size == 24);
+    REQUIRE(mems.len == 1);
+}
+
+TEST_CASE("MultiArena realloc works for head") {
+    Array<MemSlice, 1> mems;
+    CZ_DEFER(heap_dealloc_all(mems));
+    C alloc_context = ctxt(capturing_heap_allocator(&mems));
+
+    MultiArena multi_arena;
+    auto init = multi_arena.allocator().alloc(&alloc_context, 24);
+    REQUIRE(init.size == 24);
+
+    auto re = multi_arena.allocator().realloc(&alloc_context, init, 32);
+
+    REQUIRE(init.buffer == re.buffer);
+    REQUIRE(re.size == 32);
+    REQUIRE(mems.len == 1);
+}
