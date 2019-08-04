@@ -2,7 +2,7 @@
 
 #include <stddef.h>
 #include "../../src/mem/allocator.hpp"
-#include "../../src/vector.hpp"
+#include "../../src/array.hpp"
 
 namespace cz {
 namespace test {

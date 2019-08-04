@@ -3,7 +3,6 @@
 #include "../../src/defer.hpp"
 #include "../../src/mem/heap.hpp"
 #include "../../src/mem/multi_arena.hpp"
-#include "../../src/vector.hpp"
 #include "../context.hpp"
 #include "mock_allocate.hpp"
 
