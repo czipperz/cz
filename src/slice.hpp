@@ -54,8 +54,13 @@ struct MemSlice {
     constexpr bool operator==(MemSlice other) const {
         return buffer == other.buffer && size == other.size;
     }
-    constexpr bool operator!=(MemSlice other) const {
-        return !(*this == other);
+    constexpr bool operator!=(MemSlice other) const { return !(*this == other); }
+
+    constexpr void* start() const { return buffer; }
+    constexpr void* end() const { return (char*)buffer + size; }
+
+    constexpr bool contains(MemSlice other) const {
+        return start() <= other.start() && end() >= other.end();
     }
 };
 
