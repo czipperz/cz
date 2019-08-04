@@ -75,6 +75,30 @@ TEST_CASE("Arena realloc in place expanding") {
     REQUIRE(buffer[3] == '*');
 }
 
+TEST_CASE("Arena realloc in place expanding failure boundary success") {
+    char buffer[8] = {0};
+    Arena arena(buffer);
+    arena.allocator().alloc(NULL, 2);
+
+    auto mem = arena.allocator().alloc(NULL, 4);
+    REQUIRE(mem == MemSlice{buffer + 2, 4});
+
+    mem = arena.allocator().realloc(NULL, mem, 6);
+    REQUIRE(mem == MemSlice{buffer + 2, 6});
+}
+
+TEST_CASE("Arena realloc in place expanding failure boundary error") {
+    char buffer[8] = {0};
+    Arena arena(buffer);
+    arena.allocator().alloc(NULL, 2);
+
+    auto mem = arena.allocator().alloc(NULL, 4);
+    REQUIRE(mem == MemSlice{buffer + 2, 4});
+
+    mem = arena.allocator().realloc(NULL, mem, 7);
+    REQUIRE(mem == MemSlice{NULL, 0});
+}
+
 TEST_CASE("Arena realloc not enough space returns null") {
     char buffer[8] = {0};
     Arena arena(buffer);

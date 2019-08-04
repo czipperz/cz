@@ -31,7 +31,9 @@ static MemSlice arena_realloc(C* c, void* _arena, MemSlice old_mem, AllocInfo ne
     // In place if most recent
     if ((char*)arena->mem.buffer + arena->offset == (char*)old_mem.buffer + old_mem.size) {
         // Realloc in place if enough space
-        auto aligned = advance_ptr_to_alignment({old_mem.buffer, arena->mem.size}, new_info);
+        auto aligned = advance_ptr_to_alignment(
+            {old_mem.buffer, arena->mem.size + ((char*)arena->mem.buffer - (char*)old_mem.buffer)},
+            new_info);
         if (aligned) {
             arena->offset = (char*)aligned + new_info.size - (char*)arena->mem.buffer;
             return {aligned, new_info.size};
