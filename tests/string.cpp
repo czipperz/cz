@@ -12,9 +12,9 @@ using namespace cz::mem;
 using namespace cz::test;
 
 Allocator panic_allocator() {
-    return {[](C* c, void*, MemSlice, AllocInfo) -> void* {
+    return {[](C* c, void*, MemSlice, AllocInfo) -> MemSlice {
                 CZ_PANIC(c, "Allocator cannot be called in this context");
-                return NULL;
+                return {NULL, 0};
             },
             NULL};
 }

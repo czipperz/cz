@@ -25,7 +25,7 @@ static void* alloc(C* c, Arena* arena, AllocInfo info) {
     return result;
 }
 
-static void* arena_realloc(C* c, void* _arena, MemSlice old_mem, AllocInfo new_info) {
+static MemSlice arena_realloc(C* c, void* _arena, MemSlice old_mem, AllocInfo new_info) {
     auto arena = static_cast<Arena*>(_arena);
 
     // In place if most recent
@@ -34,7 +34,7 @@ static void* arena_realloc(C* c, void* _arena, MemSlice old_mem, AllocInfo new_i
         auto aligned = advance_ptr_to_alignment({old_mem.buffer, arena->mem.size}, new_info);
         if (aligned) {
             arena->offset = (char*)aligned + new_info.size - (char*)arena->mem.buffer;
-            return aligned;
+            return {aligned, new_info.size};
         }
 
         // When in dealloc mode just back out of the end.  We lose the padding
@@ -44,13 +44,13 @@ static void* arena_realloc(C* c, void* _arena, MemSlice old_mem, AllocInfo new_i
         }
 
         // Either deallocating or there isn't enough space.
-        return NULL;
+        return {NULL, 0};
     }
 
     // Allocate as subset of old_mem
     auto old_aligned = advance_ptr_to_alignment(old_mem, new_info);
     if (old_aligned) {
-        return old_aligned;
+        return {old_aligned, new_info.size};
     }
 
     // Allocate a fresh copy
@@ -60,7 +60,7 @@ static void* arena_realloc(C* c, void* _arena, MemSlice old_mem, AllocInfo new_i
         CZ_DEBUG_ASSERT(c, new_info.size <= old_mem.size);
         memcpy(new_ptr, old_mem.buffer, old_mem.size);
     }
-    return new_ptr;
+    return {new_ptr, new_ptr ? new_info.size : 0};
 }
 
 Allocator Arena::allocator() {
@@ -71,10 +71,8 @@ Allocator Arena::allocator() {
 }
 
 HeapArena::HeapArena(C* c, AllocInfo info) {
-    auto buffer = c->alloc(info);
-    CZ_ASSERT(c, buffer != NULL);
-    mem.buffer = buffer;
-    mem.size = info.size;
+    mem = c->alloc(info);
+    CZ_ASSERT(c, mem.buffer != NULL);
 }
 
 void HeapArena::drop(C* c) {

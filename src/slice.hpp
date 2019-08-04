@@ -50,6 +50,13 @@ struct MemSlice {
     template <class T>
     constexpr MemSlice(Slice<T> slice) : buffer(slice.buffer), size(slice.len * sizeof(T)) {}
     constexpr MemSlice(void* buffer, size_t size) : buffer(buffer), size(size) {}
+
+    constexpr bool operator==(MemSlice other) const {
+        return buffer == other.buffer && size == other.size;
+    }
+    constexpr bool operator!=(MemSlice other) const {
+        return !(*this == other);
+    }
 };
 
 }
