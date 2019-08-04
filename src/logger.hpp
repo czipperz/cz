@@ -9,7 +9,7 @@ namespace log {
 
 template <LogLevel level, class... Ts>
 void log(C* c, Ts... ts) {
-    String message = concat(c, ts...);
+    String message = cz::io::concat(c, ts...);
     CZ_DEFER(message.drop(c));
     c->log(LogInfo(level, message));
 }
@@ -41,6 +41,22 @@ void debug(C* c, Ts... ts) {
 template <class... Ts>
 void trace(C* c, Ts... ts) {
     return log<LogLevel::Trace>(c, ts...);
+}
+
+struct BasicLogger {
+    LogFormatter formatter;
+    io::Writer out;
+
+    static void write(C* c, void* _self, LogInfo info) {
+        auto self = static_cast<BasicLogger*>(_self);
+        self->formatter.write_to(c, self->out, info);
+    }
+
+    explicit operator Logger() { return {write, this}; }
+};
+
+inline Logger ignore() {
+    return {[](C*, void*, LogInfo) {}, NULL};
 }
 
 }

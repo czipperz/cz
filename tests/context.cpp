@@ -1,6 +1,7 @@
 #include "context.hpp"
 
 #include "../src/context.hpp"
+#include "../src/logger.hpp"
 
 namespace cz {
 namespace test {

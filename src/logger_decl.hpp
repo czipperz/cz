@@ -29,18 +29,17 @@ struct LogInfo {
 };
 
 struct LogFormatter {
-    void (*target)(C* c, void* data, io::Writer writer, LogInfo info);
+    void (*impl)(C* c, void* data, io::Writer writer, LogInfo info);
     void* data;
 
-    void write_to(C* c, io::Writer writer, LogInfo info) { return target(c, data, writer, info); }
-    void drop(C* c);
+    void write_to(C* c, io::Writer writer, LogInfo info) { return impl(c, data, writer, info); }
 };
 
 struct Logger {
-    LogFormatter formatter;
-    io::Writer out;
+    void (*impl)(C* c, void* data, LogInfo info);
+    void* data;
 
-    void log(C* c, LogInfo info) { return formatter.write_to(c, out, info); }
+    void log(C* c, LogInfo info) { return impl(c, data, info); }
 };
 
 }

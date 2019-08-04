@@ -37,7 +37,11 @@ struct Context {
 
     /// Log the following information.
     void log(log::LogInfo info) {
-        return logger.log(this, info);
+        if (info.level <= max_log_level) {
+            return logger.log(this, info);
+        } else {
+            return;
+        }
     }
 };
 
