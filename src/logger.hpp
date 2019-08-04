@@ -38,6 +38,7 @@ io::Writer trace();
 
 Logger ignore();
 Logger console();
+Logger string(C* c);
 
 }
 }

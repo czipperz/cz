@@ -1,7 +1,4 @@
-#include "logger.hpp"
-
-#include <iostream>
-#include "mem.hpp"
+#include "assert.hpp"
 
 namespace cz {
 namespace log {
@@ -32,6 +29,17 @@ static void log_console(C*, MemSlice, LogLevel level, Str str) {
 
 Logger console() {
     return {log_console, {}};
+}
+
+static void log_string(C* c, MemSlice _string, LogLevel, Str str) {
+    auto string = static_cast<String*>(_string.buffer);
+    write(c, io::string_writer(string), str, '\n');
+}
+
+Logger string(C* c) {
+    String* string = c->alloc<String>();
+    CZ_ASSERT(c, string != NULL);
+    return {log_string, slice(string, 1)};
 }
 
 void Logger::drop(C* c) {
