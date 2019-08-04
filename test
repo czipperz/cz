@@ -4,6 +4,7 @@ set -e
 
 export OUTPUT="${OUTPUT:-out}"
 export BUILD_TYPE="${BUILD_TYPE:-Debug}"
+export BUILD_TESTS=t
 
 cd "$(dirname "$0")"
 

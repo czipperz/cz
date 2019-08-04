@@ -13,8 +13,15 @@ cd "$OUTPUT"
 echo "CMake:"
 echo "Output directory: $OUTPUT"
 echo "Build type: $BUILD_TYPE"
+if [ "$BUILD_TESTS" ]; then
+    echo "Tests enabled"
+    TARGETS=""
+else
+    echo "Tests disabled"
+    TARGETS="cz"
+fi
 cmake .. -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
 
 echo
 echo "Make:"
-make -k
+make -k $TARGETS
