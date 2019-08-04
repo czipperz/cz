@@ -42,19 +42,20 @@ static Allocator capturing_heap_allocator(BaseArray<MemSlice>* mems) {
 }
 
 static void heap_dealloc_all(Slice<MemSlice> mems) {
+    auto allocator = heap_allocator();
     for (size_t i = 0; i < mems.len; ++i) {
-        heap_allocator().dealloc(NULL, mems[i]);
+        allocator.dealloc(NULL, mems[i]);
     }
 }
 
 TEST_CASE("MultiArena::drop drops the buffer when there is memory") {
     Array<MemSlice, 1> mems;
+    CZ_DEFER(heap_dealloc_all(mems));
     C alloc_context = ctxt(capturing_heap_allocator(&mems));
 
     MultiArena multi_arena;
     multi_arena.allocator().alloc(&alloc_context, 32);
     REQUIRE(mems.len == 1);
-    CZ_DEFER(heap_dealloc_all(mems));
 
     auto mock = mock_dealloc(mems[0]);
     C drop_context = ctxt(mock.allocator());
@@ -66,14 +67,13 @@ TEST_CASE("MultiArena::drop drops the buffer when there is memory") {
 
 TEST_CASE("MultiArena::drop drops all buffers") {
     Array<MemSlice, 2> mems;
+    CZ_DEFER(heap_dealloc_all(mems));
     C alloc_context = ctxt(capturing_heap_allocator(&mems));
 
     MultiArena multi_arena;
     multi_arena.allocator().alloc(&alloc_context, 700);
     multi_arena.allocator().alloc(&alloc_context, 700);
     REQUIRE(mems.len == 2);
-
-    CZ_DEFER(heap_dealloc_all(mems));
 
     MockAllocate mocks[2] = {mock_dealloc(mems[1]), mock_dealloc(mems[0])};
     MockAllocateMultiple mock(mocks);
