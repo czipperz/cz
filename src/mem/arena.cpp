@@ -1,19 +1,12 @@
 #include "arena.hpp"
 
 #include <string.h>
-#include <memory>
 #include "../assert.hpp"
+#include "alloc_utils.hpp"
 #include "allocator.hpp"
 
 namespace cz {
 namespace mem {
-
-static void* advance_ptr_to_alignment(MemSlice old_mem, AllocInfo new_info) {
-    // std::align uses references to modify the old variables inplace so is
-    // difficult to correctly inline.  This returns true if there is enough room
-    // after aligning.
-    return std::align(new_info.alignment, new_info.size, old_mem.buffer, old_mem.size);
-}
 
 static void* alloc(C* c, Arena* arena, AllocInfo info) {
     CZ_DEBUG_ASSERT(c, arena->mem.buffer != NULL);
