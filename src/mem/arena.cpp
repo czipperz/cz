@@ -8,61 +8,72 @@
 namespace cz {
 namespace mem {
 
-static void* alloc(C* c, Arena* arena, AllocInfo info) {
+static MemSlice arena_alloc(C* c, void* _arena, AllocInfo info) {
     (void)c;
+    auto arena = static_cast<Arena*>(_arena);
     CZ_DEBUG_ASSERT(c, arena->mem.buffer != NULL);
 
-    void* result = advance_ptr_to_alignment(
-        {(char*)arena->mem.buffer + arena->offset, arena->mem.size - arena->offset}, info);
+    void* result = advance_ptr_to_alignment(arena->remaining(), info);
     if (result) {
-        arena->offset = (char*)result - (char*)arena->mem.buffer + info.size;
+        MemSlice new_mem = {result, info.size};
+        arena->set_point(new_mem.end());
+        return new_mem;
+    } else {
+        return {NULL, 0};
     }
-    return result;
+}
+
+static void arena_dealloc(C* c, void* _arena, MemSlice old_mem) {
+    (void)c;
+    auto arena = static_cast<Arena*>(_arena);
+    CZ_DEBUG_ASSERT(c, arena->mem.buffer != NULL);
+
+    if (arena->point() == old_mem.end()) {
+        CZ_DEBUG_ASSERT(c, arena->mem.contains(old_mem));
+        arena->set_point(old_mem.start());
+    }
 }
 
 static MemSlice arena_realloc(C* c, void* _arena, MemSlice old_mem, AllocInfo new_info) {
     auto arena = static_cast<Arena*>(_arena);
+    CZ_DEBUG_ASSERT(c, arena->mem.buffer != NULL);
 
-    // In place if most recent
-    if ((char*)arena->mem.buffer + arena->offset == (char*)old_mem.buffer + old_mem.size) {
-        // Realloc in place if enough space
-        auto aligned = advance_ptr_to_alignment(
-            {old_mem.buffer, arena->mem.size + ((char*)arena->mem.buffer - (char*)old_mem.buffer)},
-            new_info);
-        if (aligned) {
-            arena->offset = (char*)aligned + new_info.size - (char*)arena->mem.buffer;
-            return {aligned, new_info.size};
+    if (arena->point() == old_mem.end()) {
+        // Pretend we dealloc the memory then allocate again so we get more space.
+        size_t remaining_size = (char*)arena->mem.end() - (char*)old_mem.buffer;
+        auto old_aligned = advance_ptr_to_alignment({old_mem.buffer, remaining_size}, new_info);
+
+        if (old_aligned) {
+            // Move the memory to deal with alignment.
+            memmove(old_aligned, old_mem.buffer, new_info.size);
+            MemSlice new_mem = {old_aligned, new_info.size};
+            arena->set_point(new_mem.end());
+            return new_mem;
+        } else {
+            return {NULL, 0};
         }
-
-        // When in dealloc mode just back out of the end.  We lose the padding
-        // added for the alignment of the old_mem but that's ok.
-        if (new_info.size == 0) {
-            arena->offset = (char*)old_mem.buffer - (char*)arena->mem.buffer;
+    } else {
+        auto old_aligned = advance_ptr_to_alignment(old_mem, new_info);
+        if (old_aligned) {
+            // Allocate as a subset of old_mem
+            memmove(old_aligned, old_mem.buffer, new_info.size);
+            return {old_aligned, new_info.size};
+        } else {
+            // Allocate a fresh copy
+            auto new_mem = arena_alloc(c, arena, new_info);
+            if (new_mem.buffer && old_mem.buffer) {
+                // Must have a greater new size as smaller sizes are handled above
+                CZ_DEBUG_ASSERT(c, new_info.size <= old_mem.size);
+                memcpy(new_mem.buffer, old_mem.buffer, old_mem.size);
+            }
+            return new_mem;
         }
-
-        // Either deallocating or there isn't enough space.
-        return {NULL, 0};
     }
-
-    // Allocate as subset of old_mem
-    auto old_aligned = advance_ptr_to_alignment(old_mem, new_info);
-    if (old_aligned) {
-        return {old_aligned, new_info.size};
-    }
-
-    // Allocate a fresh copy
-    auto new_ptr = alloc(c, arena, new_info);
-    if (new_ptr && old_mem.buffer) {
-        // Must have a greater new size as smaller sizes are handled above
-        CZ_DEBUG_ASSERT(c, new_info.size <= old_mem.size);
-        memcpy(new_ptr, old_mem.buffer, old_mem.size);
-    }
-    return {new_ptr, new_ptr ? new_info.size : 0};
 }
 
 Allocator Arena::allocator() {
     return {
-        arena_realloc,
+        {arena_alloc, arena_dealloc, arena_realloc},
         this,
     };
 }

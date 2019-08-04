@@ -19,8 +19,16 @@ static MemSlice test_realloc(C*, void* _data, MemSlice old_mem, AllocInfo new_in
     return {data->buffer, new_info.size};
 }
 
+static MemSlice test_alloc(C* c, void* _data, AllocInfo info) {
+    return test_realloc(c, _data, {NULL, 0}, info);
+}
+
+static void test_dealloc(C* c, void* _data, MemSlice mem) {
+    test_realloc(c, _data, mem, {0, 0});
+}
+
 Allocator MockAllocate::allocator() {
-    return {test_realloc, this};
+    return {{test_alloc, test_dealloc, test_realloc}, this};
 }
 
 MockAllocate mock_alloc(void* buffer, AllocInfo expected_new_info) {
@@ -33,25 +41,44 @@ MockAllocate mock_realloc(void* buffer, AllocInfo expected_new_info, MemSlice ex
     return {buffer, expected_old_mem, expected_new_info};
 }
 
+static MemSlice panic_alloc(C*, void*, AllocInfo) {
+    FAIL("alloc cannot be called in this context");
+    return {NULL, 0};
+}
+
+static MemSlice panic_realloc(C*, void*, MemSlice, AllocInfo) {
+    FAIL("realloc cannot be called in this context");
+    return {NULL, 0};
+}
+
+static void panic_dealloc(C*, void*, MemSlice) {
+    FAIL("dealloc cannot be called in this context");
+}
+
 Allocator panic_allocator() {
-    return {[](C*, void*, MemSlice, AllocInfo) -> MemSlice {
-                FAIL("Allocator cannot be called in this context");
-                return {NULL, 0};
-            },
-            NULL};
+    return {{panic_alloc, panic_dealloc, panic_realloc}, NULL};
 }
 
 MockAllocateMultiple::MockAllocateMultiple(Slice<MockAllocate> mocks) : mocks(mocks) {}
 
+static MemSlice test_multiple_realloc(C* c, void* _mocks, MemSlice old_mem, AllocInfo new_info) {
+    auto mocks = static_cast<MockAllocateMultiple*>(_mocks);
+    REQUIRE(mocks->index < mocks->mocks.len);
+    auto mem = mocks->mocks[mocks->index].allocator().realloc(c, old_mem, new_info);
+    ++mocks->index;
+    return mem;
+}
+
+static MemSlice test_multiple_alloc(C* c, void* _mocks, AllocInfo new_info) {
+    return test_multiple_realloc(c, _mocks, {NULL, 0}, new_info);
+}
+
+static void test_multiple_dealloc(C* c, void* _mocks, MemSlice old_mem) {
+    test_multiple_realloc(c, _mocks, old_mem, {0, 0});
+}
+
 mem::Allocator MockAllocateMultiple::allocator() {
-    return {[](C* c, void* _mocks, MemSlice old_mem, AllocInfo new_info) {
-                auto mocks = static_cast<MockAllocateMultiple*>(_mocks);
-                REQUIRE(mocks->index < mocks->mocks.len);
-                auto mem = mocks->mocks[mocks->index].allocator().realloc(c, old_mem, new_info);
-                ++mocks->index;
-                return mem;
-            },
-            this};
+    return {{test_multiple_alloc, test_multiple_dealloc, test_multiple_realloc}, this};
 }
 
 }

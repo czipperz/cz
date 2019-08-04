@@ -5,17 +5,32 @@
 namespace cz {
 namespace mem {
 
-static MemSlice heap_allocate(C*, void*, MemSlice old_mem, AllocInfo new_info) {
-    // TODO make alignment work
-    if (old_mem.size == 0) {
-        return {malloc(new_info.size), new_info.size};
+static MemSlice heap_alloc(C*, void*, AllocInfo info) {
+    // TODO alignment
+    auto buf = malloc(info.size);
+    if (buf) {
+        return {buf, info.size};
     } else {
-        return {::realloc(old_mem.buffer, new_info.size), new_info.size};
+        return {NULL, 0};
+    }
+}
+
+static void heap_dealloc(C*, void*, MemSlice mem) {
+    free(mem.buffer);
+}
+
+static MemSlice heap_realloc(C*, void*, MemSlice old_mem, AllocInfo new_info) {
+    // TODO alignment
+    auto buf = realloc(old_mem.buffer, new_info.size);
+    if (buf) {
+        return {buf, new_info.size};
+    } else {
+        return {NULL, 0};
     }
 }
 
 Allocator heap_allocator() {
-    return {heap_allocate, NULL};
+    return {{heap_alloc, heap_dealloc, heap_realloc}, NULL};
 }
 
 }

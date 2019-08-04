@@ -12,19 +12,19 @@ struct Context {
     log::Logger logger;
     log::LogLevel max_log_level;
 
-    /// Allocate memory using this allocator.
-    MemSlice alloc(mem::AllocInfo new_info) const { return allocator.alloc(this, new_info); }
+    /// Allocate memory using the allocator.
+    MemSlice alloc(mem::AllocInfo info) const { return allocator.alloc(this, info); }
 
-    /// Allocate memory to store a value of the given type.
+    /// Allocate memory to store a value of the given type using the allocator.
     template <class T>
     T* alloc() const {
         return allocator.alloc<T>(this);
     }
 
-    /// Deallocate memory allocated using this allocator.
+    /// Deallocate memory allocated using the allocator.
     void dealloc(MemSlice mem) const { return allocator.dealloc(this, mem); }
 
-    /// Reallocate memory allocated using this allocator.
+    /// Reallocate a section of memory allocated using the allocator.
     MemSlice realloc(MemSlice old_mem, mem::AllocInfo new_info) const {
         return allocator.realloc(this, old_mem, new_info);
     }

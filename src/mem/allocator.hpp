@@ -14,7 +14,11 @@ namespace mem {
 ///
 /// If \c old_mem.buffer is \c NULL the user is trying to allocate memory.
 /// If \c new_info.size is \c 0 the user is trying to deallocate memory.
-using Allocate = MemSlice (*)(C* c, void* data, MemSlice old_mem, AllocInfo new_info);
+struct Allocate {
+    MemSlice (*alloc)(C* c, void* data, AllocInfo new_info);
+    void (*dealloc)(C* c, void* data, MemSlice old_mem);
+    MemSlice (*realloc)(C* c, void* data, MemSlice old_mem, AllocInfo new_info);
+};
 
 /// A memory allocator.
 struct Allocator {
@@ -22,24 +26,20 @@ struct Allocator {
     void* data;
 
     /// Allocate memory using this allocator.
-    MemSlice alloc(C* c, AllocInfo info) const {
-        return realloc(c, {}, info);
-    }
+    MemSlice alloc(C* c, AllocInfo info) const { return allocate.alloc(c, data, info); }
 
-    /// Allocate memory to store a value of the given type.
+    /// Allocate memory to store a value of the given type using this allocator.
     template <class T>
     T* alloc(C* c) const {
         return (T*)alloc(c, alloc_info<T>()).buffer;
     }
 
     /// Deallocate memory allocated using this allocator.
-    void dealloc(C* c, MemSlice mem) const {
-        realloc(c, mem, {});
-    }
+    void dealloc(C* c, MemSlice mem) const { return allocate.dealloc(c, data, mem); }
 
-    /// Reallocate memory allocated using this allocator.
+    /// Reallocate a section of memory allocated using this allocator.
     MemSlice realloc(C* c, MemSlice old_mem, AllocInfo new_info) const {
-        return allocate(c, data, old_mem, new_info);
+        return allocate.realloc(c, data, old_mem, new_info);
     }
 };
 
