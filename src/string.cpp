@@ -3,6 +3,7 @@
 #include <string.h>
 #include "assert.hpp"
 #include "mem.hpp"
+#include "util.hpp"
 
 namespace cz {
 
@@ -33,14 +34,6 @@ size_t String::cap() const {
 
 Str String::as_str() const {
     return {_buffer, _len};
-}
-
-static size_t max(size_t a, size_t b) {
-    if (a > b) {
-        return a;
-    } else {
-        return b;
-    }
 }
 
 void String::reserve(C* c, size_t extra) {
