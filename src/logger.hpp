@@ -1,44 +1,47 @@
 #pragma once
 
-#include "io/write.hpp"
-#include "str.hpp"
+#include "context.hpp"
+#include "defer.hpp"
+#include "logger_decl.hpp"
 
 namespace cz {
 namespace log {
 
-namespace LogLevel_ {
-enum LogLevel {
-    Off = -1,
-    Fatal,
-    Error,
-    Warning,
-    Important,
-    Information,
-    Debug,
-    Trace,
-};
+template <LogLevel level, class... Ts>
+void log(C* c, Ts... ts) {
+    String message = concat(c, ts...);
+    CZ_DEFER(message.drop(c));
+    c->log(LogInfo(level, message));
 }
-using LogLevel_::LogLevel;
 
-struct Logger {
-    void (*target)(C* c, MemSlice data, LogLevel level, Str str);
-    MemSlice data;
-
-    void log(C* c, LogLevel level, Str str) { return target(c, data, level, str); }
-    void drop(C* c);
-};
-
-io::Writer fatal();
-io::Writer error();
-io::Writer warning();
-io::Writer important();
-io::Writer information();
-io::Writer debug();
-io::Writer trace();
-
-Logger ignore();
-Logger console();
-Logger string(C* c);
+template <class... Ts>
+void fatal(C* c, Ts... ts) {
+    return log<LogLevel::Fatal>(c, ts...);
+}
+template <class... Ts>
+void error(C* c, Ts... ts) {
+    return log<LogLevel::Error>(c, ts...);
+}
+template <class... Ts>
+void warning(C* c, Ts... ts) {
+    return log<LogLevel::Warning>(c, ts...);
+}
+template <class... Ts>
+void important(C* c, Ts... ts) {
+    return log<LogLevel::Important>(c, ts...);
+}
+template <class... Ts>
+void information(C* c, Ts... ts) {
+    return log<LogLevel::Information>(c, ts...);
+}
+template <class... Ts>
+void debug(C* c, Ts... ts) {
+    return log<LogLevel::Debug>(c, ts...);
+}
+template <class... Ts>
+void trace(C* c, Ts... ts) {
+    return log<LogLevel::Trace>(c, ts...);
+}
 
 }
 }

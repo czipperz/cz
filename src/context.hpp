@@ -1,7 +1,7 @@
 #pragma once
 
 #include "context_decl.hpp"
-#include "logger.hpp"
+#include "logger_decl.hpp"
 #include "mem/allocator.hpp"
 
 namespace cz {
@@ -33,6 +33,11 @@ struct Context {
     template <class T>
     T* realloc(void* old_ptr, size_t old_size) {
         return allocator.realloc<T>(this, old_ptr, old_size);
+    }
+
+    /// Log the following information.
+    void log(log::LogInfo info) {
+        return logger.log(this, info);
     }
 };
 
