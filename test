@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -e
+
+export OUTPUT="${OUTPUT:-out}"
+export BUILD_TYPE="${BUILD_TYPE:-Debug}"
+
+cd "$(dirname "$0")"
+
+./build
+
+echo
+echo "Test:"
+./"$OUTPUT"/test "$@"
