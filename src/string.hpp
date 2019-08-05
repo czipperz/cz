@@ -17,10 +17,17 @@ public:
     /// Create a new \c String using the \c buffer with initial length \c len and capacity \c cap.
     explicit String(char* buffer, size_t len, size_t cap);
 
+    /// Use move constructor or explicitly \c clone() instead.
+    String(const String&) = delete;
+    /// Use move assignment operator or explicitly \c clone() instead.
+    String& operator=(const String&) = delete;
+
+    /// Bitwise copy the other \c String.  Note: this does not deinitialize the other \c String.
     String(String&& other) = default;
+    /// Bitwise copy the other \c String.  Note: this does not deinitialize the other \c String.
     String& operator=(String&& other) = default;
 
-    /// Create a new \c String allocating a new buffer as a copy of the inputted string.
+    /// Create a new \c String allocating a new buffer as a copy of the inputted \c String.
     explicit String(C* c, Str str_to_copy);
 
     /// Ensure there are \c extra bytes available in the buffer.
