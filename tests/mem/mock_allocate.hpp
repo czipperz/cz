@@ -43,7 +43,7 @@ struct MockAllocateMultiple {
 
 mem::Allocator panic_allocator();
 
-mem::Allocator capturing_heap_allocator(BaseArray<MemSlice>* mems);
+mem::Allocator capturing_heap_allocator(ArrayRef<MemSlice>* mems);
 void heap_dealloc_all(Slice<MemSlice> mems);
 
 }

@@ -6,13 +6,13 @@ namespace cz {
 namespace impl {
 
 template <class T, class Child>
-class VectorBase {
+class ListBase {
 public:
     T* elems;
     size_t len;
     size_t cap;
 
-    constexpr VectorBase(T* elems, size_t len, size_t cap) : elems(elems), len(len), cap(cap) {}
+    constexpr ListBase(T* elems, size_t len, size_t cap) : elems(elems), len(len), cap(cap) {}
 
     void push(C* c, T t) {
         static_cast<Child*>(this)->reserve(c, 1);

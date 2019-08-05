@@ -3,12 +3,12 @@
 #include "assert.hpp"
 #include "context.hpp"
 #include "util.hpp"
-#include "vector_base.hpp"
+#include "list_base.hpp"
 
 namespace cz {
 
 template <class T>
-struct Vector : public impl::VectorBase<T, Vector<T>> {
+struct Vector : public impl::ListBase<T, Vector<T>> {
     void reserve(C* c, size_t extra) {
         if (this->cap - this->len < extra) {
             size_t new_cap = max(this->len + extra, this->cap * 2);

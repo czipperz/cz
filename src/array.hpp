@@ -2,14 +2,14 @@
 
 #include "assert.hpp"
 #include "context.hpp"
-#include "vector_base.hpp"
+#include "list_base.hpp"
 
 namespace cz {
 
 template <class T>
-struct BaseArray : public impl::VectorBase<T, BaseArray<T>> {
-    constexpr BaseArray(T* buffer, size_t cap)
-        : impl::VectorBase<T, BaseArray<T>>(buffer, 0, cap) {}
+struct ArrayRef : public impl::ListBase<T, ArrayRef<T>> {
+    constexpr ArrayRef(T* buffer, size_t len, size_t cap)
+        : impl::ListBase<T, ArrayRef<T>>(buffer, len, cap) {}
 
     void reserve(C* c, size_t extra) {
         if (this->cap - this->len < extra) {
@@ -17,21 +17,22 @@ struct BaseArray : public impl::VectorBase<T, BaseArray<T>> {
         }
     }
 
-    BaseArray(const BaseArray&) = delete;
-    BaseArray& operator=(const BaseArray&) = delete;
+    ArrayRef(const ArrayRef&) = delete;
+    ArrayRef& operator=(const ArrayRef&) = delete;
 };
 
 template <class T, size_t static_len>
-class alignas(T) Array : public BaseArray<T> {
+class alignas(T) Array : public ArrayRef<T> {
     char buffer[sizeof(T) * static_len];
 
 public:
-    constexpr Array() : BaseArray<T>(reinterpret_cast<T*>(buffer), static_len) {}
+    constexpr Array() : ArrayRef<T>(reinterpret_cast<T*>(buffer), 0, static_len) {}
 
     Array(const Array& other) : Array() { *this = other; }
     Array& operator=(const Array& other) {
         memcpy(buffer, other.buffer, other.len * sizeof(T));
         this->len = other.len;
+        return *this;
     }
 };
 
