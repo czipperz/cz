@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "../defer.hpp"
 #include "../string.hpp"
+#include "../sys.hpp"
 
 namespace cz {
 namespace fs {
@@ -15,7 +16,7 @@ bool read(C* c, String* string, FILE* file, size_t size) {
 }
 
 io::Result read_to_string(C* c, String* string, FILE* file) {
-    const size_t chunk_size = 1024;
+    const size_t chunk_size = sys::page_size();
 
     while (true) {
         if (!read(c, string, file, chunk_size)) {
