@@ -25,8 +25,8 @@ struct ArrayRef : public impl::ListBase<T, ArrayRef<T>> {
 };
 
 template <class T, size_t Capacity>
-class alignas(T) Array : public ArrayRef<T> {
-    char buffer[sizeof(T) * Capacity];
+class Array : public ArrayRef<T> {
+    alignas(T) char buffer[sizeof(T) * Capacity];
 
 public:
     constexpr Array() : ArrayRef<T>(reinterpret_cast<T*>(buffer), 0, Capacity) {}
