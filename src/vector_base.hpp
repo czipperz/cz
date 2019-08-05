@@ -12,8 +12,6 @@ public:
     size_t len;
     size_t cap;
 
-    constexpr VectorBase() : elems(NULL), len(0), cap(0) {}
-    constexpr VectorBase(T* elems, size_t len) : elems(elems), len(len), cap(len) {}
     constexpr VectorBase(T* elems, size_t len, size_t cap) : elems(elems), len(len), cap(cap) {}
 
     void push(C* c, T t) {
