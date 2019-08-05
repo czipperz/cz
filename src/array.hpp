@@ -24,12 +24,12 @@ struct ArrayRef : public impl::ListBase<T, ArrayRef<T>> {
     ArrayRef& operator=(const ArrayRef&) = delete;
 };
 
-template <class T, size_t static_len>
+template <class T, size_t Capacity>
 class alignas(T) Array : public ArrayRef<T> {
-    char buffer[sizeof(T) * static_len];
+    char buffer[sizeof(T) * Capacity];
 
 public:
-    constexpr Array() : ArrayRef<T>(reinterpret_cast<T*>(buffer), 0, static_len) {}
+    constexpr Array() : ArrayRef<T>(reinterpret_cast<T*>(buffer), 0, Capacity) {}
 
     Array(const Array& other) : Array() { *this = other; }
     Array& operator=(const Array& other) {
