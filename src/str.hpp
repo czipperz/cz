@@ -3,9 +3,12 @@
 #include <stddef.h>
 #include <string.h>
 #include <cstddef>
+#include "context_decl.hpp"
 #include "slice.hpp"
 
 namespace cz {
+
+class String;
 
 struct Str : public Slice<const char> {
     constexpr Str() : Slice({NULL, 0}) {}
@@ -17,6 +20,9 @@ struct Str : public Slice<const char> {
     static constexpr Str cstr(const char (&str)[len]) {
         return {str, len - 1};
     }
+
+    /// Create a new \c String with the same contents in a unique memory buffer.
+    String duplicate(C* c) const;
 
     bool operator==(const Str& other) const {
         return len == other.len && memcmp(buffer, other.buffer, len) == 0;

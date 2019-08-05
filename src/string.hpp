@@ -42,7 +42,7 @@ public:
     void set_len(C* c, size_t new_len);
 
     /// Create a new \c String with the same contents in a unique memory buffer.
-    String clone(C* c) const;
+    String clone(C* c) const { return as_str().duplicate(c); }
 
     /// Dealloc the \c buffer.
     void drop(C* c);
