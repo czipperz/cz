@@ -8,7 +8,7 @@
 namespace cz {
 namespace fs {
 
-bool read(C* c, String* string, FILE* file, size_t size) {
+static bool read(C* c, String* string, FILE* file, size_t size) {
     string->reserve(c, size);
     auto bytes_read = fread(string->buffer() + string->len(), 1, size, file);
     string->set_len(c, string->len() + bytes_read);
