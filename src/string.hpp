@@ -17,6 +17,9 @@ public:
     /// Create a new \c String using the \c buffer with initial length \c len and capacity \c cap.
     explicit String(char* buffer, size_t len, size_t cap);
 
+    String(String&& other) = default;
+    String& operator=(String&& other) = default;
+
     /// Create a new \c String allocating a new buffer as a copy of the inputted string.
     explicit String(C* c, Str str_to_copy);
 
