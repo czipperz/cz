@@ -8,6 +8,9 @@ namespace cz {
 
 template <class T>
 struct ArrayRef : public impl::ListBase<T, ArrayRef<T>> {
+    template <size_t cap>
+    constexpr ArrayRef(T (&buffer)[cap], size_t len)
+        : ArrayRef(buffer, len, cap) {}
     constexpr ArrayRef(T* buffer, size_t len, size_t cap)
         : impl::ListBase<T, ArrayRef<T>>(buffer, len, cap) {}
 
