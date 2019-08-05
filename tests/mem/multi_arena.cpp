@@ -36,7 +36,7 @@ TEST_CASE("MultiArena::drop drops the buffer when there is memory") {
 
     MultiArena multi_arena;
     multi_arena.allocator().alloc(&alloc_context, 32);
-    REQUIRE(mems.len == 1);
+    REQUIRE(mems.len() == 1);
 
     auto mock = mock_dealloc(mems[0]);
     C drop_context = ctxt(mock.allocator());
@@ -54,7 +54,7 @@ TEST_CASE("MultiArena::drop drops all buffers") {
     MultiArena multi_arena;
     multi_arena.allocator().alloc(&alloc_context, 700);
     multi_arena.allocator().alloc(&alloc_context, 700);
-    REQUIRE(mems.len == 2);
+    REQUIRE(mems.len() == 2);
 
     MockAllocate mocks[2] = {mock_dealloc(mems[1]), mock_dealloc(mems[0])};
     MockAllocateMultiple mock(mocks);
@@ -78,7 +78,7 @@ TEST_CASE("MultiArena realloc as subset works") {
 
     REQUIRE(init.buffer == re.buffer);
     REQUIRE(re.size == 24);
-    REQUIRE(mems.len == 1);
+    REQUIRE(mems.len() == 1);
 }
 
 TEST_CASE("MultiArena realloc works for head") {
@@ -94,5 +94,5 @@ TEST_CASE("MultiArena realloc works for head") {
 
     REQUIRE(init.buffer == re.buffer);
     REQUIRE(re.size == 32);
-    REQUIRE(mems.len == 1);
+    REQUIRE(mems.len() == 1);
 }

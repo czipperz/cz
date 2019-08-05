@@ -7,31 +7,43 @@ namespace impl {
 
 template <class T, class Child>
 class ListBase {
-public:
-    T* elems;
-    size_t len;
-    size_t cap;
+protected:
+    size_t _len;
 
-    constexpr ListBase(T* elems, size_t len, size_t cap) : elems(elems), len(len), cap(cap) {}
+public:
+    constexpr ListBase(size_t len) : _len(len) {}
+
+    ListBase(const ListBase&) = delete;
+    ListBase& operator=(const ListBase&) = delete;
 
     void push(C* c, T t) {
-        static_cast<Child*>(this)->reserve(c, 1);
-        elems[len] = t;
-        ++len;
+        _lb_reserve(c, 1);
+        _lb_elems()[_len] = t;
+        ++_len;
     }
 
     void insert(C* c, size_t index, T t) {
-        CZ_ASSERT(c, index <= len);
-        static_cast<Child*>(this)->reserve(c, 1);
-        memmove(elems + index + 1, elems + index, (len - index) * sizeof(T));
+        CZ_ASSERT(c, index <= _len);
+        _lb_reserve(c, 1);
+        auto elems = _lb_elems();
+        memmove(elems + index + 1, elems + index, (_len - index) * sizeof(T));
         elems[index] = t;
-        ++len;
+        ++_len;
     }
 
-    T& operator[](size_t i) { return elems[i]; }
-    const T& operator[](size_t i) const { return elems[i]; }
+    T& operator[](size_t i) { return _lb_elems()[i]; }
+    constexpr const T& operator[](size_t i) const { return _lb_elems()[i]; }
 
-    constexpr operator Slice<T>() const { return {elems, len}; }
+    operator Slice<T>() { return {_lb_elems(), _len}; }
+    constexpr operator Slice<const T>() const { return {_lb_elems(), _len}; }
+
+    constexpr size_t len() const { return _len; }
+
+private:
+    void _lb_reserve(C* c, size_t extra) { return static_cast<Child*>(this)->reserve(c, extra); }
+    T* _lb_elems() { return static_cast<Child*>(this)->elems(); }
+    const T* _lb_elems() const { return static_cast<const Child*>(this)->elems(); }
+    size_t _lb_cap() { return static_cast<Child*>(this)->cap(); }
 };
 
 }

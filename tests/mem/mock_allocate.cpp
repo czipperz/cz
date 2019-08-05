@@ -83,7 +83,7 @@ mem::Allocator MockAllocateMultiple::allocator() {
 }
 
 static MemSlice capturing_heap_realloc(C* c, void* _mems, MemSlice old_mem, AllocInfo new_info) {
-    auto mems = static_cast<ArrayRef<MemSlice>*>(_mems);
+    auto mems = static_cast<ArrayImpl<MemSlice>*>(_mems);
     auto mem = heap_allocator().realloc(NULL, old_mem, new_info);
     REQUIRE(mem.buffer != NULL);
     mems->push(c, mem);
@@ -98,7 +98,7 @@ static void capturing_heap_dealloc(C* c, void* _mocks, MemSlice old_mem) {
     capturing_heap_realloc(c, _mocks, old_mem, {0, 0});
 }
 
-Allocator capturing_heap_allocator(ArrayRef<MemSlice>* mems) {
+Allocator capturing_heap_allocator(ArrayImpl<MemSlice>* mems) {
     return {{capturing_heap_alloc, capturing_heap_dealloc, capturing_heap_realloc}, mems};
 }
 
