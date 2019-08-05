@@ -17,6 +17,11 @@
 
 namespace cz {
 
+template <class T>
+bool is_ok(T t) {
+    return !is_err(t);
+}
+
 inline bool is_err(int e) {
     return e != 0;
 }
