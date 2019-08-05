@@ -81,6 +81,14 @@ void String::set_len(C* c, size_t new_len) {
     }
 }
 
+String String::clone(C* c) const {
+    auto l = len();
+    auto ptr = static_cast<char*>(c->alloc(l).buffer);
+    CZ_ASSERT(c, ptr != NULL);
+    memcpy(ptr, buffer(), l);
+    return String{ptr, l, l};
+}
+
 void String::drop(C* c) {
     c->dealloc({_buffer, _cap});
 }

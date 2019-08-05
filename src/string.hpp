@@ -37,6 +37,9 @@ public:
     /// Set the \c len to \c new_len.  Panics if \c new_len is greater than \c cap.
     void set_len(C* c, size_t new_len);
 
+    /// Create a new \c String with the same contents in a unique memory buffer.
+    String clone(C* c) const;
+
     /// Dealloc the \c buffer.
     void drop(C* c);
 
