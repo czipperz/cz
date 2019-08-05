@@ -16,14 +16,14 @@ Writer string_writer(String* string) {
     return {{string_writer_write_str}, string};
 }
 
-static Result file_writer_write_str(C* c, void* _file, Str str) {
+static Result file_writer_write_str(C*, void* _file, Str str) {
     auto file = static_cast<FILE*>(_file);
     auto ret = fwrite(str.buffer, sizeof(char), str.len, file);
 
     if (ret == str.len) {
         return Result::ok();
     } else {
-        return Result::from_errno(c);
+        return Result::last_error();
     }
 }
 

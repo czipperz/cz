@@ -1,6 +1,5 @@
 #pragma once
 
-#include <errno.h>
 #include "../context_decl.hpp"
 #include "../str.hpp"
 
@@ -8,15 +7,13 @@ namespace cz {
 namespace io {
 
 struct Result {
-    Str message;
+    int code;
 
-    bool is_ok() { return !is_err(); }
-    bool is_err() { return message.buffer != 0; }
+    constexpr static Result ok() { return {0}; }
+    static Result last_error();
 
-    constexpr static Result ok() { return {}; }
-
-    static Result from_errno(C* c) { return from_errno(c, errno); }
-    static Result from_errno(C* c, int e);
+    constexpr bool is_ok() const { return !is_err(); }
+    constexpr bool is_err() const { return code != 0; }
 };
 
 }
