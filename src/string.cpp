@@ -8,7 +8,6 @@
 namespace cz {
 
 String::String() : _buffer(NULL), _len(0), _cap(0) {}
-String::String(char* buffer, size_t len) : _buffer(buffer), _len(len), _cap(len) {}
 String::String(char* buffer, size_t len, size_t cap) : _buffer(buffer), _len(len), _cap(cap) {}
 
 String::String(C* c, Str str_to_clone)

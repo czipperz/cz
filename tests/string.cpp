@@ -17,14 +17,6 @@ TEST_CASE("String::String() is empty") {
     REQUIRE(string == "");
 }
 
-TEST_CASE("String::String(char*, size_t)") {
-    char buffer[4] = "abc";
-    String string(buffer, 2);
-
-    REQUIRE(string == "ab");
-    REQUIRE(string.cap() == 2);
-}
-
 TEST_CASE("String::String(char*, size_t, size_t)") {
     char buffer[4] = "abc";
     String string(buffer, 2, 4);

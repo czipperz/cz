@@ -14,10 +14,8 @@ class String {
 public:
     /// Create a new empty \c String.
     String();
-    /// Create a new \c String using the \c buffer with initial length and capacity \c len.
-    String(char* buffer, size_t len);
     /// Create a new \c String using the \c buffer with initial length \c len and capacity \c cap.
-    String(char* buffer, size_t len, size_t cap);
+    explicit String(char* buffer, size_t len, size_t cap);
 
     /// Create a new \c String allocating a new buffer as a copy of the inputted string.
     explicit String(C* c, Str str_to_copy);
