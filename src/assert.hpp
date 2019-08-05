@@ -4,20 +4,23 @@
 #include "source_location.hpp"
 #include "stringify.hpp"
 
-#ifdef NDEBUG
-#define CZ_DEBUG_ASSERT(c, ignore) ((void)0)
-#else
 #define CZ_DEBUG_ASSERT(c, val) CZ_ASSERT(c, val)
+
+#ifdef NDEBUG
+#define CZ_ASSERT(c, ignore) ((void)0)
+#else
+#define CZ_ASSERT(c, val) \
+    ((val) ? ((void)0) : cz::impl::assert_fail(c, CZ_SOURCE_LOCATION, CZ_STRINGIFY(val)))
 #endif
 
-#define CZ_ASSERT(c, val) cz::assert_(c, CZ_SOURCE_LOCATION, CZ_STRINGIFY(val), (val))
-
-#define CZ_PANIC(c, message) cz::panic_(c, CZ_SOURCE_LOCATION, message)
+#define CZ_PANIC(c, message) (cz::impl::panic_(c, CZ_SOURCE_LOCATION, message))
 
 namespace cz {
+namespace impl {
 
-void assert_(C* c, SourceLocation, const char* expression_string, bool value);
+[[noreturn]] void assert_fail(C* c, SourceLocation, const char* expression_string);
 
-void panic_(C* c, SourceLocation, const char* message);
+[[noreturn]] void panic_(C* c, SourceLocation, const char* message);
 
+}
 }
