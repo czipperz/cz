@@ -27,9 +27,6 @@ public:
     /// Bitwise copy the other \c String.  Note: this does not deinitialize the other \c String.
     String& operator=(String&& other) = default;
 
-    /// Create a new \c String allocating a new buffer as a copy of the inputted \c String.
-    explicit String(C* c, Str str_to_copy);
-
     /// Ensure there are \c extra bytes available in the buffer.
     void reserve(C* c, size_t extra);
     /// Append the \c Str to the buffer.

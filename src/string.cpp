@@ -10,14 +10,6 @@ namespace cz {
 String::String() : _buffer(NULL), _len(0), _cap(0) {}
 String::String(char* buffer, size_t len, size_t cap) : _buffer(buffer), _len(len), _cap(cap) {}
 
-String::String(C* c, Str str_to_clone)
-    : _buffer(static_cast<char*>(c->alloc(str_to_clone.len).buffer)),
-      _len(str_to_clone.len),
-      _cap(str_to_clone.len) {
-    CZ_ASSERT(c, _buffer);
-    memcpy(_buffer, str_to_clone.buffer, str_to_clone.len);
-}
-
 char* String::buffer() {
     return _buffer;
 }

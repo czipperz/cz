@@ -25,16 +25,6 @@ TEST_CASE("String::String(char*, size_t, size_t)") {
     REQUIRE(string.cap() == 4);
 }
 
-TEST_CASE("String::String(Str) clones") {
-    char buffer[3];
-    auto mock = mock_alloc(buffer, 3);
-    C c = ctxt(mock.allocator());
-
-    String string(&c, "abc");
-
-    REQUIRE(mock.called);
-}
-
 TEST_CASE("String::append from empty string") {
     mem::StackArena<32> arena;
     C c = ctxt(arena.allocator());
