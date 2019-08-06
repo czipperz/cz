@@ -8,8 +8,8 @@ export BUILD_TESTS=t
 
 cd "$(dirname "$0")"
 
-./build
+time ./build
 
 echo
 echo "Test:"
-./"$OUTPUT"/test "$@"
+time ./"$OUTPUT"/test "$@"
