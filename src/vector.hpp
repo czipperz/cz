@@ -1,14 +1,16 @@
 #pragma once
 
-#include "assert.hpp"
-#include "context.hpp"
-#include "util.hpp"
-#include "list_base.hpp"
+#include "list.hpp"
 
 namespace cz {
 
 template <class T>
-struct Vector : public impl::ListBase<T, Vector<T>> {
+class Vector : public List<T> {
+protected:
+    Vector(const Vector&) = default;
+    Vector& operator=(const Vector&) = default;
+
+public:
     void reserve(C* c, size_t extra) {
         if (this->cap - this->len < extra) {
             size_t new_cap = max(this->len + extra, this->cap * 2);
@@ -21,13 +23,6 @@ struct Vector : public impl::ListBase<T, Vector<T>> {
     }
 
     void drop(C* c) { c->dealloc({this->elems, this->cap}); }
-
-    Vector clone(C* c) const {
-        auto new_elems = c->alloc({sizeof(T) * this->len, alignof(T)});
-        CZ_ASSERT(c, new_elems != NULL);
-        memcpy(new_elems, this->elems, sizeof(T) * this->len);
-        return {new_elems, this->len, this->len};
-    }
 };
 
 }
