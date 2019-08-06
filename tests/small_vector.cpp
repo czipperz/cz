@@ -1,11 +1,13 @@
 #include "catch.hpp"
 
+#include "../src/mem/heap.hpp"
 #include "../src/small_vector.hpp"
 #include "context.hpp"
 #include "mem/mock_allocate.hpp"
 
 using namespace cz;
 using namespace cz::test;
+using namespace cz::mem;
 
 TEST_CASE("SmallVector create") {
     SmallVector<int, 4> vector;
@@ -54,5 +56,6 @@ TEST_CASE("SmallVector first push outside bounds panics as no reserve") {
     vector.push(&c, 5);
     vector.push(&c, 6);
 
+    c = ctxt(heap_allocator());
     vector.push(&c, 7);
 }
