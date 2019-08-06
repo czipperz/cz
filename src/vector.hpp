@@ -1,6 +1,7 @@
 #pragma once
 
 #include "list.hpp"
+#include "util.hpp"
 
 namespace cz {
 
@@ -22,21 +23,26 @@ public:
     }
 
     void reserve(C* c, size_t extra) {
-        if (this->cap - this->len < extra) {
-            size_t new_cap = max(this->len + extra, this->cap * 2);
+        if (this->cap() - this->len() < extra) {
+            size_t new_cap = max(this->len() + extra, this->cap() * 2);
+
             T* new_elems;
             if (is_small()) {
-                new_elems = static_cast<T*>(c->alloc({new_cap, alignof(T)}).buffer);
+                new_elems = static_cast<T*>(c->alloc({new_cap * sizeof(T), alignof(T)}).buffer);
             } else {
                 new_elems = static_cast<T*>(
-                    c->realloc({this->elems, this->cap}, {new_cap, alignof(T)}).buffer);
+                    c->realloc({this->elems(), this->cap()}, {new_cap * sizeof(T), alignof(T)})
+                        .buffer);
             }
+
             CZ_ASSERT(new_elems != NULL);
+
             if (is_small()) {
-                memcpy(new_elems, this->elems, this->len * sizeof(T));
+                memcpy(new_elems, this->elems(), this->len() * sizeof(T));
             }
-            this->elems = new_elems;
-            this->cap = new_cap;
+
+            this->_elems = new_elems;
+            this->_cap = new_cap;
         }
     }
 
