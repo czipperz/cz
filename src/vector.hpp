@@ -31,7 +31,7 @@ public:
                 new_elems = static_cast<T*>(
                     c->realloc({this->elems, this->cap}, {new_cap, alignof(T)}).buffer);
             }
-            CZ_ASSERT(c, new_elems != NULL);
+            CZ_ASSERT(new_elems != NULL);
             if (is_small()) {
                 memcpy(new_elems, this->elems, this->len * sizeof(T));
             }

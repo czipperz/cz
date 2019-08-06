@@ -37,9 +37,9 @@ public:
     /// Set the \c len to \c 0.
     void clear();
     /// Set the \c len to \c new_len.  Panics if \c new_len is greater than \c len.
-    void shrink_to(C* c, size_t new_len);
+    void shrink_to(size_t new_len);
     /// Set the \c len to \c new_len.  Panics if \c new_len is greater than \c cap.
-    void set_len(C* c, size_t new_len);
+    void set_len(size_t new_len);
 
     /// Create a new \c String with the same contents in a unique memory buffer.
     String clone(C* c) const { return as_str().duplicate(c); }

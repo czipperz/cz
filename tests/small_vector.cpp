@@ -20,8 +20,7 @@ TEST_CASE("SmallVector create") {
 TEST_CASE("SmallVector first push works correctly") {
     SmallVector<int, 4> vector;
 
-    C c = ctxt(panic_allocator());
-    vector.push(&c, 3);
+    vector.push(3);
 
     CHECK(vector.is_small());
     CHECK(vector.len() == 1);
@@ -32,11 +31,10 @@ TEST_CASE("SmallVector first push works correctly") {
 TEST_CASE("SmallVector push in limits doesn't allocate") {
     SmallVector<int, 4> vector;
 
-    C c = ctxt(panic_allocator());
-    vector.push(&c, 3);
-    vector.push(&c, 4);
-    vector.push(&c, 5);
-    vector.push(&c, 6);
+    vector.push(3);
+    vector.push(4);
+    vector.push(5);
+    vector.push(6);
 
     CHECK(vector.is_small());
     CHECK(vector.len() == 4);
@@ -50,12 +48,10 @@ TEST_CASE("SmallVector push in limits doesn't allocate") {
 TEST_CASE("SmallVector first push outside bounds panics as no reserve") {
     SmallVector<int, 4> vector;
 
-    auto c = ctxt(panic_allocator());
-    vector.push(&c, 3);
-    vector.push(&c, 4);
-    vector.push(&c, 5);
-    vector.push(&c, 6);
+    vector.push(3);
+    vector.push(4);
+    vector.push(5);
+    vector.push(6);
 
-    c = ctxt(heap_allocator());
-    vector.push(&c, 7);
+    REQUIRE_THROWS_AS(vector.push(7), PanicReachedException);
 }

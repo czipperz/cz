@@ -8,10 +8,9 @@
 namespace cz {
 namespace mem {
 
-static MemSlice arena_alloc(C* c, void* _arena, AllocInfo info) {
-    (void)c;
+static MemSlice arena_alloc(C*, void* _arena, AllocInfo info) {
     auto arena = static_cast<Arena*>(_arena);
-    CZ_DEBUG_ASSERT(c, arena->mem.buffer != NULL);
+    CZ_DEBUG_ASSERT(arena->mem.buffer != NULL);
 
     void* result = advance_ptr_to_alignment(arena->remaining(), info);
     if (result) {
@@ -23,20 +22,19 @@ static MemSlice arena_alloc(C* c, void* _arena, AllocInfo info) {
     }
 }
 
-static void arena_dealloc(C* c, void* _arena, MemSlice old_mem) {
-    (void)c;
+static void arena_dealloc(C*, void* _arena, MemSlice old_mem) {
     auto arena = static_cast<Arena*>(_arena);
-    CZ_DEBUG_ASSERT(c, arena->mem.buffer != NULL);
+    CZ_DEBUG_ASSERT(arena->mem.buffer != NULL);
 
     if (arena->point() == old_mem.end()) {
-        CZ_DEBUG_ASSERT(c, arena->mem.contains(old_mem));
+        CZ_DEBUG_ASSERT(arena->mem.contains(old_mem));
         arena->set_point(old_mem.start());
     }
 }
 
 static MemSlice arena_realloc(C* c, void* _arena, MemSlice old_mem, AllocInfo new_info) {
     auto arena = static_cast<Arena*>(_arena);
-    CZ_DEBUG_ASSERT(c, arena->mem.buffer != NULL);
+    CZ_DEBUG_ASSERT(arena->mem.buffer != NULL);
 
     if (arena->point() == old_mem.end()) {
         // Pretend we dealloc the memory then allocate again so we get more space.
@@ -63,7 +61,7 @@ static MemSlice arena_realloc(C* c, void* _arena, MemSlice old_mem, AllocInfo ne
             auto new_mem = arena_alloc(c, arena, new_info);
             if (new_mem.buffer && old_mem.buffer) {
                 // Must have a greater new size as smaller sizes are handled above
-                CZ_DEBUG_ASSERT(c, new_info.size <= old_mem.size);
+                CZ_DEBUG_ASSERT(new_info.size <= old_mem.size);
                 memcpy(new_mem.buffer, old_mem.buffer, old_mem.size);
             }
             return new_mem;
@@ -80,7 +78,7 @@ Allocator Arena::allocator() {
 
 HeapArena::HeapArena(C* c, AllocInfo info) {
     mem = c->alloc(info);
-    CZ_ASSERT(c, mem.buffer != NULL);
+    CZ_ASSERT(mem.buffer != NULL);
 }
 
 void HeapArena::drop(C* c) {

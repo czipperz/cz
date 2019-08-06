@@ -4,16 +4,18 @@
 #include "logger.hpp"
 
 namespace cz {
-namespace impl {
 
-void assert_fail(C* c, SourceLocation loc, const char* expression_string) {
-    log::fatal(c, loc.file, ':', loc.line, ": Assertion failed: '", expression_string, "'\n");
-    abort();
+PanicReachedException::PanicReachedException(SourceLocation loc, const char* message)
+    : loc(loc), message(message) {}
+
+void PanicReachedException::log(C* c) {
+    log::fatal(c, loc.file, ':', loc.line, ": ", message, '\n');
 }
 
-void panic_(C* c, SourceLocation loc, const char* message) {
-    log::fatal(c, loc.file, ':', loc.line, ": ", message, '\n');
-    abort();
+namespace impl {
+
+void panic_reached(SourceLocation loc, const char* message) {
+    throw PanicReachedException(loc, message);
 }
 
 }

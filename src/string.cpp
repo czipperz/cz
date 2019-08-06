@@ -31,7 +31,7 @@ void String::reserve(C* c, size_t extra) {
     if (_cap - _len < extra) {
         size_t new_cap = max(_len + extra, _cap * 2);
         auto new_buffer = static_cast<char*>(c->realloc({_buffer, _cap}, new_cap).buffer);
-        CZ_ASSERT(c, new_buffer != NULL);
+        CZ_ASSERT(new_buffer != NULL);
         _buffer = new_buffer;
         _cap = new_cap;
     }
@@ -41,35 +41,35 @@ void String::append(C* c, Str str) {
     reserve(c, str.len);
     memcpy(_buffer + _len, str.buffer, str.len);
     _len += str.len;
-    CZ_DEBUG_ASSERT(c, _len <= _cap);
+    CZ_DEBUG_ASSERT(_len <= _cap);
 }
 
 void String::insert(C* c, size_t index, Str str) {
-    CZ_ASSERT(c, index <= _len);
+    CZ_ASSERT(index <= _len);
     reserve(c, str.len);
     memmove(_buffer + index + str.len, _buffer + index, len() - index);
     memcpy(_buffer + index, str.buffer, str.len);
     _len += str.len;
-    CZ_DEBUG_ASSERT(c, _len <= _cap);
+    CZ_DEBUG_ASSERT(_len <= _cap);
 }
 
 void String::clear() {
-    set_len(NULL, 0);
+    set_len(0);
 }
 
-void String::shrink_to(C* c, size_t new_len) {
+void String::shrink_to(size_t new_len) {
     if (new_len <= len()) {
-        set_len(c, new_len);
+        set_len(new_len);
     } else {
-        CZ_PANIC(c, "String::shrink_to(): new_len > String::len()");
+        CZ_PANIC("String::shrink_to(): new_len > String::len()");
     }
 }
 
-void String::set_len(C* c, size_t new_len) {
+void String::set_len(size_t new_len) {
     if (new_len <= cap()) {
         _len = new_len;
     } else {
-        CZ_PANIC(c, "String::set_len(): new_len > String::cap()");
+        CZ_PANIC("String::set_len(): new_len > String::cap()");
     }
 }
 

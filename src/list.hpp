@@ -17,26 +17,26 @@ protected:
     List& operator=(const List&) = default;
 
 public:
-    void push(C* c, T t) {
+    void push(T t) {
         if (_cap - _len < 1) {
-            CZ_PANIC(c, "List::push(): length exceeded");
+            CZ_PANIC("List::push(): length exceeded");
         }
         _elems[_len] = t;
         ++_len;
     }
 
-    T pop(C* c) {
+    T pop() {
         if (_len < 1) {
-            CZ_PANIC(c, "List::pop(): No element to pop");
+            CZ_PANIC("List::pop(): No element to pop");
         }
         --_len;
         return _elems[_len];
     }
 
-    void insert(C* c, size_t index, T t) {
-        CZ_ASSERT(c, index <= _len);
+    void insert(size_t index, T t) {
+        CZ_ASSERT(index <= _len);
         if (_cap - _len < 1) {
-            CZ_PANIC(c, "List::insert(): length exceeded");
+            CZ_PANIC("List::insert(): length exceeded");
         }
         memmove(_elems + index + 1, _elems + index, (_len - index) * sizeof(T));
         _elems[index] = t;

@@ -82,11 +82,11 @@ mem::Allocator MockAllocateMultiple::allocator() {
     return {{test_multiple_alloc, test_multiple_dealloc, test_multiple_realloc}, this};
 }
 
-static MemSlice capturing_heap_realloc(C* c, void* _mems, MemSlice old_mem, AllocInfo new_info) {
+static MemSlice capturing_heap_realloc(C*, void* _mems, MemSlice old_mem, AllocInfo new_info) {
     auto mems = static_cast<List<MemSlice>*>(_mems);
     auto mem = heap_allocator().realloc(NULL, old_mem, new_info);
     REQUIRE(mem.buffer != NULL);
-    mems->push(c, mem);
+    mems->push(mem);
     return mem;
 }
 
