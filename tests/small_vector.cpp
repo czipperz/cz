@@ -1,6 +1,7 @@
 #include "catch.hpp"
 
-#include "../src/mem/heap.hpp"
+#include "../src/io/write.hpp"
+#include "../src/mem.hpp"
 #include "../src/small_vector.hpp"
 #include "context.hpp"
 #include "mem/mock_allocate.hpp"
@@ -8,6 +9,7 @@
 using namespace cz;
 using namespace cz::test;
 using namespace cz::mem;
+using namespace cz::io;
 
 TEST_CASE("SmallVector create") {
     SmallVector<int, 4> vector;
@@ -15,6 +17,38 @@ TEST_CASE("SmallVector create") {
     CHECK(vector.is_small());
     CHECK(vector.len() == 0);
     REQUIRE(vector.cap() == 4);
+}
+
+TEST_CASE("SmallVector actually knows if is small") {
+    char buffer[128];
+    mem::Arena arena(buffer);
+    C c = ctxt(arena.allocator());
+
+    auto vector = c.alloc<SmallVector<int, 0>>();
+    new (vector) SmallVector<int, 0>();
+    REQUIRE(vector->is_small());
+
+    vector->reserve(&c, 1);
+    REQUIRE(!vector->is_small());
+
+    vector->push(5);
+    REQUIRE(!vector->is_small());
+}
+
+TEST_CASE("SmallVector<1> actually knows if is small") {
+    char buffer[128];
+    mem::Arena arena(buffer);
+    C c = ctxt(arena.allocator());
+
+    auto vector = c.alloc<SmallVector<int, 1>>();
+    new (vector) SmallVector<int, 1>();
+    REQUIRE(vector->is_small());
+
+    vector->reserve(&c, 1);
+    REQUIRE(vector->is_small());
+
+    vector->push(5);
+    REQUIRE(vector->is_small());
 }
 
 TEST_CASE("SmallVector first push works correctly") {
@@ -69,18 +103,6 @@ TEST_CASE("SmallVector reserve reallocates from small buffer to dynamic buffer w
     C c = ctxt(mock.allocator());
 
     vector.reserve(&c, 1);
-
-    REQUIRE(mock.called);
-}
-
-TEST_CASE("SmallVector reserve reallocates from small buffer to dynamic buffer when empty") {
-    SmallVector<int, 4> vector;
-
-    int buffer[8];
-    auto mock = mock_alloc(buffer, {8 * sizeof(int), alignof(int)});
-    C c = ctxt(mock.allocator());
-
-    vector.reserve(&c, 5);
 
     REQUIRE(mock.called);
 }

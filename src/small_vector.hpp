@@ -4,12 +4,24 @@
 
 namespace cz {
 
+namespace impl {
+
+template <class T, size_t BufferSize>
+struct SmallVectorBuffer {
+    alignas(T) char _buffer[sizeof(T) * BufferSize];
+};
+
+template <class T>
+struct alignas(T) SmallVectorBuffer<T, 0> {};
+
+}
+
 template <class T, size_t BufferSize>
 class SmallVector : public Vector<T> {
-    alignas(T) char _buffer[sizeof(T) * BufferSize];
+    impl::SmallVectorBuffer<T, BufferSize> buffer;
 
 public:
-    constexpr SmallVector() : Vector<T>(reinterpret_cast<T*>(_buffer), 0, BufferSize) {}
+    constexpr SmallVector() : Vector<T>(reinterpret_cast<T*>(&buffer), 0, BufferSize) {}
 
     SmallVector clone(C* c) const {
         auto new_elems = c->alloc({sizeof(T) * this->len, alignof(T)});
