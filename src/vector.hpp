@@ -46,7 +46,11 @@ public:
         }
     }
 
-    void drop(C* c) { c->dealloc({this->elems, this->cap}); }
+    void drop(C* c) {
+        if (!is_small()) {
+            c->dealloc({this->elems(), this->cap() * sizeof(T)});
+        }
+    }
 };
 
 }
