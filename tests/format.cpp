@@ -22,7 +22,7 @@ TEST_CASE("sprint works") {
 TEST_CASE("tprint works") {
     mem::StackArena<32> arena;
     auto c = ctxt(panic_allocator());
-    c.temp = &arena;
+    c.temp = arena.allocator();
 
     auto string = format::tprint(&c, 123, " + ", 456);
 
