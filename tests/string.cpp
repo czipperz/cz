@@ -277,3 +277,27 @@ TEST_CASE("Str<Str substring on right") {
 TEST_CASE("Str<Str both empty") {
     REQUIRE_FALSE(Str("") < "");
 }
+
+TEST_CASE("String::realloc does nothing when len == cap") {
+    Array<MemSlice, 1> mems;
+    CZ_DEFER(heap_dealloc_all(mems));
+    auto c = ctxt(capturing_heap_allocator(&mems));
+
+    String string;
+    string.reserve(&c, 4);
+    REQUIRE(mems[0].size == 4);
+
+    c = ctxt(panic_allocator());
+    string.append(&c, "abc");
+    REQUIRE(string.len() == 3);
+    REQUIRE(string.cap() > 3);
+
+    char buffer[3];
+    auto mock = mock_realloc(buffer, mems[0], {3, 1});
+    c = ctxt(mock.allocator());
+    string.realloc(&c);
+    REQUIRE(mock.called);
+
+    REQUIRE(string.buffer() == buffer);
+    REQUIRE(string.cap() == 3);
+}

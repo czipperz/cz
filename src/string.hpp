@@ -34,6 +34,11 @@ public:
     /// Insert the \c Str into the middle of the buffer.  Panics if \c index is greater than \c len.
     void insert(C* c, size_t index, Str str);
 
+    /// Reallocate the buffer so that the length is the same as the capacity.
+    ///
+    /// If the reallocation fails, nothing happens.
+    void realloc(C* c);
+
     /// Set the \c len to \c 0.
     void clear();
     /// Set the \c len to \c new_len.  Panics if \c new_len is greater than \c len.

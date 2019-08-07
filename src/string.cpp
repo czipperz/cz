@@ -54,6 +54,14 @@ void String::insert(C* c, size_t index, Str str) {
     CZ_DEBUG_ASSERT(_len <= _cap);
 }
 
+void String::realloc(C* c) {
+    auto res = c->realloc({_buffer, _cap}, {_len, 1}).buffer;
+    if (res) {
+        _buffer = (char*)res;
+        _cap = _len;
+    }
+}
+
 void String::clear() {
     set_len(0);
 }
