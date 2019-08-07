@@ -38,7 +38,7 @@ MockAllocate mock_alloc(void* buffer, AllocInfo expected_new_info) {
 MockAllocate mock_dealloc(MemSlice expected_old_mem) {
     return {NULL, expected_old_mem, {0, 0}};
 }
-MockAllocate mock_realloc(void* buffer, AllocInfo expected_new_info, MemSlice expected_old_mem) {
+MockAllocate mock_realloc(void* buffer, MemSlice expected_old_mem, AllocInfo expected_new_info) {
     return {buffer, expected_old_mem, expected_new_info};
 }
 

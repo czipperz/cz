@@ -21,6 +21,7 @@ TEST_CASE("Vector::drop while small does nothing") {
 
 TEST_CASE("Vector::drop while large deallocates") {
     Array<MemSlice, 1> mems;
+    CZ_DEFER(heap_dealloc_all(mems));
     auto c = ctxt(capturing_heap_allocator(&mems));
 
     SmallVector<int, 0> vec;
