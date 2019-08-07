@@ -13,14 +13,7 @@ protected:
     Vector& operator=(const Vector&) = default;
 
 public:
-    bool is_small() const {
-        struct SmallVector : public Vector {
-            alignas(T) char _buffer[sizeof(T)];
-        };
-        auto small_buffer =
-            static_cast<const void*>(reinterpret_cast<const SmallVector*>(this)->_buffer);
-        return small_buffer == static_cast<const void*>(this->elems());
-    }
+    constexpr bool is_small() const;
 
     void reserve(C* c, size_t extra) {
         if (this->cap() - this->len() < extra) {
@@ -52,5 +45,62 @@ public:
         }
     }
 };
+
+namespace impl {
+template <class T, size_t BufferSize>
+struct SmallVectorBuffer {
+    alignas(T) char _buffer[sizeof(T) * BufferSize];
+};
+template <class T>
+struct alignas(T) SmallVectorBuffer<T, 0> {};
+}
+
+template <class T, size_t BufferSize>
+class SmallVector : public Vector<T> {
+    impl::SmallVectorBuffer<T, BufferSize> buffer;
+
+public:
+    constexpr SmallVector() : Vector<T>(small_buffer(), 0, BufferSize) {}
+
+    SmallVector(SmallVector&& other) : Vector<T>(0, other.len(), BufferSize) {
+        if (other.is_small()) {
+            this->_elems = small_buffer();
+            memcpy(buffer._buffer, other.buffer._buffer, other.len() * sizeof(T));
+        } else {
+            this->_elems = other.elems();
+        }
+    }
+
+    SmallVector& operator=(SmallVector&& other) {
+        this->_len = other.len();
+        if (other.is_small()) {
+            this->_elems = reinterpret_cast<T*>(&buffer);
+            memcpy(buffer._buffer, other.buffer._buffer, other.len() * sizeof(T));
+        } else {
+            this->_elems = other.elems();
+        }
+        return *this;
+    }
+
+    constexpr const T* small_buffer() const {
+        return reinterpret_cast<const T*>(&buffer);
+    }
+    T* small_buffer() {
+        return reinterpret_cast<T*>(&buffer);
+    }
+
+    SmallVector clone(C* c) const {
+        auto new_elems = c->alloc({sizeof(T) * this->len, alignof(T)});
+        CZ_ASSERT(new_elems != NULL);
+        memcpy(new_elems, this->elems, sizeof(T) * this->len);
+        return {new_elems, this->len, this->len};
+    }
+};
+
+template <class T>
+constexpr bool Vector<T>::is_small() const {
+    return static_cast<const void*>(reinterpret_cast<const SmallVector<T, 1>*>(this)->small_buffer()) ==
+           static_cast<const void*>(this->elems());
+}
 
 }
