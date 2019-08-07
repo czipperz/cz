@@ -14,5 +14,12 @@ String sprint(C* c, Ts... ts) {
     return string;
 }
 
+template <class... Ts>
+String tprint(C* c, Ts... ts) {
+    String string;
+    io::write(c, io::tstring_writer(&string), ts...);
+    return string;
+}
+
 }
 }

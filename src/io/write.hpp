@@ -22,6 +22,7 @@ struct Writer {
 
 Writer file_writer(FILE* file);
 Writer string_writer(String* string);
+Writer tstring_writer(String* string);
 inline Writer cout() { return file_writer(stdout); }
 inline Writer cerr() { return file_writer(stderr); }
 

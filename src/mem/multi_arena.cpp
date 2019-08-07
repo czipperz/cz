@@ -1,6 +1,7 @@
 #include "multi_arena.hpp"
 
 #include "../assert.hpp"
+#include "../context.hpp"
 #include "../util.hpp"
 #include "alloc_utils.hpp"
 #include "arena.hpp"

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stddef.h>
-#include "../context.hpp"
+#include "../context_decl.hpp"
 #include "allocator.hpp"
 
 namespace cz {

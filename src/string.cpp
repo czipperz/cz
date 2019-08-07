@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include "assert.hpp"
+#include "context.hpp"
 #include "mem.hpp"
 #include "util.hpp"
 

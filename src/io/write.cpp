@@ -1,6 +1,7 @@
 #include "write.hpp"
 
 #include <stdint.h>
+#include "../context.hpp"
 #include "../try.hpp"
 
 namespace cz {
@@ -14,6 +15,18 @@ static Result string_writer_write_str(C* c, void* _string, Str str) {
 
 Writer string_writer(String* string) {
     return {{string_writer_write_str}, string};
+}
+
+static Result tstring_writer_write_str(C* c, void* _string, Str str) {
+    auto string = static_cast<String*>(_string);
+    Context tc = *c;
+    tc.allocator = temp_allocator();
+    string->append(&tc, str);
+    return Result::ok();
+}
+
+Writer tstring_writer(String* string) {
+    return {{tstring_writer_write_str}, string};
 }
 
 static Result file_writer_write_str(C*, void* _file, Str str) {
