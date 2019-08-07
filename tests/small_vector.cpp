@@ -1,5 +1,6 @@
 #include "catch.hpp"
 
+#include "../src/defer.hpp"
 #include "../src/io/write.hpp"
 #include "../src/mem.hpp"
 #include "../src/small_vector.hpp"
@@ -117,4 +118,78 @@ TEST_CASE("SmallVector reserve reallocates from small buffer to dynamic buffer w
     vector.reserve(&c, 5);
 
     REQUIRE(mock.called);
+}
+
+TEST_CASE("SmallVector move constructor small sets elems pointer correctly") {
+    SmallVector<int, 1> original;
+    SmallVector<int, 1> copy(move(original));
+
+    CHECK(copy.elems() != original.elems());
+    CHECK(copy.is_small());
+}
+
+TEST_CASE("SmallVector move constructor small sets elemements correctly") {
+    SmallVector<int, 1> original;
+    original.push(13);
+    SmallVector<int, 1> copy(move(original));
+
+    CHECK(copy[0] == 13);
+    CHECK(copy.len() == 1);
+    CHECK(copy.is_small());
+}
+
+TEST_CASE("SmallVector move constructor large sets elemements copies pointer") {
+    auto c = ctxt(heap_allocator());
+
+    SmallVector<int, 1> original;
+    CZ_DEFER(original.drop(&c));
+    original.reserve(&c, 2);
+    original.push(13);
+    original.push(27);
+
+    SmallVector<int, 1> copy(move(original));
+    CHECK(original.elems() == copy.elems());
+    CHECK(copy[0] == 13);
+    CHECK(copy[1] == 27);
+    CHECK(copy.len() == 2);
+    CHECK(!copy.is_small());
+}
+
+TEST_CASE("SmallVector move operator small sets elems pointer correctly") {
+    SmallVector<int, 1> original;
+    SmallVector<int, 1> copy;
+    copy = move(original);
+
+    CHECK(copy.elems() != original.elems());
+    CHECK(copy.is_small());
+}
+
+TEST_CASE("SmallVector move operator small sets elemements correctly") {
+    SmallVector<int, 1> original;
+    original.push(13);
+
+    SmallVector<int, 1> copy;
+    copy = move(original);
+
+    CHECK(copy[0] == 13);
+    CHECK(copy.len() == 1);
+    CHECK(copy.is_small());
+}
+
+TEST_CASE("SmallVector move operator large sets elemements copies pointer") {
+    auto c = ctxt(heap_allocator());
+
+    SmallVector<int, 1> original;
+    CZ_DEFER(original.drop(&c));
+    original.reserve(&c, 2);
+    original.push(13);
+    original.push(27);
+
+    SmallVector<int, 1> copy;
+    copy = move(original);
+    CHECK(original.elems() == copy.elems());
+    CHECK(copy[0] == 13);
+    CHECK(copy[1] == 27);
+    CHECK(copy.len() == 2);
+    CHECK(!copy.is_small());
 }
