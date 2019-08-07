@@ -59,10 +59,7 @@ template <class T, size_t BufferSize>
 class SmallVector : public Vector<T> {
     impl::SmallVectorBuffer<T, BufferSize> buffer;
 
-public:
-    constexpr SmallVector() : Vector<T>(small_buffer(), 0, BufferSize) {}
-
-    SmallVector(SmallVector&& other) : Vector<T>(0, other.len(), BufferSize) {
+    void assign_move(SmallVector&& other) {
         if (other.is_small()) {
             this->_elems = small_buffer();
             memcpy(buffer._buffer, other.buffer._buffer, other.len() * sizeof(T));
@@ -71,14 +68,16 @@ public:
         }
     }
 
+public:
+    constexpr SmallVector() : Vector<T>(small_buffer(), 0, BufferSize) {}
+
+    SmallVector(SmallVector&& other) : Vector<T>(0, other.len(), BufferSize) {
+        assign_move(move(other));
+    }
+
     SmallVector& operator=(SmallVector&& other) {
         this->_len = other.len();
-        if (other.is_small()) {
-            this->_elems = reinterpret_cast<T*>(&buffer);
-            memcpy(buffer._buffer, other.buffer._buffer, other.len() * sizeof(T));
-        } else {
-            this->_elems = other.elems();
-        }
+        assign_move(move(other));
         return *this;
     }
 
