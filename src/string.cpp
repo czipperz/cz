@@ -38,6 +38,16 @@ void String::reserve(C* c, size_t extra) {
     }
 }
 
+void String::treserve(C* c, size_t extra) {
+    if (_cap - _len < extra) {
+        size_t new_cap = max(_len + extra, _cap * 2);
+        auto new_buffer = static_cast<char*>(c->trealloc({_buffer, _cap}, new_cap).buffer);
+        CZ_ASSERT(new_buffer != NULL);
+        _buffer = new_buffer;
+        _cap = new_cap;
+    }
+}
+
 void String::append(C* c, Str str) {
     reserve(c, str.len);
     memcpy(_buffer + _len, str.buffer, str.len);
@@ -56,6 +66,14 @@ void String::insert(C* c, size_t index, Str str) {
 
 void String::realloc(C* c) {
     auto res = c->realloc({_buffer, _cap}, {_len, 1}).buffer;
+    if (res) {
+        _buffer = (char*)res;
+        _cap = _len;
+    }
+}
+
+void String::trealloc(C* c) {
+    auto res = c->trealloc({_buffer, _cap}, {_len, 1}).buffer;
     if (res) {
         _buffer = (char*)res;
         _cap = _len;
@@ -84,6 +102,10 @@ void String::set_len(size_t new_len) {
 
 void String::drop(C* c) {
     c->dealloc({_buffer, _cap});
+}
+
+void String::tdrop(C* c) {
+    c->tdealloc({_buffer, _cap});
 }
 
 }

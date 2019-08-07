@@ -23,6 +23,9 @@ struct Str : public Slice<const char> {
 
     /// Create a new \c String with the same contents in a unique memory buffer.
     String duplicate(C* c) const;
+    /// Create a new \c String with the same contents in a unique memory buffer in the temporary
+    /// buffer.
+    String tduplicate(C* c) const;
 
     bool operator==(const Str& other) const {
         return len == other.len && memcmp(buffer, other.buffer, len) == 0;

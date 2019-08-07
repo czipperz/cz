@@ -13,4 +13,11 @@ String Str::duplicate(C* c) const {
     return String{ptr, len, len};
 }
 
+String Str::tduplicate(C* c) const {
+    auto ptr = static_cast<char*>(c->talloc(len).buffer);
+    CZ_ASSERT(ptr != NULL);
+    memcpy(ptr, buffer, len);
+    return String{ptr, len, len};
+}
+
 }

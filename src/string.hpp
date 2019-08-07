@@ -29,6 +29,10 @@ public:
 
     /// Ensure there are \c extra bytes available in the buffer.
     void reserve(C* c, size_t extra);
+    /// Ensure there are \c extra bytes available in the buffer, reallocating using the temporary
+    /// allocator when necessary.
+    void treserve(C* c, size_t extra);
+
     /// Append the \c Str to the buffer.
     void append(C* c, Str str);
     /// Insert the \c Str into the middle of the buffer.  Panics if \c index is greater than \c len.
@@ -38,6 +42,11 @@ public:
     ///
     /// If the reallocation fails, nothing happens.
     void realloc(C* c);
+    /// Reallocate the buffer using the temporary allocator so that the length
+    /// is the same as the capacity.
+    ///
+    /// If the reallocation fails, nothing happens.
+    void trealloc(C* c);
 
     /// Set the \c len to \c 0.
     void clear();
@@ -48,9 +57,13 @@ public:
 
     /// Create a new \c String with the same contents in a unique memory buffer.
     String clone(C* c) const { return as_str().duplicate(c); }
+    /// Create a new \c String with the same contents in a unique memory buffer in the temporary buffer.
+    String tclone(C* c) const { return as_str().tduplicate(c); }
 
     /// Dealloc the \c buffer.
     void drop(C* c);
+    /// Dealloc the \c buffer using the temporary allocator.
+    void tdrop(C* c);
 
     /// Get the byte buffer backing the string.
     char* buffer();
