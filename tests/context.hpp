@@ -1,6 +1,7 @@
+#include "../src/context.hpp"
+
 namespace cz {
 
-struct Context;
 namespace mem {
 struct Allocator;
 }

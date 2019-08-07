@@ -1,7 +1,9 @@
 #pragma once
 
+#include <stddef.h>
+#include <string.h>
 #include "assert.hpp"
-#include "context.hpp"
+#include "slice.hpp"
 
 namespace cz {
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "context.hpp"
 #include "list.hpp"
 #include "util.hpp"
 
@@ -81,12 +82,8 @@ public:
         return *this;
     }
 
-    constexpr const T* small_buffer() const {
-        return reinterpret_cast<const T*>(&buffer);
-    }
-    T* small_buffer() {
-        return reinterpret_cast<T*>(&buffer);
-    }
+    constexpr const T* small_buffer() const { return reinterpret_cast<const T*>(&buffer); }
+    T* small_buffer() { return reinterpret_cast<T*>(&buffer); }
 
     SmallVector clone(C* c) const {
         auto new_elems = c->alloc({sizeof(T) * this->len, alignof(T)});
@@ -98,7 +95,8 @@ public:
 
 template <class T>
 constexpr bool Vector<T>::is_small() const {
-    return static_cast<const void*>(reinterpret_cast<const SmallVector<T, 1>*>(this)->small_buffer()) ==
+    return static_cast<const void*>(
+               reinterpret_cast<const SmallVector<T, 1>*>(this)->small_buffer()) ==
            static_cast<const void*>(this->elems());
 }
 
