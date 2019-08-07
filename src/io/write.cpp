@@ -9,7 +9,8 @@ namespace io {
 
 static Result string_writer_write_str(C* c, void* _string, Str str) {
     auto string = static_cast<String*>(_string);
-    string->append(c, str);
+    string->reserve(c, str.len);
+    string->append(str);
     return Result::ok();
 }
 
@@ -19,9 +20,8 @@ Writer string_writer(String* string) {
 
 static Result tstring_writer_write_str(C* c, void* _string, Str str) {
     auto string = static_cast<String*>(_string);
-    Context tc = *c;
-    tc.allocator = temp_allocator();
-    string->append(&tc, str);
+    string->treserve(c, str.len);
+    string->append(str);
     return Result::ok();
 }
 

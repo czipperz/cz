@@ -34,9 +34,13 @@ public:
     void treserve(C* c, size_t extra);
 
     /// Append the \c Str to the buffer.
-    void append(C* c, Str str);
-    /// Insert the \c Str into the middle of the buffer.  Panics if \c index is greater than \c len.
-    void insert(C* c, size_t index, Str str);
+    ///
+    /// Panics if there isn't enough space.
+    void append(Str str);
+    /// Insert the \c Str into the middle of the buffer.
+    ///
+    /// Panics if there isn't enough space or if \c index is greater than \c len.
+    void insert(size_t index, Str str);
 
     /// Reallocate the buffer so that the length is the same as the capacity.
     ///

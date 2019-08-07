@@ -61,7 +61,8 @@ TEST_CASE("String::append from empty string") {
     C c = ctxt(arena.allocator());
 
     String string;
-    string.append(&c, "abc");
+    string.reserve(&c, 3);
+    string.append("abc");
 
     REQUIRE(string == "abc");
 }
@@ -71,8 +72,10 @@ TEST_CASE("String::append from non-empty string and reallocates") {
     C c = ctxt(arena.allocator());
 
     String string;
-    string.append(&c, "abc");
-    string.append(&c, "defghijklmnopqrstuvwxyz0123456789");
+    string.reserve(&c, 3);
+    string.append("abc");
+    string.reserve(&c, 33);
+    string.append("defghijklmnopqrstuvwxyz0123456789");
 
     REQUIRE(string == "abcdefghijklmnopqrstuvwxyz0123456789");
 }
@@ -86,9 +89,9 @@ TEST_CASE("String::append no realloc") {
     string.reserve(&c, 64);
     mock.called = false;
 
-    string.append(&c, "abc");
+    string.append("abc");
     REQUIRE(!mock.called);
-    string.append(&c, "defghijklmnopqrstuvwxyz0123456789");
+    string.append("defghijklmnopqrstuvwxyz0123456789");
     REQUIRE(!mock.called);
 
     REQUIRE(string == "abcdefghijklmnopqrstuvwxyz0123456789");
@@ -109,11 +112,8 @@ TEST_CASE("String::reserve allocates") {
 }
 
 TEST_CASE("String::insert empty string") {
-    auto mock = mock_alloc(NULL, 0);
-    C c = ctxt(mock.allocator());
     String string;
-
-    string.insert(&c, 0, "");
+    string.insert(0, "");
 
     CHECK(string.buffer() == NULL);
     REQUIRE(string == "");
@@ -124,7 +124,8 @@ TEST_CASE("String::insert into empty string") {
     C c = ctxt(arena.allocator());
     String string;
 
-    string.insert(&c, 0, "abc");
+    string.reserve(&c, 3);
+    string.insert(0, "abc");
 
     CHECK(string.buffer() != NULL);
     CHECK(string.len() == 3);
@@ -136,7 +137,7 @@ TEST_CASE("String::insert beginning") {
     char buffer[10] = "xyz";
     String string(buffer, 3, 10);
 
-    string.insert(NULL, 0, "abc");
+    string.insert(0, "abc");
 
     CHECK(string.buffer() == buffer);
     CHECK(string.len() == 6);
@@ -148,7 +149,7 @@ TEST_CASE("String::insert middle") {
     char buffer[10] = "xyz";
     String string(buffer, 3, 10);
 
-    string.insert(NULL, 1, "abc");
+    string.insert(1, "abc");
 
     CHECK(string.buffer() == buffer);
     CHECK(string.len() == 6);
@@ -160,7 +161,7 @@ TEST_CASE("String::insert end") {
     char buffer[10] = "xyz";
     String string(buffer, 3, 10);
 
-    string.insert(NULL, 3, "abc");
+    string.insert(3, "abc");
 
     CHECK(string.buffer() == buffer);
     CHECK(string.len() == 6);
@@ -173,7 +174,8 @@ TEST_CASE("String::insert with resize") {
     C c = ctxt(arena.allocator());
     String string;
 
-    string.insert(&c, 0, "abc");
+    string.reserve(&c, 3);
+    string.insert(0, "abc");
 
     CHECK(string.buffer() == arena.mem.buffer);
     REQUIRE(string == "abc");
@@ -183,7 +185,7 @@ TEST_CASE("String::insert resize boundary") {
     char buffer[10] = "xyz";
     String string(buffer, 3, 6);
 
-    string.insert(NULL, 3, "abc");
+    string.insert(3, "abc");
 
     CHECK(string.buffer() == buffer);
     CHECK(string.len() == 6);
@@ -195,7 +197,7 @@ TEST_CASE("String::insert into long string") {
     char buffer[128] = "once upoa time in a land far far away";
     String string(buffer, strlen(buffer), 128);
 
-    string.insert(NULL, 8, "n ");
+    string.insert(8, "n ");
 
     CHECK(string == "once upon a time in a land far far away");
 }
@@ -287,8 +289,7 @@ TEST_CASE("String::realloc does nothing when len == cap") {
     string.reserve(&c, 4);
     REQUIRE(mems[0].size == 4);
 
-    c = ctxt(panic_allocator());
-    string.append(&c, "abc");
+    string.append("abc");
     REQUIRE(string.len() == 3);
     REQUIRE(string.cap() > 3);
 
