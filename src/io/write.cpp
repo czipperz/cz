@@ -31,30 +31,36 @@ Writer file_writer(FILE* file) {
     return {{file_writer_write_str}, file};
 }
 
-#define define_numeric_write(type)                                         \
-    Result write(C* c, Writer writer, type v) {                            \
-        if (v < 0) {                                                       \
-            CZ_TRY(write(c, writer, '-'));                                 \
-            v = -v;                                                        \
-        }                                                                  \
-                                                                           \
-        return write(c, writer, static_cast<unsigned type>(v));            \
-    }                                                                      \
-                                                                           \
-    Result write(C* c, Writer writer, unsigned type v) {                   \
-        if (v == 0) {                                                      \
-            return write(c, writer, '0');                                  \
-        }                                                                  \
-                                                                           \
-        char buffer[32];                                                   \
-        size_t index;                                                      \
-        for (index = sizeof(buffer) - 1; v != 0; --index) {                \
-            buffer[index] = '0' + v % 10;                                  \
-            v /= 10;                                                       \
-        }                                                                  \
-        ++index;                                                           \
-                                                                           \
-        return write(c, writer, {buffer + index, sizeof(buffer) - index}); \
+template <class T>
+Result write_base(C* c, Writer writer, T val, T base) {
+    char buffer[32];
+    const char lookup[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    size_t index;
+    for (index = sizeof(buffer) - 1; val != 0; --index) {
+        buffer[index] = lookup[val % base];
+        val /= base;
+    }
+    ++index;
+
+    return write(c, writer, {buffer + index, sizeof(buffer) - index});
+}
+
+#define define_numeric_write(type)                              \
+    Result write(C* c, Writer writer, type v) {                 \
+        if (v < 0) {                                            \
+            CZ_TRY(write(c, writer, '-'));                      \
+            v = -v;                                             \
+        }                                                       \
+                                                                \
+        return write(c, writer, static_cast<unsigned type>(v)); \
+    }                                                           \
+                                                                \
+    Result write(C* c, Writer writer, unsigned type v) {        \
+        if (v == 0) {                                           \
+            return write(c, writer, '0');                       \
+        }                                                       \
+                                                                \
+        return write_base<unsigned type>(c, writer, v, 10);     \
     }
 
 // clang-format off
@@ -72,18 +78,7 @@ Result write(C* c, Writer writer, Address addr) {
     CZ_TRY(write(c, writer, '0'));
     CZ_TRY(write(c, writer, 'x'));
 
-    auto v = (intptr_t)addr.val;
-    char buffer[32];
-    size_t index;
-    for (index = 0; v != 0; ++index) {
-        buffer[index] = '0' + v % 16;
-        v /= 16;
-    }
-    while (index > 0) {
-        --index;
-        CZ_TRY(write(c, writer, buffer[index]));
-    }
-    return Result::ok();
+    return write_base<intptr_t>(c, writer, (intptr_t)addr.val, 16);
 }
 
 }
