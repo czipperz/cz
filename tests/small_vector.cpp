@@ -20,7 +20,7 @@ TEST_CASE("SmallVector create") {
     REQUIRE(vector.cap() == 4);
 }
 
-TEST_CASE("SmallVector actually knows if is small") {
+TEST_CASE("SmallVector<0> in an arena correctly knows when it is small") {
     char buffer[128];
     mem::Arena arena(buffer);
     C c = ctxt(arena.allocator());
@@ -36,7 +36,7 @@ TEST_CASE("SmallVector actually knows if is small") {
     REQUIRE(!vector->is_small());
 }
 
-TEST_CASE("SmallVector<1> actually knows if is small") {
+TEST_CASE("SmallVector<1> in an arena correctly knows when it is small") {
     char buffer[128];
     mem::Arena arena(buffer);
     C c = ctxt(arena.allocator());
