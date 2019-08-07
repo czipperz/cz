@@ -48,16 +48,20 @@ void String::treserve(C* c, size_t extra) {
     }
 }
 
-void String::append(C* c, Str str) {
-    reserve(c, str.len);
+void String::append(Str str) {
+    if (_cap - _len < str.len) {
+        CZ_PANIC("String::append(): Length exceeded");
+    }
     memcpy(_buffer + _len, str.buffer, str.len);
     _len += str.len;
     CZ_DEBUG_ASSERT(_len <= _cap);
 }
 
-void String::insert(C* c, size_t index, Str str) {
+void String::insert(size_t index, Str str) {
     CZ_ASSERT(index <= _len);
-    reserve(c, str.len);
+    if (_cap - _len < str.len) {
+        CZ_PANIC("String::insert(): Length exceeded");
+    }
     memmove(_buffer + index + str.len, _buffer + index, len() - index);
     memcpy(_buffer + index, str.buffer, str.len);
     _len += str.len;

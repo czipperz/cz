@@ -54,6 +54,4 @@ struct Context {
     }
 };
 
-mem::Allocator temp_allocator();
-
 }
