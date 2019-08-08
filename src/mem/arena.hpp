@@ -30,9 +30,9 @@ struct StackArena : public Arena {
 };
 
 struct HeapArena : public Arena {
-    HeapArena(C* c, AllocInfo info);
+    HeapArena(Allocator, AllocInfo info);
 
-    void drop(C* c);
+    void drop(Allocator);
 };
 
 }

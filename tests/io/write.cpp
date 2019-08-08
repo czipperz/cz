@@ -14,7 +14,7 @@ TEST_CASE("write multiple arguments works") {
     C c = ctxt(arena.allocator());
 
     String string;
-    CZ_DEFER(string.drop(&c));
+    CZ_DEFER(string.drop(arena.allocator()));
 
     Writer writer = string_writer(&string);
     write(&c, writer, 123, " + ", 456);
@@ -27,7 +27,7 @@ TEST_CASE("write multiple arguments with debug") {
     C c = ctxt(arena.allocator());
 
     String string;
-    CZ_DEFER(string.drop(&c));
+    CZ_DEFER(string.drop(c.allocator));
 
     Writer writer = string_writer(&string);
     int elems[3] = {10, 30, 40};
@@ -41,7 +41,7 @@ TEST_CASE("write str") {
     C c = ctxt(arena.allocator());
 
     String string;
-    CZ_DEFER(string.drop(&c));
+    CZ_DEFER(string.drop(c.allocator));
 
     Writer writer = string_writer(&string);
     Result result;
@@ -57,7 +57,7 @@ TEST_CASE("write char") {
     C c = ctxt(arena.allocator());
 
     String string;
-    CZ_DEFER(string.drop(&c));
+    CZ_DEFER(string.drop(c.allocator));
 
     Writer writer = string_writer(&string);
     Result result = write(&c, writer, 'a');
@@ -71,7 +71,7 @@ TEST_CASE("write(int = 123)") {
     C c = ctxt(arena.allocator());
 
     String string;
-    CZ_DEFER(string.drop(&c));
+    CZ_DEFER(string.drop(c.allocator));
 
     Writer writer = string_writer(&string);
     Result result = write(&c, writer, 123);
@@ -85,7 +85,7 @@ TEST_CASE("write(int = 0)") {
     C c = ctxt(arena.allocator());
 
     String string;
-    CZ_DEFER(string.drop(&c));
+    CZ_DEFER(string.drop(c.allocator));
 
     Writer writer = string_writer(&string);
     Result result = write(&c, writer, 0);
@@ -99,7 +99,7 @@ TEST_CASE("write(int = 9)") {
     C c = ctxt(arena.allocator());
 
     String string;
-    CZ_DEFER(string.drop(&c));
+    CZ_DEFER(string.drop(c.allocator));
 
     Writer writer = string_writer(&string);
     Result result = write(&c, writer, 9);
@@ -113,7 +113,7 @@ TEST_CASE("write(int = -47)") {
     C c = ctxt(arena.allocator());
 
     String string;
-    CZ_DEFER(string.drop(&c));
+    CZ_DEFER(string.drop(c.allocator));
 
     Writer writer = string_writer(&string);
     Result result = write(&c, writer, -47);
@@ -127,7 +127,7 @@ TEST_CASE("write(Address(NULL))") {
     C c = ctxt(arena.allocator());
 
     String string;
-    CZ_DEFER(string.drop(&c));
+    CZ_DEFER(string.drop(c.allocator));
 
     Writer writer = string_writer(&string);
     Result result = write(&c, writer, addr(NULL));
@@ -141,7 +141,7 @@ TEST_CASE("write(Address(arbitrary) starts with 0x)") {
     C c = ctxt(arena.allocator());
 
     String string;
-    CZ_DEFER(string.drop(&c));
+    CZ_DEFER(string.drop(c.allocator));
 
     Writer writer = string_writer(&string);
     Result result = write(&c, writer, addr(&string));

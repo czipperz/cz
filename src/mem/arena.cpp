@@ -9,7 +9,7 @@
 namespace cz {
 namespace mem {
 
-static MemSlice arena_alloc(C*, void* _arena, AllocInfo info) {
+static MemSlice arena_alloc(void* _arena, AllocInfo info) {
     auto arena = static_cast<Arena*>(_arena);
     CZ_DEBUG_ASSERT(arena->mem.buffer != NULL);
 
@@ -23,7 +23,7 @@ static MemSlice arena_alloc(C*, void* _arena, AllocInfo info) {
     }
 }
 
-static void arena_dealloc(C*, void* _arena, MemSlice old_mem) {
+static void arena_dealloc(void* _arena, MemSlice old_mem) {
     auto arena = static_cast<Arena*>(_arena);
     CZ_DEBUG_ASSERT(arena->mem.buffer != NULL);
 
@@ -33,7 +33,7 @@ static void arena_dealloc(C*, void* _arena, MemSlice old_mem) {
     }
 }
 
-static MemSlice arena_realloc(C* c, void* _arena, MemSlice old_mem, AllocInfo new_info) {
+static MemSlice arena_realloc(void* _arena, MemSlice old_mem, AllocInfo new_info) {
     auto arena = static_cast<Arena*>(_arena);
     CZ_DEBUG_ASSERT(arena->mem.buffer != NULL);
 
@@ -59,7 +59,7 @@ static MemSlice arena_realloc(C* c, void* _arena, MemSlice old_mem, AllocInfo ne
             return {old_aligned, new_info.size};
         } else {
             // Allocate a fresh copy
-            auto new_mem = arena_alloc(c, arena, new_info);
+            auto new_mem = arena_alloc(arena, new_info);
             if (new_mem.buffer && old_mem.buffer) {
                 // Must have a greater new size as smaller sizes are handled above
                 CZ_DEBUG_ASSERT(new_info.size <= old_mem.size);
@@ -77,13 +77,13 @@ Allocator Arena::allocator() {
     };
 }
 
-HeapArena::HeapArena(C* c, AllocInfo info) {
-    mem = c->alloc(info);
+HeapArena::HeapArena(Allocator allocator, AllocInfo info) {
+    mem = allocator.alloc(info);
     CZ_ASSERT(mem.buffer != NULL);
 }
 
-void HeapArena::drop(C* c) {
-    c->allocator.dealloc(c, mem);
+void HeapArena::drop(Allocator allocator) {
+    allocator.dealloc(mem);
 }
 
 }

@@ -8,18 +8,18 @@
 namespace cz {
 namespace fs {
 
-static bool read(C* c, String* string, FILE* file, size_t size) {
-    string->reserve(c, size);
+static bool read(mem::Allocator allocator, String* string, FILE* file, size_t size) {
+    string->reserve(allocator, size);
     auto bytes_read = fread(string->buffer() + string->len(), 1, size, file);
     string->set_len(string->len() + bytes_read);
     return bytes_read == size;
 }
 
-io::Result read_to_string(C* c, String* string, FILE* file) {
+io::Result read_to_string(mem::Allocator allocator, String* string, FILE* file) {
     const size_t chunk_size = sys::page_size();
 
     while (true) {
-        if (!read(c, string, file, chunk_size)) {
+        if (!read(allocator, string, file, chunk_size)) {
             if (feof(file)) {
                 break;
             } else {
@@ -31,7 +31,7 @@ io::Result read_to_string(C* c, String* string, FILE* file) {
     return io::Result::ok();
 }
 
-io::Result read_to_string(C* c, String* string, const char* cstr_file_name) {
+io::Result read_to_string(mem::Allocator allocator, String* string, const char* cstr_file_name) {
     auto file = fopen(cstr_file_name, "r");
     if (!file) {
         return io::Result::last_error();
@@ -42,7 +42,7 @@ io::Result read_to_string(C* c, String* string, const char* cstr_file_name) {
     auto len = ftell(file);
     if (len) {
         rewind(file);
-        if (!read(c, string, file, len)) {
+        if (!read(allocator, string, file, len)) {
             if (feof(file)) {
                 return io::Result::ok();
             } else {
@@ -51,7 +51,7 @@ io::Result read_to_string(C* c, String* string, const char* cstr_file_name) {
         }
     }
 
-    return read_to_string(c, string, file);
+    return read_to_string(allocator, string, file);
 }
 
 }

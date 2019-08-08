@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stddef.h>
-#include "context_decl.hpp"
+#include "mem/allocator.hpp"
 #include "str.hpp"
 
 namespace cz {
@@ -28,10 +28,7 @@ public:
     String& operator=(String&& other) = default;
 
     /// Ensure there are \c extra bytes available in the buffer.
-    void reserve(C* c, size_t extra);
-    /// Ensure there are \c extra bytes available in the buffer, reallocating using the temporary
-    /// allocator when necessary.
-    void treserve(C* c, size_t extra);
+    void reserve(mem::Allocator, size_t extra);
 
     /// Append the \c Str to the buffer.
     ///
@@ -45,12 +42,7 @@ public:
     /// Reallocate the buffer so that the length is the same as the capacity.
     ///
     /// If the reallocation fails, nothing happens.
-    void realloc(C* c);
-    /// Reallocate the buffer using the temporary allocator so that the length
-    /// is the same as the capacity.
-    ///
-    /// If the reallocation fails, nothing happens.
-    void trealloc(C* c);
+    void realloc(mem::Allocator);
 
     /// Set the \c len to \c 0.
     void clear();
@@ -60,14 +52,10 @@ public:
     void set_len(size_t new_len);
 
     /// Create a new \c String with the same contents in a unique memory buffer.
-    String clone(C* c) const { return as_str().duplicate(c); }
-    /// Create a new \c String with the same contents in a unique memory buffer in the temporary buffer.
-    String tclone(C* c) const { return as_str().tduplicate(c); }
+    String clone(mem::Allocator allocator) const { return as_str().duplicate(allocator); }
 
     /// Dealloc the \c buffer.
-    void drop(C* c);
-    /// Dealloc the \c buffer using the temporary allocator.
-    void tdrop(C* c);
+    void drop(mem::Allocator);
 
     /// Get the byte buffer backing the string.
     char* buffer();

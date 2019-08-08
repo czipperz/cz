@@ -11,40 +11,40 @@ using cz::io::Result;
 
 TEST_CASE("read_to_string invalid file") {
     String string;
-    C c = test::ctxt(mem::heap_allocator());
-    CZ_DEFER(string.drop(&c));
+    auto allocator = mem::heap_allocator();
+    CZ_DEFER(string.drop(allocator));
 
-    REQUIRE(read_to_string(&c, &string, "tests/fs/test_file_that_does_not_exist").is_err());
+    REQUIRE(read_to_string(allocator, &string, "tests/fs/test_file_that_does_not_exist").is_err());
 
     REQUIRE(string.len() == 0);
 }
 
 TEST_CASE("read_to_string empty file") {
     String string;
-    C c = test::ctxt(mem::heap_allocator());
-    CZ_DEFER(string.drop(&c));
+    auto allocator = mem::heap_allocator();
+    CZ_DEFER(string.drop(allocator));
 
-    REQUIRE(read_to_string(&c, &string, "tests/fs/test_empty_file.txt").is_ok());
+    REQUIRE(read_to_string(allocator, &string, "tests/fs/test_empty_file.txt").is_ok());
 
     REQUIRE(string.len() == 0);
 }
 
 TEST_CASE("read_to_string small file") {
     String string;
-    C c = test::ctxt(mem::heap_allocator());
-    CZ_DEFER(string.drop(&c));
+    auto allocator = mem::heap_allocator();
+    CZ_DEFER(string.drop(allocator));
 
-    REQUIRE(read_to_string(&c, &string, "tests/fs/test_small_file.txt").is_ok());
+    REQUIRE(read_to_string(allocator, &string, "tests/fs/test_small_file.txt").is_ok());
 
     REQUIRE(string == "a\nb\nc\n");
 }
 
 TEST_CASE("read_to_string large file") {
     String string;
-    C c = test::ctxt(mem::heap_allocator());
-    CZ_DEFER(string.drop(&c));
+    auto allocator = mem::heap_allocator();
+    CZ_DEFER(string.drop(allocator));
 
-    REQUIRE(read_to_string(&c, &string, "tests/fs/test_large_file.txt").is_ok());
+    REQUIRE(read_to_string(allocator, &string, "tests/fs/test_large_file.txt").is_ok());
 
     REQUIRE(string ==
             "\

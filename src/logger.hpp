@@ -11,8 +11,8 @@ namespace log {
 template <LogLevel level, class... Ts>
 void log(C* c, Ts... ts) {
     String message = cz::format::tprint(c, ts...);
-    message.trealloc(c);
-    CZ_DEFER(message.tdrop(c));
+    message.realloc(c->temp);
+    CZ_DEFER(message.drop(c->temp));
     c->log(LogInfo(level, message));
 }
 

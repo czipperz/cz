@@ -16,16 +16,16 @@ protected:
 public:
     constexpr bool is_small() const;
 
-    void reserve(C* c, size_t extra) {
+    void reserve(mem::Allocator allocator, size_t extra) {
         if (this->cap() - this->len() < extra) {
             size_t new_cap = max(this->len() + extra, this->cap() * 2);
 
             T* new_elems;
             if (is_small()) {
-                new_elems = static_cast<T*>(c->alloc({new_cap * sizeof(T), alignof(T)}).buffer);
+                new_elems = static_cast<T*>(allocator.alloc({new_cap * sizeof(T), alignof(T)}).buffer);
             } else {
                 new_elems = static_cast<T*>(
-                    c->realloc({this->elems(), this->cap()}, {new_cap * sizeof(T), alignof(T)})
+                    allocator.realloc({this->elems(), this->cap()}, {new_cap * sizeof(T), alignof(T)})
                         .buffer);
             }
 
@@ -40,9 +40,9 @@ public:
         }
     }
 
-    void drop(C* c) {
+    void drop(mem::Allocator allocator) {
         if (!is_small()) {
-            c->dealloc({this->elems(), this->cap() * sizeof(T)});
+            allocator.dealloc({this->elems(), this->cap() * sizeof(T)});
         }
     }
 };
@@ -85,8 +85,8 @@ public:
     constexpr const T* small_buffer() const { return reinterpret_cast<const T*>(&buffer); }
     T* small_buffer() { return reinterpret_cast<T*>(&buffer); }
 
-    SmallVector clone(C* c) const {
-        auto new_elems = c->alloc({sizeof(T) * this->len, alignof(T)});
+    SmallVector clone(mem::Allocator allocator) const {
+        auto new_elems = allocator.alloc({sizeof(T) * this->len, alignof(T)});
         CZ_ASSERT(new_elems != NULL);
         memcpy(new_elems, this->elems, sizeof(T) * this->len);
         return {new_elems, this->len, this->len};

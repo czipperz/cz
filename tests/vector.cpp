@@ -13,24 +13,22 @@ using namespace cz::mem;
 using namespace cz::io;
 
 TEST_CASE("Vector::drop while small does nothing") {
-    C c = ctxt(panic_allocator());
     SmallVector<int, 0> vec;
     REQUIRE(vec.is_small());
-    vec.drop(&c);
+    vec.drop(panic_allocator());
 }
 
 TEST_CASE("Vector::drop while large deallocates") {
     Array<MemSlice, 1> mems;
     CZ_DEFER(heap_dealloc_all(mems));
-    auto c = ctxt(capturing_heap_allocator(&mems));
 
     SmallVector<int, 0> vec;
-    vec.reserve(&c, 1);
+    vec.reserve(capturing_heap_allocator(&mems), 1);
     REQUIRE(!vec.is_small());
 
     auto mock = mock_dealloc(mems[0]);
-    c = ctxt(mock.allocator());
-    vec.drop(&c);
+
+    vec.drop(mock.allocator());
 
     REQUIRE(mock.called);
 }
@@ -46,13 +44,12 @@ TEST_CASE("SmallVector create") {
 TEST_CASE("SmallVector<0> in an arena correctly knows when it is small") {
     char buffer[128];
     mem::Arena arena(buffer);
-    C c = ctxt(arena.allocator());
 
-    auto vector = c.alloc<SmallVector<int, 0>>();
+    auto vector = arena.allocator().alloc<SmallVector<int, 0>>();
     new (vector) SmallVector<int, 0>();
     REQUIRE(vector->is_small());
 
-    vector->reserve(&c, 1);
+    vector->reserve(arena.allocator(), 1);
     REQUIRE(!vector->is_small());
 
     vector->push(5);
@@ -62,13 +59,12 @@ TEST_CASE("SmallVector<0> in an arena correctly knows when it is small") {
 TEST_CASE("SmallVector<1> in an arena correctly knows when it is small") {
     char buffer[128];
     mem::Arena arena(buffer);
-    C c = ctxt(arena.allocator());
 
-    auto vector = c.alloc<SmallVector<int, 1>>();
+    auto vector = arena.allocator().alloc<SmallVector<int, 1>>();
     new (vector) SmallVector<int, 1>();
     REQUIRE(vector->is_small());
 
-    vector->reserve(&c, 1);
+    vector->reserve(arena.allocator(), 1);
     REQUIRE(vector->is_small());
 
     vector->push(5);
@@ -124,9 +120,8 @@ TEST_CASE("SmallVector reserve reallocates from small buffer to dynamic buffer w
 
     int buffer[8];
     auto mock = mock_alloc(buffer, {8 * sizeof(int), alignof(int)});
-    C c = ctxt(mock.allocator());
 
-    vector.reserve(&c, 1);
+    vector.reserve(mock.allocator(), 1);
 
     REQUIRE(mock.called);
 }
@@ -136,9 +131,8 @@ TEST_CASE("SmallVector reserve reallocates from small buffer to dynamic buffer w
 
     int buffer[8];
     auto mock = mock_alloc(buffer, {8 * sizeof(int), alignof(int)});
-    C c = ctxt(mock.allocator());
 
-    vector.reserve(&c, 5);
+    vector.reserve(mock.allocator(), 5);
 
     REQUIRE(mock.called);
 }
@@ -162,11 +156,9 @@ TEST_CASE("SmallVector move constructor small sets elemements correctly") {
 }
 
 TEST_CASE("SmallVector move constructor large sets elemements copies pointer") {
-    auto c = ctxt(heap_allocator());
-
     SmallVector<int, 1> original;
-    CZ_DEFER(original.drop(&c));
-    original.reserve(&c, 2);
+    CZ_DEFER(original.drop(heap_allocator()));
+    original.reserve(heap_allocator(), 2);
     original.push(13);
     original.push(27);
 
@@ -200,11 +192,9 @@ TEST_CASE("SmallVector move operator small sets elemements correctly") {
 }
 
 TEST_CASE("SmallVector move operator large sets elemements copies pointer") {
-    auto c = ctxt(heap_allocator());
-
     SmallVector<int, 1> original;
-    CZ_DEFER(original.drop(&c));
-    original.reserve(&c, 2);
+    CZ_DEFER(original.drop(heap_allocator()));
+    original.reserve(heap_allocator(), 2);
     original.push(13);
     original.push(27);
 

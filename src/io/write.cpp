@@ -9,7 +9,7 @@ namespace io {
 
 static Result string_writer_write_str(C* c, void* _string, Str str) {
     auto string = static_cast<String*>(_string);
-    string->reserve(c, str.len);
+    string->reserve(c->allocator, str.len);
     string->append(str);
     return Result::ok();
 }
@@ -20,7 +20,7 @@ Writer string_writer(String* string) {
 
 static Result tstring_writer_write_str(C* c, void* _string, Str str) {
     auto string = static_cast<String*>(_string);
-    string->treserve(c, str.len);
+    string->reserve(c->temp, str.len);
     string->append(str);
     return Result::ok();
 }

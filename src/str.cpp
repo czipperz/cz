@@ -6,15 +6,8 @@
 
 namespace cz {
 
-String Str::duplicate(C* c) const {
-    auto ptr = static_cast<char*>(c->alloc(len).buffer);
-    CZ_ASSERT(ptr != NULL);
-    memcpy(ptr, buffer, len);
-    return String{ptr, len, len};
-}
-
-String Str::tduplicate(C* c) const {
-    auto ptr = static_cast<char*>(c->talloc(len).buffer);
+String Str::duplicate(mem::Allocator allocator) const {
+    auto ptr = static_cast<char*>(allocator.alloc(len).buffer);
     CZ_ASSERT(ptr != NULL);
     memcpy(ptr, buffer, len);
     return String{ptr, len, len};

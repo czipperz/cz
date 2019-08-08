@@ -5,7 +5,7 @@
 namespace cz {
 namespace mem {
 
-static MemSlice heap_alloc(C*, void*, AllocInfo info) {
+static MemSlice heap_alloc(void*, AllocInfo info) {
     // TODO alignment
     auto buf = malloc(info.size);
     if (buf) {
@@ -15,11 +15,11 @@ static MemSlice heap_alloc(C*, void*, AllocInfo info) {
     }
 }
 
-static void heap_dealloc(C*, void*, MemSlice mem) {
+static void heap_dealloc(void*, MemSlice mem) {
     free(mem.buffer);
 }
 
-static MemSlice heap_realloc(C*, void*, MemSlice old_mem, AllocInfo new_info) {
+static MemSlice heap_realloc(void*, MemSlice old_mem, AllocInfo new_info) {
     // TODO alignment
     auto buf = realloc(old_mem.buffer, new_info.size);
     if (buf) {

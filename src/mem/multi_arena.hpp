@@ -11,11 +11,14 @@ struct MultiArena {
         size_t offset;
         size_t size;
     };
-
     Node* head = NULL;
 
+    Allocator inner_allocator;
+
+    constexpr explicit MultiArena(Allocator inner_allocator) : inner_allocator(inner_allocator) {}
+    void drop();
+
     Allocator allocator();
-    void drop(C* c);
 };
 
 }

@@ -30,9 +30,8 @@ TEST_CASE("Str::duplicate(C*) clones") {
 
     char clone_buffer[3] = {0};
     auto mock = mock_alloc(clone_buffer, 3);
-    C c = ctxt(mock.allocator());
 
-    String clone = str.duplicate(&c);
+    String clone = str.duplicate(mock.allocator());
 
     REQUIRE(clone.buffer() == clone_buffer);
     REQUIRE(clone.len() == 3);
@@ -46,9 +45,8 @@ TEST_CASE("String::clone(C*) clones") {
 
     char clone_buffer[3] = {0};
     auto mock = mock_alloc(clone_buffer, 3);
-    C c = ctxt(mock.allocator());
 
-    String clone = string.clone(&c);
+    String clone = string.clone(mock.allocator());
 
     REQUIRE(clone.buffer() == clone_buffer);
     REQUIRE(clone.len() == 3);
@@ -58,10 +56,9 @@ TEST_CASE("String::clone(C*) clones") {
 
 TEST_CASE("String::append from empty string") {
     mem::StackArena<32> arena;
-    C c = ctxt(arena.allocator());
 
     String string;
-    string.reserve(&c, 3);
+    string.reserve(arena.allocator(), 3);
     string.append("abc");
 
     REQUIRE(string == "abc");
@@ -69,12 +66,11 @@ TEST_CASE("String::append from empty string") {
 
 TEST_CASE("String::append from non-empty string and reallocates") {
     mem::StackArena<64> arena;
-    C c = ctxt(arena.allocator());
 
     String string;
-    string.reserve(&c, 3);
+    string.reserve(arena.allocator(), 3);
     string.append("abc");
-    string.reserve(&c, 33);
+    string.reserve(arena.allocator(), 33);
     string.append("defghijklmnopqrstuvwxyz0123456789");
 
     REQUIRE(string == "abcdefghijklmnopqrstuvwxyz0123456789");
@@ -83,10 +79,9 @@ TEST_CASE("String::append from non-empty string and reallocates") {
 TEST_CASE("String::append no realloc") {
     char buffer[64];
     auto mock = mock_alloc(buffer, 64);
-    C c = ctxt(mock.allocator());
 
     String string;
-    string.reserve(&c, 64);
+    string.reserve(mock.allocator(), 64);
     mock.called = false;
 
     string.append("abc");
@@ -100,10 +95,9 @@ TEST_CASE("String::append no realloc") {
 TEST_CASE("String::reserve allocates") {
     char buffer[64];
     auto mock = mock_alloc(buffer, 64);
-    C c = ctxt(mock.allocator());
     String string;
 
-    string.reserve(&c, 64);
+    string.reserve(mock.allocator(), 64);
 
     CHECK(string.buffer() == buffer);
     CHECK(string.len() == 0);
@@ -121,10 +115,9 @@ TEST_CASE("String::insert empty string") {
 
 TEST_CASE("String::insert into empty string") {
     mem::StackArena<32> arena;
-    C c = ctxt(arena.allocator());
     String string;
 
-    string.reserve(&c, 3);
+    string.reserve(arena.allocator(), 3);
     string.insert(0, "abc");
 
     CHECK(string.buffer() != NULL);
@@ -171,10 +164,9 @@ TEST_CASE("String::insert end") {
 
 TEST_CASE("String::insert with resize") {
     StackArena<8> arena;
-    C c = ctxt(arena.allocator());
     String string;
 
-    string.reserve(&c, 3);
+    string.reserve(arena.allocator(), 3);
     string.insert(0, "abc");
 
     CHECK(string.buffer() == arena.mem.buffer);
@@ -283,10 +275,9 @@ TEST_CASE("Str<Str both empty") {
 TEST_CASE("String::realloc does nothing when len == cap") {
     Array<MemSlice, 1> mems;
     CZ_DEFER(heap_dealloc_all(mems));
-    auto c = ctxt(capturing_heap_allocator(&mems));
 
     String string;
-    string.reserve(&c, 4);
+    string.reserve(capturing_heap_allocator(&mems), 4);
     REQUIRE(mems[0].size == 4);
 
     string.append("abc");
@@ -295,8 +286,7 @@ TEST_CASE("String::realloc does nothing when len == cap") {
 
     char buffer[3];
     auto mock = mock_realloc(buffer, mems[0], {3, 1});
-    c = ctxt(mock.allocator());
-    string.realloc(&c);
+    string.realloc(mock.allocator());
     REQUIRE(mock.called);
 
     REQUIRE(string.buffer() == buffer);

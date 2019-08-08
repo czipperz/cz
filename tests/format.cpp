@@ -14,7 +14,7 @@ TEST_CASE("sprint works") {
     C c = ctxt(arena.allocator());
 
     auto string = format::sprint(&c, 123, " + ", 456);
-    CZ_DEFER(string.drop(&c));
+    CZ_DEFER(string.drop(c.allocator));
 
     REQUIRE(string == "123 + 456");
 }

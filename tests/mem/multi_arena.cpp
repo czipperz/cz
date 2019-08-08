@@ -13,35 +13,31 @@ using namespace cz::mem;
 TEST_CASE("MultiArena alloc allocates a buffer") {
     char buffer[1024];
     auto mock = mock_alloc(buffer, 1024);
-    C c = ctxt(mock.allocator());
 
-    MultiArena multi_arena;
-    auto mem = multi_arena.allocator().alloc(&c, 32);
+    MultiArena multi_arena(mock.allocator());
+    auto mem = multi_arena.allocator().alloc(32);
 
     CHECK(mock.called);
     REQUIRE(mem == MemSlice{buffer + sizeof(MultiArena::Node), 32});
 }
 
 TEST_CASE("MultiArena::drop does nothing when no memory") {
-    C c = ctxt(panic_allocator());
-
-    MultiArena multi_arena;
-    multi_arena.drop(&c);
+    MultiArena multi_arena(panic_allocator());
+    multi_arena.drop();
 }
 
 TEST_CASE("MultiArena::drop drops the buffer when there is memory") {
     Array<MemSlice, 1> mems;
     CZ_DEFER(heap_dealloc_all(mems));
-    C alloc_context = ctxt(capturing_heap_allocator(&mems));
 
-    MultiArena multi_arena;
-    multi_arena.allocator().alloc(&alloc_context, 32);
+    MultiArena multi_arena(capturing_heap_allocator(&mems));
+    multi_arena.allocator().alloc(32);
     REQUIRE(mems.len() == 1);
 
     auto mock = mock_dealloc(mems[0]);
-    C drop_context = ctxt(mock.allocator());
 
-    multi_arena.drop(&drop_context);
+    multi_arena.inner_allocator = mock.allocator();
+    multi_arena.drop();
 
     REQUIRE(mock.called);
 }
@@ -49,18 +45,17 @@ TEST_CASE("MultiArena::drop drops the buffer when there is memory") {
 TEST_CASE("MultiArena::drop drops all buffers") {
     Array<MemSlice, 2> mems;
     CZ_DEFER(heap_dealloc_all(mems));
-    C alloc_context = ctxt(capturing_heap_allocator(&mems));
 
-    MultiArena multi_arena;
-    multi_arena.allocator().alloc(&alloc_context, 700);
-    multi_arena.allocator().alloc(&alloc_context, 700);
+    MultiArena multi_arena(capturing_heap_allocator(&mems));
+    multi_arena.allocator().alloc(700);
+    multi_arena.allocator().alloc(700);
     REQUIRE(mems.len() == 2);
 
     MockAllocate mocks[2] = {mock_dealloc(mems[1]), mock_dealloc(mems[0])};
     MockAllocateMultiple mock(mocks);
-    C drop_context = ctxt(mock.allocator());
 
-    multi_arena.drop(&drop_context);
+    multi_arena.inner_allocator = mock.allocator();
+    multi_arena.drop();
 
     REQUIRE(mock.index == 2);
 }
@@ -68,13 +63,12 @@ TEST_CASE("MultiArena::drop drops all buffers") {
 TEST_CASE("MultiArena realloc as subset works") {
     Array<MemSlice, 1> mems;
     CZ_DEFER(heap_dealloc_all(mems));
-    C alloc_context = ctxt(capturing_heap_allocator(&mems));
 
-    MultiArena multi_arena;
-    auto init = multi_arena.allocator().alloc(&alloc_context, 32);
+    MultiArena multi_arena(capturing_heap_allocator(&mems));
+    auto init = multi_arena.allocator().alloc(32);
     REQUIRE(init.size == 32);
 
-    auto re = multi_arena.allocator().realloc(&alloc_context, init, 24);
+    auto re = multi_arena.allocator().realloc(init, 24);
 
     REQUIRE(init.buffer == re.buffer);
     REQUIRE(re.size == 24);
@@ -84,13 +78,12 @@ TEST_CASE("MultiArena realloc as subset works") {
 TEST_CASE("MultiArena realloc works for head") {
     Array<MemSlice, 1> mems;
     CZ_DEFER(heap_dealloc_all(mems));
-    C alloc_context = ctxt(capturing_heap_allocator(&mems));
 
-    MultiArena multi_arena;
-    auto init = multi_arena.allocator().alloc(&alloc_context, 24);
+    MultiArena multi_arena(capturing_heap_allocator(&mems));
+    auto init = multi_arena.allocator().alloc(24);
     REQUIRE(init.size == 24);
 
-    auto re = multi_arena.allocator().realloc(&alloc_context, init, 32);
+    auto re = multi_arena.allocator().realloc(init, 32);
 
     REQUIRE(init.buffer == re.buffer);
     REQUIRE(re.size == 32);
