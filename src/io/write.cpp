@@ -86,7 +86,16 @@ Result write(Writer writer, Address addr) {
 Result write(Writer writer, Debug<Str> str) {
     CZ_TRY(write(writer, '"'));
     for (size_t i = 0; i < str.val.len; ++i) {
-        CZ_TRY(write(writer, str.val[i]));
+        char ch = str.val[i];
+        if (ch == '\\') {
+            CZ_TRY(write(writer, "\\\\"));
+        } else if (ch == '"') {
+            CZ_TRY(write(writer, "\\\""));
+        } else if (ch == '\n') {
+            CZ_TRY(write(writer, "\\n"));
+        } else {
+            CZ_TRY(write(writer, ch));
+        }
     }
     return write(writer, '"');
 }
