@@ -10,7 +10,7 @@ namespace log {
 
 template <LogLevel level, class... Ts>
 void log(C* c, Ts... ts) {
-    String message = cz::format::tprint(c, ts...);
+    String message = cz::format::sprint(c->temp, ts...);
     message.realloc(c->temp);
     CZ_DEFER(message.drop(c->temp));
     c->log(LogInfo(level, message));
