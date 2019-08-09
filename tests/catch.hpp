@@ -1,3 +1,5 @@
+#include "common.hpp"
+
 /*
  *  Catch v2.9.1
  *  Generated: 2019-06-17 11:59:24.363643
