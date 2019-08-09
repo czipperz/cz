@@ -83,5 +83,13 @@ Result write(Writer writer, Address addr) {
     return write_base<intptr_t>(writer, (intptr_t)addr.val, 16);
 }
 
+Result write(Writer writer, Debug<Str> str) {
+    CZ_TRY(write(writer, '"'));
+    for (size_t i = 0; i < str.val.len; ++i) {
+        CZ_TRY(write(writer, str.val[i]));
+    }
+    return write(writer, '"');
+}
+
 }
 }

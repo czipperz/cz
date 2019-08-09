@@ -77,6 +77,14 @@ Result write(Writer writer, Debug<T> debug) {
     return write(writer, debug.val);
 }
 
+Result write(Writer writer, Debug<Str>);
+inline Result write(Writer writer, Debug<const char*> str) {
+    return write(writer, debug(Str(str.val)));
+}
+inline Result write(Writer writer, Debug<String> string) {
+    return write(writer, debug(Str(string.val)));
+}
+
 template <class T>
 Result write(Writer writer, Debug<Slice<T>> debug_slice) {
     auto slice = debug_slice.val;
