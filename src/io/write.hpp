@@ -85,6 +85,9 @@ inline Result write(Writer writer, Debug<String> string) {
     return write(writer, debug(Str(string.val)));
 }
 
+Result write(Writer writer, Debug<MemSlice>);
+Result write(Writer writer, Debug<mem::AllocInfo>);
+
 template <class T>
 Result write(Writer writer, Debug<Slice<T>> debug_slice) {
     auto slice = debug_slice.val;
