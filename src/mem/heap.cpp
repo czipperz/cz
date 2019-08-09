@@ -30,7 +30,8 @@ static MemSlice heap_realloc(void*, MemSlice old_mem, AllocInfo new_info) {
 }
 
 Allocator heap_allocator() {
-    return {{heap_alloc, heap_dealloc, heap_realloc}, NULL};
+    static const Allocator::VTable vtable = {heap_alloc, heap_dealloc, heap_realloc};
+    return {&vtable, NULL};
 }
 
 }

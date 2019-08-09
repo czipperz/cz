@@ -81,9 +81,7 @@ static void multi_arena_dealloc(void* _multi_arena, MemSlice mem) {
     }
 }
 
-static MemSlice multi_arena_realloc(void* _multi_arena,
-                                    MemSlice old_mem,
-                                    AllocInfo new_info) {
+static MemSlice multi_arena_realloc(void* _multi_arena, MemSlice old_mem, AllocInfo new_info) {
     auto old_aligned = advance_ptr_to_alignment(old_mem, new_info);
     if (old_aligned) {
         return {old_aligned, new_info.size};
@@ -105,10 +103,9 @@ static MemSlice multi_arena_realloc(void* _multi_arena,
 }
 
 Allocator MultiArena::allocator() {
-    return {
-        {multi_arena_alloc, multi_arena_dealloc, multi_arena_realloc},
-        this,
-    };
+    static const Allocator::VTable vtable = {multi_arena_alloc, multi_arena_dealloc,
+                                             multi_arena_realloc};
+    return {&vtable, this};
 }
 
 void MultiArena::drop() {

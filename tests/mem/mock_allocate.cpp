@@ -29,7 +29,8 @@ static void test_dealloc(void* _data, MemSlice mem) {
 }
 
 Allocator MockAllocate::allocator() {
-    return {{test_alloc, test_dealloc, test_realloc}, this};
+    static const Allocator::VTable vtable = {test_alloc, test_dealloc, test_realloc};
+    return {&vtable, this};
 }
 
 MockAllocate mock_alloc(void* buffer, AllocInfo expected_new_info) {
@@ -57,7 +58,8 @@ static void panic_dealloc(void*, MemSlice) {
 }
 
 Allocator panic_allocator() {
-    return {{panic_alloc, panic_dealloc, panic_realloc}, NULL};
+    static const Allocator::VTable vtable = {panic_alloc, panic_dealloc, panic_realloc};
+    return {&vtable, NULL};
 }
 
 MockAllocateMultiple::MockAllocateMultiple(Slice<MockAllocate> mocks) : mocks(mocks) {}
@@ -79,7 +81,9 @@ static void test_multiple_dealloc(void* _mocks, MemSlice old_mem) {
 }
 
 mem::Allocator MockAllocateMultiple::allocator() {
-    return {{test_multiple_alloc, test_multiple_dealloc, test_multiple_realloc}, this};
+    static const Allocator::VTable vtable = {test_multiple_alloc, test_multiple_dealloc,
+                                             test_multiple_realloc};
+    return {&vtable, this};
 }
 
 static MemSlice capturing_heap_realloc(void* _mems, MemSlice old_mem, AllocInfo new_info) {
@@ -99,7 +103,9 @@ static void capturing_heap_dealloc(void* _mocks, MemSlice old_mem) {
 }
 
 Allocator capturing_heap_allocator(List<MemSlice>* mems) {
-    return {{capturing_heap_alloc, capturing_heap_dealloc, capturing_heap_realloc}, mems};
+    static const Allocator::VTable vtable = {capturing_heap_alloc, capturing_heap_dealloc,
+                                             capturing_heap_realloc};
+    return {&vtable, mems};
 }
 
 void heap_dealloc_all(Slice<MemSlice> mems) {

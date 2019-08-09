@@ -71,10 +71,8 @@ static MemSlice arena_realloc(void* _arena, MemSlice old_mem, AllocInfo new_info
 }
 
 Allocator Arena::allocator() {
-    return {
-        {arena_alloc, arena_dealloc, arena_realloc},
-        this,
-    };
+    static const Allocator::VTable vtable = {arena_alloc, arena_dealloc, arena_realloc};
+    return {&vtable, this};
 }
 
 HeapArena::HeapArena(Allocator allocator, AllocInfo info) {
