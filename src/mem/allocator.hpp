@@ -36,5 +36,12 @@ struct Allocator {
     }
 };
 
+template <class T>
+struct Allocated : T {
+    Allocator allocator;
+
+    constexpr Allocated(Allocator allocator) : allocator(allocator) {}
+};
+
 }
 }
