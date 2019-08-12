@@ -163,7 +163,7 @@ TEST_CASE("String::insert end") {
 }
 
 TEST_CASE("String::insert with resize") {
-    StackArena<8> arena;
+    StackArena<Arena::alignment> arena;
     String string;
 
     string.reserve(arena.allocator(), 3);

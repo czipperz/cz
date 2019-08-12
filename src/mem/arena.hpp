@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <cstddef>
 #include "../context_decl.hpp"
 #include "allocator.hpp"
 
@@ -8,11 +9,15 @@ namespace cz {
 namespace mem {
 
 struct Arena {
-    MemSlice mem;
-    size_t offset = 0;
-
+protected:
     constexpr Arena() = default;
     constexpr explicit Arena(MemSlice mem) : mem(mem) {}
+
+public:
+    static const size_t alignment = alignof(std::max_align_t);
+
+    MemSlice mem;
+    size_t offset = 0;
 
     /// Create an \c cz::Allocator allocating memory in the \c Arena.
     Allocator allocator();
@@ -24,15 +29,19 @@ struct Arena {
 
 template <size_t size>
 struct StackArena : public Arena {
-    char buffer[size];
+    alignas(Arena::alignment) char buffer[size];
 
-    constexpr StackArena() : Arena(buffer) {}
+    constexpr StackArena() : Arena(this->buffer) {}
 };
 
 struct HeapArena : public Arena {
-    HeapArena(Allocator, AllocInfo info);
+    explicit HeapArena(Allocator, AllocInfo info);
 
     void drop(Allocator);
+};
+
+struct DynamicArena : public Arena {
+    explicit DynamicArena(MemSlice slice) : Arena(slice) {}
 };
 
 }

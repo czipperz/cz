@@ -11,132 +11,113 @@ using namespace cz::mem;
 
 TEST_CASE("Arena alloc returns null when no space left") {
     char buffer[1] = {0};
-    Arena arena({buffer, 0});
+    DynamicArena arena({buffer, 0});
     REQUIRE(arena.allocator().alloc(1) == MemSlice{NULL, 0});
 }
 
 TEST_CASE("Arena alloc succeeds when exactly enough space left") {
-    char buffer[8] = {0};
-    Arena arena(buffer);
-    REQUIRE(arena.allocator().alloc(8) == MemSlice{buffer, 8});
+    StackArena<Arena::alignment> arena;
+    REQUIRE(arena.allocator().alloc(Arena::alignment) == MemSlice{arena.buffer, Arena::alignment});
 }
 
-TEST_CASE("Arena allocates at an offset") {
-    char buffer[8] = {0};
-    Arena arena(buffer);
-    REQUIRE(arena.allocator().alloc(2) == MemSlice{buffer, 2});
-    REQUIRE(arena.allocator().alloc(4) == MemSlice{buffer + 2, 4});
-    REQUIRE(arena.allocator().alloc(2) == MemSlice{buffer + 6, 2});
+TEST_CASE("Arena allocates in alignment sized chunks") {
+    StackArena<Arena::alignment * 2> arena;
+    REQUIRE(arena.allocator().alloc(Arena::alignment / 2) ==
+            MemSlice{arena.buffer, Arena::alignment});
+    REQUIRE(arena.allocator().alloc(Arena::alignment / 2) ==
+            MemSlice{arena.buffer + Arena::alignment, Arena::alignment});
 }
 
 TEST_CASE("Arena alloc succeeds after first failure") {
-    char buffer[8] = {0};
-    Arena arena(buffer);
-    REQUIRE(arena.allocator().alloc(2) == MemSlice{buffer, 2});
-    REQUIRE(arena.allocator().alloc(4) == MemSlice{buffer + 2, 4});
-    REQUIRE(arena.allocator().alloc(4) == MemSlice{NULL, 0});
-    REQUIRE(arena.allocator().alloc(2) == MemSlice{buffer + 6, 2});
-}
-
-TEST_CASE() {
-    char buffer[8] = {0};
-    Arena arena(buffer);
-
-    auto start = arena.allocator().alloc({1, 2}).buffer;
-    REQUIRE(start);
-    auto offset = arena.allocator().alloc({1, 2}).buffer;
-    REQUIRE(offset == (void*)((char*)start + 2));
+    StackArena<Arena::alignment * 3> arena;
+    REQUIRE(arena.allocator().alloc(Arena::alignment) == MemSlice{arena.buffer, Arena::alignment});
+    REQUIRE(arena.allocator().alloc(Arena::alignment * 3) == MemSlice{NULL, 0});
+    REQUIRE(arena.allocator().alloc(Arena::alignment * 2) ==
+            MemSlice{arena.buffer + Arena::alignment, Arena::alignment * 2});
 }
 
 TEST_CASE("Arena dealloc move pointer back when most recent allocation") {
-    char buffer[8] = {0};
-    Arena arena(buffer);
-    arena.allocator().alloc(2);
+    StackArena<Arena::alignment * 2> arena;
+    arena.allocator().alloc(Arena::alignment);
 
-    auto mem = arena.allocator().alloc(2);
+    auto mem = arena.allocator().alloc(Arena::alignment / 2);
     arena.allocator().dealloc(mem);
 
-    REQUIRE(arena.allocator().alloc(3).buffer == mem.buffer);
+    REQUIRE(arena.allocator().alloc(Arena::alignment / 4).buffer == mem.buffer);
 }
 
-TEST_CASE("Arena realloc in place expanding") {
-    char buffer[8] = {0};
-    Arena arena(buffer);
+TEST_CASE("Arena realloc in place expanding to fill the chunk") {
+    StackArena<Arena::alignment> arena;
 
-    auto mem = arena.allocator().alloc(4);
-    REQUIRE(mem == MemSlice{buffer, 4});
-    memset(mem.buffer, '*', 4);
+    auto mem = arena.allocator().alloc(Arena::alignment / 2);
+    REQUIRE(mem == MemSlice{arena.buffer, Arena::alignment});
 
-    mem = arena.allocator().realloc(mem, 6);
-    REQUIRE(mem == MemSlice{buffer, 6});
-    REQUIRE(buffer[0] == '*');
-    REQUIRE(buffer[1] == '*');
-    REQUIRE(buffer[2] == '*');
-    REQUIRE(buffer[3] == '*');
+    mem = arena.allocator().realloc(mem, Arena::alignment * 3 / 4);
+    REQUIRE(mem == MemSlice{arena.buffer, Arena::alignment});
+
+    mem = arena.allocator().realloc(mem, Arena::alignment);
+    REQUIRE(mem == MemSlice{arena.buffer, Arena::alignment});
 }
 
-TEST_CASE("Arena realloc in place expanding failure boundary success") {
-    char buffer[8] = {0};
-    Arena arena(buffer);
-    arena.allocator().alloc(2);
+TEST_CASE("Arena realloc in place expanding to more chunks") {
+    StackArena<Arena::alignment * 2> arena;
 
-    auto mem = arena.allocator().alloc(4);
-    REQUIRE(mem == MemSlice{buffer + 2, 4});
+    auto mem = arena.allocator().alloc(Arena::alignment / 2);
+    REQUIRE(mem == MemSlice{arena.buffer, Arena::alignment});
 
-    mem = arena.allocator().realloc(mem, 6);
-    REQUIRE(mem == MemSlice{buffer + 2, 6});
+    mem = arena.allocator().realloc(mem, Arena::alignment * 2);
+    REQUIRE(mem == MemSlice{arena.buffer, Arena::alignment * 2});
 }
 
-TEST_CASE("Arena realloc in place expanding failure boundary error") {
-    char buffer[8] = {0};
-    Arena arena(buffer);
-    arena.allocator().alloc(2);
+TEST_CASE("Arena realloc in place expanding to more chunks fails as no more chunks") {
+    StackArena<Arena::alignment * 2> arena;
+    arena.allocator().alloc(Arena::alignment);
 
-    auto mem = arena.allocator().alloc(4);
-    REQUIRE(mem == MemSlice{buffer + 2, 4});
+    auto mem = arena.allocator().alloc(Arena::alignment);
+    REQUIRE(mem == MemSlice{arena.buffer + Arena::alignment, Arena::alignment});
 
-    mem = arena.allocator().realloc(mem, 7);
+    mem = arena.allocator().realloc(mem, Arena::alignment + 1);
     REQUIRE(mem == MemSlice{NULL, 0});
+
+    REQUIRE(arena.offset == Arena::alignment * 2);
 }
 
-TEST_CASE("Arena realloc not enough space returns null") {
-    char buffer[8] = {0};
-    Arena arena(buffer);
+TEST_CASE("Arena realloc smaller size same chunks") {
+    StackArena<Arena::alignment> arena;
 
-    auto mem = arena.allocator().alloc(4);
-    REQUIRE(arena.allocator().realloc(mem, 10).buffer == NULL);
-
-    REQUIRE(arena.offset == 4);
-}
-
-TEST_CASE("Arena realloc smaller size") {
-    char buffer[8] = {0};
-    Arena arena(buffer);
-
-    auto mem = arena.allocator().alloc(4);
-    mem = arena.allocator().realloc(mem, 2);
+    auto mem = arena.allocator().alloc(Arena::alignment);
+    mem = arena.allocator().realloc(mem, Arena::alignment / 2);
 
     REQUIRE(mem.buffer == arena.mem.buffer);
-    REQUIRE(arena.offset == 2);
+    REQUIRE(arena.offset == Arena::alignment);
+}
+
+TEST_CASE("Arena realloc smaller size less chunks") {
+    StackArena<Arena::alignment * 2> arena;
+
+    auto mem = arena.allocator().alloc(Arena::alignment * 2);
+    mem = arena.allocator().realloc(mem, Arena::alignment / 2);
+
+    REQUIRE(mem.buffer == arena.mem.buffer);
+    REQUIRE(arena.offset == Arena::alignment);
 }
 
 TEST_CASE("HeapArena constructor allocates memory") {
-    char buffer[8];
-    auto mock = mock_alloc(buffer, {4, 2});
+    alignas(Arena::alignment) char buffer[Arena::alignment];
+    auto mock = mock_alloc(buffer, {Arena::alignment, Arena::alignment});
 
-    HeapArena arena(mock.allocator(), {4, 2});
+    HeapArena arena(mock.allocator(), {Arena::alignment / 2, Arena::alignment / 2});
 
-    CHECK(arena.mem.buffer == buffer);
-    CHECK(arena.mem.size == 4);
+    CHECK(arena.mem == MemSlice{buffer, Arena::alignment});
     CHECK(arena.offset == 0);
     REQUIRE(mock.called);
 }
 
 TEST_CASE("HeapArena::drop deallocates memory") {
-    StackArena<8> stack_arena;
-    HeapArena arena(stack_arena.allocator(), {4, 2});
+    StackArena<Arena::alignment> stack_arena;
+    HeapArena arena(stack_arena.allocator(), {Arena::alignment, Arena::alignment});
 
-    auto mock = mock_dealloc({stack_arena.buffer, 4});
+    auto mock = mock_dealloc({stack_arena.buffer, Arena::alignment});
 
     arena.drop(mock.allocator());
 

@@ -31,7 +31,12 @@ Str String::as_str() const {
 void String::reserve(mem::Allocator allocator, size_t extra) {
     if (_cap - _len < extra) {
         size_t new_cap = max(_len + extra, _cap * 2);
-        auto new_buffer = static_cast<char*>(allocator.realloc({_buffer, _cap}, new_cap).buffer);
+        char* new_buffer;
+        if (_buffer) {
+            new_buffer = static_cast<char*>(allocator.realloc({_buffer, _cap}, new_cap).buffer);
+        } else {
+            new_buffer = static_cast<char*>(allocator.alloc(new_cap).buffer);
+        }
         CZ_ASSERT(new_buffer != NULL);
         _buffer = new_buffer;
         _cap = new_cap;

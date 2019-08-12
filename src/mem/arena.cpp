@@ -9,9 +9,25 @@
 namespace cz {
 namespace mem {
 
+const size_t Arena::alignment;
+
+static size_t zero_alignment(size_t x) {
+    return x & ~(Arena::alignment - 1);
+}
+
+static size_t expand_to_alignment(size_t x) {
+    return zero_alignment(x + Arena::alignment - 1);
+}
+
+static AllocInfo expand_to_alignment(AllocInfo info) {
+    return {expand_to_alignment(info.size), expand_to_alignment(info.alignment)};
+}
+
 static MemSlice arena_alloc(void* _arena, AllocInfo info) {
     auto arena = static_cast<Arena*>(_arena);
     CZ_DEBUG_ASSERT(arena->mem.buffer != NULL);
+
+    info = expand_to_alignment(info);
 
     void* result = advance_ptr_to_alignment(arena->remaining(), info);
     if (result) {
@@ -26,9 +42,11 @@ static MemSlice arena_alloc(void* _arena, AllocInfo info) {
 static void arena_dealloc(void* _arena, MemSlice old_mem) {
     auto arena = static_cast<Arena*>(_arena);
     CZ_DEBUG_ASSERT(arena->mem.buffer != NULL);
+    CZ_DEBUG_ASSERT(arena->mem.contains(old_mem));
+
+    old_mem.size = expand_to_alignment(old_mem.size);
 
     if (arena->point() == old_mem.end()) {
-        CZ_DEBUG_ASSERT(arena->mem.contains(old_mem));
         arena->set_point(old_mem.start());
     }
 }
@@ -36,6 +54,10 @@ static void arena_dealloc(void* _arena, MemSlice old_mem) {
 static MemSlice arena_realloc(void* _arena, MemSlice old_mem, AllocInfo new_info) {
     auto arena = static_cast<Arena*>(_arena);
     CZ_DEBUG_ASSERT(arena->mem.buffer != NULL);
+    CZ_DEBUG_ASSERT(arena->mem.contains(old_mem));
+
+    old_mem.size = expand_to_alignment(old_mem.size);
+    new_info = expand_to_alignment(new_info);
 
     if (arena->point() == old_mem.end()) {
         // Pretend we dealloc the memory then allocate again so we get more space.
@@ -76,6 +98,7 @@ Allocator Arena::allocator() {
 }
 
 HeapArena::HeapArena(Allocator allocator, AllocInfo info) {
+    info = expand_to_alignment(info);
     mem = allocator.alloc(info);
     CZ_ASSERT(mem.buffer != NULL);
 }

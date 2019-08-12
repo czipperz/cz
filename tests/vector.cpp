@@ -42,8 +42,7 @@ TEST_CASE("SmallVector create") {
 }
 
 TEST_CASE("SmallVector<0> in an arena correctly knows when it is small") {
-    char buffer[128];
-    mem::Arena arena(buffer);
+    StackArena<128> arena;
 
     auto vector = arena.allocator().alloc<SmallVector<int, 0>>();
     new (vector) SmallVector<int, 0>();
@@ -57,8 +56,7 @@ TEST_CASE("SmallVector<0> in an arena correctly knows when it is small") {
 }
 
 TEST_CASE("SmallVector<1> in an arena correctly knows when it is small") {
-    char buffer[128];
-    mem::Arena arena(buffer);
+    StackArena<128> arena;
 
     auto vector = arena.allocator().alloc<SmallVector<int, 1>>();
     new (vector) SmallVector<int, 1>();
