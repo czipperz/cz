@@ -1,4 +1,5 @@
-#include "common.hpp"
+#define CATCH_CONFIG_FALLBACK_STRINGIFIER(value) (cz::io::ssprint(cz::io::debug(value)))
+#include "../src/io/std_string_writer.hpp"
 
 /*
  *  Catch v2.9.1

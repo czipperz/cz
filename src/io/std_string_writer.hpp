@@ -1,9 +1,7 @@
 #pragma once
 
-#define CATCH_CONFIG_FALLBACK_STRINGIFIER(value) (cz::io::ssprint(cz::io::debug(value)))
-
 #include <string>
-#include "../src/io/write.hpp"
+#include "write.hpp"
 
 namespace cz {
 namespace io {
@@ -19,5 +17,3 @@ std::string ssprint(T t) {
 
 }
 }
-
-#include "catch.hpp"
