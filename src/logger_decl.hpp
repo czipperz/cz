@@ -30,13 +30,6 @@ struct LogInfo {
     explicit LogInfo(const char* file, size_t line, LogLevel level, Str message);
 };
 
-struct LogFormatter {
-    void (*impl)(C* c, void* data, io::Writer writer, LogInfo info);
-    void* data;
-
-    void write_to(C* c, io::Writer writer, LogInfo info) { return impl(c, data, writer, info); }
-};
-
 struct Logger {
     void (*impl)(C* c, void* data, LogInfo info);
     void* data;
