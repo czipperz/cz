@@ -45,6 +45,9 @@ public:
         ++_len;
     }
 
+    T& last() { return (*this)[len() - 1]; }
+    constexpr const T& last() const { return (*this)[len() - 1]; }
+
     T& operator[](size_t i) { return elems()[i]; }
     constexpr const T& operator[](size_t i) const { return elems()[i]; }
 
