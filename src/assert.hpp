@@ -1,5 +1,6 @@
 #pragma once
 
+#include <exception>
 #include "exception.hpp"
 #include "source_location.hpp"
 #include "stringify.hpp"
@@ -16,13 +17,14 @@
 
 namespace cz {
 
-struct PanicReachedException : Exception {
+struct PanicReachedException : Exception, std::exception {
     SourceLocation loc;
     const char* message;
 
     PanicReachedException(SourceLocation loc, const char* message);
 
     virtual void log(C* c) override;
+    virtual const char* what() const noexcept override;
 };
 
 namespace impl {

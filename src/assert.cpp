@@ -12,6 +12,10 @@ void PanicReachedException::log(C* c) {
     log::fatal(c, loc.file, ':', loc.line, ": ", message, '\n');
 }
 
+const char* PanicReachedException::what() const noexcept {
+    return message;
+}
+
 namespace impl {
 
 void panic_reached(SourceLocation loc, const char* message) {
