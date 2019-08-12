@@ -22,10 +22,12 @@ enum LogLevel {
 using LogLevel_::LogLevel;
 
 struct LogInfo {
+    const char* file;
+    size_t line;
     LogLevel level;
     Str message;
 
-    explicit LogInfo(LogLevel level, Str message);
+    explicit LogInfo(const char* file, size_t line, LogLevel level, Str message);
 };
 
 struct LogFormatter {

@@ -9,41 +9,15 @@ namespace cz {
 namespace log {
 
 template <LogLevel level, class... Ts>
-void log(C* c, Ts... ts) {
+void log(C* c, const char* file, size_t line, Ts... ts) {
     String message = cz::format::sprint(c->temp, ts...);
     message.realloc(c->temp);
     CZ_DEFER(message.drop(c->temp));
-    c->log(LogInfo(level, message));
+    c->log(LogInfo(file, line, level, message));
 }
 
-template <class... Ts>
-void fatal(C* c, Ts... ts) {
-    return log<LogLevel::Fatal>(c, ts...);
-}
-template <class... Ts>
-void error(C* c, Ts... ts) {
-    return log<LogLevel::Error>(c, ts...);
-}
-template <class... Ts>
-void warning(C* c, Ts... ts) {
-    return log<LogLevel::Warning>(c, ts...);
-}
-template <class... Ts>
-void important(C* c, Ts... ts) {
-    return log<LogLevel::Important>(c, ts...);
-}
-template <class... Ts>
-void information(C* c, Ts... ts) {
-    return log<LogLevel::Information>(c, ts...);
-}
-template <class... Ts>
-void debug(C* c, Ts... ts) {
-    return log<LogLevel::Debug>(c, ts...);
-}
-template <class... Ts>
-void trace(C* c, Ts... ts) {
-    return log<LogLevel::Trace>(c, ts...);
-}
+#define CZ_LOG(c, level, ...) \
+    (cz::log::log<cz::log::LogLevel::level>(c, __FILE__, __LINE__, __VA_ARGS__))
 
 struct BasicLogger {
     LogFormatter formatter;

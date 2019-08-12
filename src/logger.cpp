@@ -7,7 +7,8 @@
 namespace cz {
 namespace log {
 
-LogInfo::LogInfo(LogLevel level, Str message) : level(level), message(message) {}
+LogInfo::LogInfo(const char* file, size_t line, LogLevel level, Str message)
+    : file(file), line(line), level(level), message(message) {}
 
 }
 }

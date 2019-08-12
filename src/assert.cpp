@@ -9,7 +9,7 @@ PanicReachedException::PanicReachedException(SourceLocation loc, const char* mes
     : loc(loc), message(message) {}
 
 void PanicReachedException::log(C* c) {
-    log::fatal(c, loc.file, ':', loc.line, ": ", message, '\n');
+    CZ_LOG(c, Fatal, loc.file, ':', loc.line, ": ", message, '\n');
 }
 
 const char* PanicReachedException::what() const noexcept {
