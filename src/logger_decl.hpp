@@ -38,4 +38,8 @@ struct Logger {
 };
 
 }
+
+namespace io {
+Result write(Writer, log::LogLevel);
+}
 }

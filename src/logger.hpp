@@ -22,4 +22,5 @@ void log(C* c, const char* file, size_t line, Ts... ts) {
 Logger ignore();
 
 }
+
 }
