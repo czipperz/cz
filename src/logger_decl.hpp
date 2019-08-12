@@ -31,10 +31,10 @@ struct LogInfo {
 };
 
 struct Logger {
-    void (*impl)(C* c, void* data, LogInfo info);
+    void (*impl)(void* data, LogInfo info);
     void* data;
 
-    void log(C* c, LogInfo info) const { return impl(c, data, info); }
+    void log(LogInfo info) const { return impl(data, info); }
 };
 
 }
