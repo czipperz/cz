@@ -59,6 +59,10 @@ public:
 
     T* elems() { return _elems; }
     constexpr const T* elems() const { return _elems; }
+    void set_len(size_t new_len) {
+        CZ_DEBUG_ASSERT(new_len <= cap());
+        _len = new_len;
+    }
     constexpr size_t len() const { return _len; }
     constexpr size_t cap() const { return _cap; }
 };
