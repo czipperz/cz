@@ -1,7 +1,3 @@
-#define CATCH_CONFIG_FALLBACK_STRINGIFIER(value) (cz::io::ssprint(cz::format::debug(value)))
-#include "../src/format.hpp"
-#include "../src/io/std_string_writer.hpp"
-
 /*
  *  Catch v2.9.1
  *  Generated: 2019-06-17 11:59:24.363643

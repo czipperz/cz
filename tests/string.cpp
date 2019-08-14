@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include "test_base.hpp"
 
 #include "../src/assert.hpp"
 #include "../src/defer.hpp"

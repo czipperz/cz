@@ -1,4 +1,4 @@
-#include "../catch.hpp"
+#include "../test_base.hpp"
 
 #include <string.h>
 #include "../../src/mem.hpp"
