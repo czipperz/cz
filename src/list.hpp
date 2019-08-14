@@ -54,6 +54,9 @@ public:
     operator Slice<T>() { return {elems(), _len}; }
     constexpr operator Slice<const T>() const { return {elems(), _len}; }
 
+    Slice<T> as_slice() { return *this; }
+    constexpr Slice<const T> as_slice() const { return *this; }
+
     T* elems() { return _elems; }
     constexpr const T* elems() const { return _elems; }
     constexpr size_t len() const { return _len; }
