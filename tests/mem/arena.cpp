@@ -12,7 +12,7 @@ using namespace cz::mem;
 TEST_CASE("Arena alloc returns null when no space left") {
     char buffer[1] = {0};
     DynamicArena arena({buffer, 0});
-    REQUIRE(arena.allocator().alloc(1) == MemSlice{NULL, 0});
+    REQUIRE(arena.allocator().alloc(1) == MemSlice{nullptr, 0});
 }
 
 TEST_CASE("Arena alloc succeeds when exactly enough space left") {
@@ -31,7 +31,7 @@ TEST_CASE("Arena allocates in alignment sized chunks") {
 TEST_CASE("Arena alloc succeeds after first failure") {
     StackArena<Arena::alignment * 3> arena;
     REQUIRE(arena.allocator().alloc(Arena::alignment) == MemSlice{arena.buffer, Arena::alignment});
-    REQUIRE(arena.allocator().alloc(Arena::alignment * 3) == MemSlice{NULL, 0});
+    REQUIRE(arena.allocator().alloc(Arena::alignment * 3) == MemSlice{nullptr, 0});
     REQUIRE(arena.allocator().alloc(Arena::alignment * 2) ==
             MemSlice{arena.buffer + Arena::alignment, Arena::alignment * 2});
 }
@@ -77,7 +77,7 @@ TEST_CASE("Arena realloc in place expanding to more chunks fails as no more chun
     REQUIRE(mem == MemSlice{arena.buffer + Arena::alignment, Arena::alignment});
 
     mem = arena.allocator().realloc(mem, Arena::alignment + 1);
-    REQUIRE(mem == MemSlice{NULL, 0});
+    REQUIRE(mem == MemSlice{nullptr, 0});
 
     REQUIRE(arena.offset == Arena::alignment * 2);
 }

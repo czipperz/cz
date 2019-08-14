@@ -11,7 +11,7 @@ static MemSlice heap_alloc(void*, AllocInfo info) {
     if (buf) {
         return {buf, info.size};
     } else {
-        return {NULL, 0};
+        return {nullptr, 0};
     }
 }
 
@@ -25,13 +25,13 @@ static MemSlice heap_realloc(void*, MemSlice old_mem, AllocInfo new_info) {
     if (buf) {
         return {buf, new_info.size};
     } else {
-        return {NULL, 0};
+        return {nullptr, 0};
     }
 }
 
 Allocator heap_allocator() {
     static const Allocator::VTable vtable = {heap_alloc, heap_dealloc, heap_realloc};
-    return {&vtable, NULL};
+    return {&vtable, nullptr};
 }
 
 }

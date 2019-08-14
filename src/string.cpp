@@ -8,7 +8,7 @@
 
 namespace cz {
 
-String::String() : _buffer(NULL), _len(0), _cap(0) {}
+String::String() : _buffer(nullptr), _len(0), _cap(0) {}
 String::String(char* buffer, size_t len, size_t cap) : _buffer(buffer), _len(len), _cap(cap) {}
 
 char* String::buffer() {
@@ -37,7 +37,7 @@ void String::reserve(mem::Allocator allocator, size_t extra) {
         } else {
             new_buffer = static_cast<char*>(allocator.alloc(new_cap).buffer);
         }
-        CZ_ASSERT(new_buffer != NULL);
+        CZ_ASSERT(new_buffer != nullptr);
         _buffer = new_buffer;
         _cap = new_cap;
     }

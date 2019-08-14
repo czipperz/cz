@@ -21,7 +21,7 @@ static MemSlice test_realloc(void* _data, MemSlice old_mem, AllocInfo new_info) 
 }
 
 static MemSlice test_alloc(void* _data, AllocInfo info) {
-    return test_realloc(_data, {NULL, 0}, info);
+    return test_realloc(_data, {nullptr, 0}, info);
 }
 
 static void test_dealloc(void* _data, MemSlice mem) {
@@ -34,10 +34,10 @@ Allocator MockAllocate::allocator() {
 }
 
 MockAllocate mock_alloc(void* buffer, AllocInfo expected_new_info) {
-    return {buffer, {NULL, 0}, expected_new_info};
+    return {buffer, {nullptr, 0}, expected_new_info};
 }
 MockAllocate mock_dealloc(MemSlice expected_old_mem) {
-    return {NULL, expected_old_mem, {0, 0}};
+    return {nullptr, expected_old_mem, {0, 0}};
 }
 MockAllocate mock_realloc(void* buffer, MemSlice expected_old_mem, AllocInfo expected_new_info) {
     return {buffer, expected_old_mem, expected_new_info};
@@ -45,12 +45,12 @@ MockAllocate mock_realloc(void* buffer, MemSlice expected_old_mem, AllocInfo exp
 
 static MemSlice panic_alloc(void*, AllocInfo) {
     FAIL("alloc cannot be called in this context");
-    return {NULL, 0};
+    return {nullptr, 0};
 }
 
 static MemSlice panic_realloc(void*, MemSlice, AllocInfo) {
     FAIL("realloc cannot be called in this context");
-    return {NULL, 0};
+    return {nullptr, 0};
 }
 
 static void panic_dealloc(void*, MemSlice) {
@@ -59,7 +59,7 @@ static void panic_dealloc(void*, MemSlice) {
 
 Allocator panic_allocator() {
     static const Allocator::VTable vtable = {panic_alloc, panic_dealloc, panic_realloc};
-    return {&vtable, NULL};
+    return {&vtable, nullptr};
 }
 
 MockAllocateMultiple::MockAllocateMultiple(Slice<MockAllocate> mocks) : mocks(mocks) {}
@@ -73,7 +73,7 @@ static MemSlice test_multiple_realloc(void* _mocks, MemSlice old_mem, AllocInfo 
 }
 
 static MemSlice test_multiple_alloc(void* _mocks, AllocInfo new_info) {
-    return test_multiple_realloc(_mocks, {NULL, 0}, new_info);
+    return test_multiple_realloc(_mocks, {nullptr, 0}, new_info);
 }
 
 static void test_multiple_dealloc(void* _mocks, MemSlice old_mem) {
@@ -89,13 +89,13 @@ mem::Allocator MockAllocateMultiple::allocator() {
 static MemSlice capturing_heap_realloc(void* _mems, MemSlice old_mem, AllocInfo new_info) {
     auto mems = static_cast<List<MemSlice>*>(_mems);
     auto mem = heap_allocator().realloc(old_mem, new_info);
-    REQUIRE(mem.buffer != NULL);
+    REQUIRE(mem.buffer != nullptr);
     mems->push(mem);
     return mem;
 }
 
 static MemSlice capturing_heap_alloc(void* _mocks, AllocInfo new_info) {
-    return capturing_heap_realloc(_mocks, {NULL, 0}, new_info);
+    return capturing_heap_realloc(_mocks, {nullptr, 0}, new_info);
 }
 
 static void capturing_heap_dealloc(void* _mocks, MemSlice old_mem) {

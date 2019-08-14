@@ -74,8 +74,8 @@ define_numeric_write(long long)
 
 Result write(Writer writer, format::Address addr) {
     // clang-format on
-    if (addr.val == NULL) {
-        return write(writer, "NULL");
+    if (addr.val == nullptr) {
+        return write(writer, "nullptr");
     }
 
     CZ_TRY(write(writer, '0'));

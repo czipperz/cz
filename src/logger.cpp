@@ -11,7 +11,7 @@ LogInfo::LogInfo(const char* file, size_t line, LogLevel level, Str message)
     : file(file), line(line), level(level), message(message) {}
 
 Logger ignore() {
-    return {[](void*, LogInfo) {}, NULL};
+    return {[](void*, LogInfo) {}, nullptr};
 }
 
 }

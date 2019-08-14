@@ -29,7 +29,7 @@ public:
                         .buffer);
             }
 
-            CZ_ASSERT(new_elems != NULL);
+            CZ_ASSERT(new_elems != nullptr);
 
             if (is_small()) {
                 memcpy(new_elems, this->elems(), this->len() * sizeof(T));
@@ -87,7 +87,7 @@ public:
 
     SmallVector clone(mem::Allocator allocator) const {
         auto new_elems = allocator.alloc({sizeof(T) * this->len, alignof(T)});
-        CZ_ASSERT(new_elems != NULL);
+        CZ_ASSERT(new_elems != nullptr);
         memcpy(new_elems, this->elems, sizeof(T) * this->len);
         return {new_elems, this->len, this->len};
     }

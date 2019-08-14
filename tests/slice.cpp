@@ -4,7 +4,7 @@
 
 TEST_CASE("slice()") {
     auto slice = cz::slice<int>();
-    REQUIRE(slice.buffer == NULL);
+    REQUIRE(slice.buffer == nullptr);
     REQUIRE(slice.len == 0);
 }
 
@@ -24,7 +24,7 @@ TEST_CASE("slice(T*, size_t)") {
 
 TEST_CASE("MemSlice()") {
     cz::MemSlice slice;
-    REQUIRE(slice.buffer == NULL);
+    REQUIRE(slice.buffer == nullptr);
     REQUIRE(slice.size == 0);
 }
 
@@ -35,9 +35,9 @@ TEST_CASE("MemSlice(char[])") {
     REQUIRE(slice.size == 8);
 }
 
-TEST_CASE("MemSlice(NULL, 0) works") {
-    cz::MemSlice slice(NULL, 0);
-    REQUIRE(slice.buffer == NULL);
+TEST_CASE("MemSlice(nullptr, 0) works") {
+    cz::MemSlice slice(nullptr, 0);
+    REQUIRE(slice.buffer == nullptr);
     REQUIRE(slice.size == 0);
 }
 

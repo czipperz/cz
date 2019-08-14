@@ -98,14 +98,14 @@ TEST_CASE("write(int = -47)") {
     REQUIRE(result.is_ok());
 }
 
-TEST_CASE("write(Address(NULL))") {
+TEST_CASE("write(Address(nullptr))") {
     mem::StackArena<32> arena;
     mem::Allocated<String> string(arena.allocator());
 
     Writer writer = string_writer(&string);
-    Result result = write(writer, format::addr(NULL));
+    Result result = write(writer, format::addr(nullptr));
 
-    REQUIRE(string == "NULL");
+    REQUIRE(string == "nullptr");
     REQUIRE(result.is_ok());
 }
 

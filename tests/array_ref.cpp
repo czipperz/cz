@@ -8,7 +8,7 @@ using namespace cz;
 TEST_CASE("ArrayRef constructor array ref and length") {
     ArrayRef<int> ref;
 
-    CHECK(ref.elems() == NULL);
+    CHECK(ref.elems() == nullptr);
     CHECK(ref.len() == 0);
     CHECK(ref.cap() == 0);
 }

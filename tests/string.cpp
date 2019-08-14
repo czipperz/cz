@@ -109,7 +109,7 @@ TEST_CASE("String::insert empty string") {
     String string;
     string.insert(0, "");
 
-    CHECK(string.buffer() == NULL);
+    CHECK(string.buffer() == nullptr);
     REQUIRE(string == "");
 }
 
@@ -120,7 +120,7 @@ TEST_CASE("String::insert into empty string") {
     string.reserve(arena.allocator(), 3);
     string.insert(0, "abc");
 
-    CHECK(string.buffer() != NULL);
+    CHECK(string.buffer() != nullptr);
     CHECK(string.len() == 3);
     CHECK(string.cap() >= 3);
     REQUIRE(string == "abc");

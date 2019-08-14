@@ -7,7 +7,7 @@ namespace cz {
 template <class T>
 class ArrayRef : public List<T> {
 public:
-    constexpr ArrayRef() : ArrayRef(NULL, 0, 0) {}
+    constexpr ArrayRef() : ArrayRef(nullptr, 0, 0) {}
     template <size_t cap>
     constexpr ArrayRef(T (&elems)[cap], size_t len) : ArrayRef(elems, len, cap) {}
     constexpr ArrayRef(T* elems, size_t len, size_t cap) : List<T>(elems, len, cap) {}

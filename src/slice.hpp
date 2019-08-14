@@ -12,7 +12,7 @@ struct Slice {
     T* buffer;
     size_t len;
 
-    constexpr Slice() : buffer(NULL), len(0) {}
+    constexpr Slice() : buffer(nullptr), len(0) {}
     template <size_t len>
     constexpr Slice(T (&buffer)[len]) : buffer(buffer), len(len) {}
     constexpr Slice(T* buffer, size_t len) : buffer(buffer), len(len) {}
@@ -44,7 +44,7 @@ struct MemSlice {
     void* buffer;
     size_t size;
 
-    constexpr MemSlice() : buffer(NULL), size(0) {}
+    constexpr MemSlice() : buffer(nullptr), size(0) {}
     template <size_t size>
     constexpr MemSlice(char (&buffer)[size]) : buffer(buffer), size(size) {}
     template <class T>
