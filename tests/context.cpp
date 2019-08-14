@@ -8,7 +8,7 @@ namespace cz {
 namespace test {
 
 Context ctxt(mem::Allocator allocator) {
-    return {allocator, panic_allocator(), log::ignore(), log::LogLevel::Off};
+    return {allocator, {}, log::ignore(), log::LogLevel::Off};
 }
 
 }

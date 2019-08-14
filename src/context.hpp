@@ -2,14 +2,13 @@
 
 #include "context_decl.hpp"
 #include "logger_decl.hpp"
-#include "mem/allocator.hpp"
-#include "mem/arena.hpp"
+#include "mem.hpp"
 
 namespace cz {
 
 struct Context {
     mem::Allocator allocator;
-    mem::Allocator temp;
+    mem::TempArena* temp;
 
     log::Logger logger;
     log::LogLevel max_log_level;
