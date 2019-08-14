@@ -11,10 +11,10 @@ namespace cz {
 class String;
 
 struct Str : public Slice<const char> {
-    constexpr Str() : Slice({NULL, 0}) {}
-    Str(std::nullptr_t) : Slice({NULL, 0}) {}
-    Str(const char* cstr) : Slice({cstr, strlen(cstr)}) {}
-    constexpr Str(const char* buffer, size_t len) : Slice({buffer, len}) {}
+    constexpr Str() : Slice(NULL, 0) {}
+    constexpr Str(std::nullptr_t) : Str() {}
+    Str(const char* cstr) : Slice(cstr, strlen(cstr)) {}
+    constexpr Str(const char* buffer, size_t len) : Slice(buffer, len) {}
 
     template <size_t len>
     static constexpr Str cstr(const char (&str)[len]) {
