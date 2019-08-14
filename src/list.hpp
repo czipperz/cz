@@ -27,6 +27,14 @@ public:
         ++_len;
     }
 
+    void append(Slice<T> slice) {
+        if (_cap - _len < slice.len) {
+            CZ_PANIC("List::append(): length exceeded");
+        }
+        memcpy(_elems, slice.buffer, slice.len * sizeof(T));
+        _len += slice.len;
+    }
+
     T pop() {
         if (_len < 1) {
             CZ_PANIC("List::pop(): No element to pop");
