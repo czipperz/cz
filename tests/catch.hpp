@@ -1,4 +1,5 @@
-#define CATCH_CONFIG_FALLBACK_STRINGIFIER(value) (cz::io::ssprint(cz::io::debug(value)))
+#define CATCH_CONFIG_FALLBACK_STRINGIFIER(value) (cz::io::ssprint(cz::format::debug(value)))
+#include "../src/format.hpp"
 #include "../src/io/std_string_writer.hpp"
 
 /*

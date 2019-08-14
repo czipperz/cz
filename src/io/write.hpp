@@ -52,57 +52,5 @@ Result write(Writer writer, unsigned long);
 Result write(Writer writer, long long);
 Result write(Writer writer, unsigned long long);
 
-struct Address {
-    void* val;
-};
-
-inline Address addr(void* val) {
-    return {val};
-}
-
-Result write(Writer writer, Address addr);
-
-template <class T>
-struct Debug {
-    T val;
-};
-
-template <class T>
-inline Debug<T> debug(T val) {
-    return {val};
-}
-
-template <class T>
-Result write(Writer writer, Debug<T> debug) {
-    return write(writer, debug.val);
-}
-
-Result write(Writer writer, Debug<Str>);
-inline Result write(Writer writer, Debug<const char*> str) {
-    return write(writer, debug(Str(str.val)));
-}
-inline Result write(Writer writer, Debug<String> string) {
-    return write(writer, debug(Str(string.val)));
-}
-
-Result write(Writer writer, Debug<MemSlice>);
-Result write(Writer writer, Debug<mem::AllocInfo>);
-
-template <class T>
-Result write(Writer writer, Debug<Slice<T>> debug_slice) {
-    auto slice = debug_slice.val;
-    CZ_TRY(write(writer, '['));
-
-    for (size_t i = 0; i < slice.len; ++i) {
-        if (i != 0) {
-            CZ_TRY(write(writer, ", "));
-        }
-
-        CZ_TRY(write(writer, debug(slice.buffer[i])));
-    }
-
-    return write(writer, ']');
-}
-
 }
 }

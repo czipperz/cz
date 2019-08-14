@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include "../context.hpp"
+#include "../format.hpp"
 #include "../try.hpp"
 
 namespace cz {
@@ -71,7 +72,7 @@ define_numeric_write(int)
 define_numeric_write(long)
 define_numeric_write(long long)
 
-Result write(Writer writer, Address addr) {
+Result write(Writer writer, format::Address addr) {
     // clang-format on
     if (addr.val == NULL) {
         return write(writer, "NULL");
@@ -81,30 +82,6 @@ Result write(Writer writer, Address addr) {
     CZ_TRY(write(writer, 'x'));
 
     return write_base<intptr_t>(writer, (intptr_t)addr.val, 16);
-}
-
-Result write(Writer writer, Debug<Str> str) {
-    CZ_TRY(write(writer, '"'));
-    for (size_t i = 0; i < str.val.len; ++i) {
-        char ch = str.val[i];
-        if (ch == '\\') {
-            CZ_TRY(write(writer, "\\\\"));
-        } else if (ch == '"') {
-            CZ_TRY(write(writer, "\\\""));
-        } else if (ch == '\n') {
-            CZ_TRY(write(writer, "\\n"));
-        } else {
-            CZ_TRY(write(writer, ch));
-        }
-    }
-    return write(writer, '"');
-}
-
-Result write(Writer writer, Debug<MemSlice> slice) {
-    return write(writer, "MemSlice{ ", addr(slice.val.buffer), ", ", slice.val.size, " }");
-}
-Result write(Writer writer, Debug<mem::AllocInfo> info) {
-    return write(writer, "AllocInfo{ ", info.val.size, ", ", info.val.alignment, " }");
 }
 
 }

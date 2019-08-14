@@ -25,7 +25,7 @@ TEST_CASE("write multiple arguments with debug") {
 
     Writer writer = string_writer(&string);
     int elems[3] = {10, 30, 40};
-    write(writer, "  ", debug(slice(elems)));
+    write(writer, "  ", format::debug(slice(elems)));
 
     REQUIRE(string == "  [10, 30, 40]");
 }
@@ -103,7 +103,7 @@ TEST_CASE("write(Address(NULL))") {
     mem::Allocated<String> string(arena.allocator());
 
     Writer writer = string_writer(&string);
-    Result result = write(writer, addr(NULL));
+    Result result = write(writer, format::addr(NULL));
 
     REQUIRE(string == "NULL");
     REQUIRE(result.is_ok());
@@ -114,7 +114,7 @@ TEST_CASE("write(Address(arbitrary) starts with 0x)") {
     mem::Allocated<String> string(arena.allocator());
 
     Writer writer = string_writer(&string);
-    Result result = write(writer, addr(&string));
+    Result result = write(writer, format::addr(&string));
 
     REQUIRE(string[0] == '0');
     REQUIRE(string[1] == 'x');
