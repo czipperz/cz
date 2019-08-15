@@ -11,7 +11,7 @@ using namespace cz::mem;
 
 TEST_CASE("Arena alloc returns null when no space left") {
     char buffer[1] = {0};
-    DynamicArena arena({buffer, 0});
+    Arena arena({buffer, 0});
     REQUIRE(arena.allocator().alloc(1) == MemSlice{nullptr, 0});
 }
 

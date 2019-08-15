@@ -9,11 +9,9 @@ namespace cz {
 namespace mem {
 
 struct Arena {
-protected:
     constexpr Arena() = default;
     constexpr explicit Arena(MemSlice mem) : mem(mem) {}
 
-public:
     static const size_t alignment = alignof(std::max_align_t);
 
     MemSlice mem;
@@ -38,10 +36,6 @@ struct HeapArena : public Arena {
     explicit HeapArena(Allocator, AllocInfo info);
 
     void drop(Allocator);
-};
-
-struct DynamicArena : public Arena {
-    explicit DynamicArena(MemSlice slice) : Arena(slice) {}
 };
 
 }
