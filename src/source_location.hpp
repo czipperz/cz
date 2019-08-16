@@ -6,7 +6,7 @@ namespace cz {
 
 struct SourceLocation {
     const char* file;
-    unsigned line;
+    long line;
 };
 
 }
