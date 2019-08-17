@@ -31,8 +31,7 @@ io::Result read_to_string(mem::Allocator allocator, String* string, FILE* file) 
     return io::Result::ok();
 }
 
-io::Result read_to_string(mem::Allocator allocator, String* string, const char* cstr_file_name) {
-    auto file = fopen(cstr_file_name, "r");
+static io::Result read_to_string_(mem::Allocator allocator, String* string, FILE* file) {
     if (!file) {
         return io::Result::last_error();
     }
@@ -52,6 +51,14 @@ io::Result read_to_string(mem::Allocator allocator, String* string, const char* 
     }
 
     return read_to_string(allocator, string, file);
+}
+
+io::Result read_to_string(mem::Allocator allocator, String* string, const char* cstr_file_name) {
+	return read_to_string_(allocator, string, fopen(cstr_file_name, "r"));
+}
+
+io::Result read_to_string_binary(mem::Allocator allocator, String* string, const char* cstr_file_name) {
+	return read_to_string_(allocator, string, fopen(cstr_file_name, "rb"));
 }
 
 }
