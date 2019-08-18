@@ -8,7 +8,8 @@ root of the repository.
 
 List of features:
 
-* `Context` class allows injecting allocation and logging facilities to applicable functions.
+* `Context` class allows injecting allocation and logging facilities to
+  applicable functions.
 * Explicit memory allocation.
 * Explicit memory deallocation.
 * Explicit memory copying.
