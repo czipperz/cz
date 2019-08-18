@@ -114,9 +114,11 @@ io::Result DirectoryIterator::advance() {
         }
 
         _file.clear();
-        _file.reserve(_allocator, file.len + 1);
         _file.append(file);
+
+        CZ_DEBUG_ASSERT(_file.cap() - _file.len() >= 1);
         _file[file.len] = '\0';
+
         return io::Result::ok();
     } else if (errno == 0) {
         _done = true;
@@ -139,8 +141,15 @@ io::Result iterate_files(const char* cstr_path, DirectoryIterator* iterator) {
         return io::Result::last_error();
     }
 
+    // NAME_MAX doesn't account for null terminator
+    iterator->_file.reserve(iterator->_allocator, NAME_MAX + 1);
     iterator->dir = dir;
-    return iterator->advance();
+
+    auto result = iterator->advance();
+    if (result.is_err()) {
+        closedir(dir);
+    }
+    return result;
 }
 
 }
