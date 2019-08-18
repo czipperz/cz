@@ -55,7 +55,9 @@ TEST_CASE("String::clone(C*) clones") {
 }
 
 TEST_CASE("String::append from empty string") {
-    mem::StackArena<32> arena;
+    AlignedBuffer<32> buffer;
+    Arena arena;
+    arena.mem = buffer;
 
     String string;
     string.reserve(arena.allocator(), 3);
@@ -65,7 +67,9 @@ TEST_CASE("String::append from empty string") {
 }
 
 TEST_CASE("String::append from non-empty string and reallocates") {
-    mem::StackArena<64> arena;
+    AlignedBuffer<64> buffer;
+    Arena arena;
+    arena.mem = buffer;
 
     String string;
     string.reserve(arena.allocator(), 3);
@@ -114,7 +118,9 @@ TEST_CASE("String::insert empty string") {
 }
 
 TEST_CASE("String::insert into empty string") {
-    mem::StackArena<32> arena;
+    AlignedBuffer<32> buffer;
+    Arena arena;
+    arena.mem = buffer;
     String string;
 
     string.reserve(arena.allocator(), 3);
@@ -163,7 +169,9 @@ TEST_CASE("String::insert end") {
 }
 
 TEST_CASE("String::insert with resize") {
-    StackArena<Arena::alignment> arena;
+    AlignedBuffer<Arena::alignment> buffer;
+    Arena arena;
+    arena.mem = buffer;
     String string;
 
     string.reserve(arena.allocator(), 3);

@@ -42,7 +42,9 @@ TEST_CASE("SmallVector create") {
 }
 
 TEST_CASE("SmallVector<0> in an arena correctly knows when it is small") {
-    StackArena<128> arena;
+    AlignedBuffer<128> buffer;
+    Arena arena;
+    arena.mem = buffer;
 
     auto vector = arena.allocator().alloc<SmallVector<int, 0>>();
     new (vector) SmallVector<int, 0>();
@@ -56,7 +58,9 @@ TEST_CASE("SmallVector<0> in an arena correctly knows when it is small") {
 }
 
 TEST_CASE("SmallVector<1> in an arena correctly knows when it is small") {
-    StackArena<128> arena;
+    AlignedBuffer<128> buffer;
+    Arena arena;
+    arena.mem = buffer;
 
     auto vector = arena.allocator().alloc<SmallVector<int, 1>>();
     new (vector) SmallVector<int, 1>();

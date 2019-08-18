@@ -25,17 +25,12 @@ struct Arena {
     void set_point(void* p) { offset = (char*)p - (char*)mem.buffer; }
 };
 
-template <size_t size>
-struct StackArena : public Arena {
-    alignas(Arena::alignment) char buffer[size];
+template <size_t size, size_t alignment = Arena::alignment>
+struct AlignedBuffer {
+    alignas(alignment) char buffer[size];
 
-    constexpr StackArena() : Arena(this->buffer) {}
-};
-
-struct HeapArena : public Arena {
-    explicit HeapArena(Allocator, AllocInfo info);
-
-    void drop(Allocator);
+    MemSlice mem() { return {buffer, size}; }
+    operator MemSlice() { return mem(); }
 };
 
 }

@@ -10,7 +10,9 @@ using namespace cz;
 using namespace cz::test;
 
 TEST_CASE("sprint works") {
-    mem::StackArena<32> arena;
+    mem::AlignedBuffer<32> buffer;
+    mem::Arena arena;
+    arena.mem = buffer;
     auto string = format::sprint(arena.allocator(), 123, " + ", 456);
 
     REQUIRE(string == "123 + 456");

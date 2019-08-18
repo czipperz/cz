@@ -97,15 +97,5 @@ Allocator Arena::allocator() {
     return {&vtable, this};
 }
 
-HeapArena::HeapArena(Allocator allocator, AllocInfo info) {
-    info = expand_to_alignment(info);
-    mem = allocator.alloc(info);
-    CZ_ASSERT(mem.buffer != nullptr);
-}
-
-void HeapArena::drop(Allocator allocator) {
-    allocator.dealloc(mem);
-}
-
 }
 }
