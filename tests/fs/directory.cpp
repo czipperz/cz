@@ -18,7 +18,7 @@ TEST_CASE("fs::files works") {
     const char* dir = "tests/fs";
 
     DirectoryIterator iterator(allocator);
-    REQUIRE(iterate_files(dir, &iterator).is_ok());
+    REQUIRE(iterator.create(dir).is_ok());
     CZ_DEFER(REQUIRE(iterator.destroy().is_ok()));
 
     SmallVector<String, 0> paths;

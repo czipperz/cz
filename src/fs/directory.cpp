@@ -23,7 +23,7 @@ static io::Result get_last_error() {
 
 io::Result DirectoryIterator::advance() {
     WIN32_FIND_DATA data;
-    if (FindNextFileA(handle, &data)) {
+    if (FindNextFileA(_handle, &data)) {
         _file.clear();
 
         Str file = data.cFileName;
@@ -43,14 +43,14 @@ io::Result DirectoryIterator::advance() {
 
 io::Result DirectoryIterator::destroy() {
     _file.drop(_allocator);
-    if (FindClose(handle)) {
+    if (FindClose(_handle)) {
         return io::Result::ok();
     } else {
         return get_last_error();
     }
 }
 
-io::Result iterate_files(const char* cstr_path, DirectoryIterator* iterator) {
+io::Result DirectoryIterator::create(const char* cstr_path) {
     // Windows doesn't list the files in a directory, it findes files matching criteria.  Thus we
     // must append \c "\*" to get all files in the directory \c cstr_path.
     char buffer[_MAX_PATH];
@@ -66,31 +66,34 @@ io::Result iterate_files(const char* cstr_path, DirectoryIterator* iterator) {
         return get_last_error();
     }
 
-    iterator->handle = handle;
-    // _MAX_PATH (= 260) accounts for null terminator
-    iterator->_file.reserve(iterator->_allocator, sizeof(buffer));
+    _handle = handle;
 
     // skip "." and ".."
     if (strcmp(data.cFileName, ".") == 0 && !FindNextFileA(handle, &data)) {
         if (GetLastError() == ERROR_NO_MORE_FILES) {
-            iterator->_done = true;
+            _done = true;
             return io::Result::ok();
         } else {
+            destroy();
             return get_last_error();
         }
     }
     if (strcmp(data.cFileName, "..") == 0 && !FindNextFileA(handle, &data)) {
         if (GetLastError() == ERROR_NO_MORE_FILES) {
-            iterator->_done = true;
+            _done = true;
             return io::Result::ok();
         } else {
+            destroy();
             return get_last_error();
         }
     }
 
+    // _MAX_PATH (= 260) accounts for null terminator
+    _file.reserve(_allocator, sizeof(buffer));
+
     Str file = data.cFileName;
-    iterator->_file.append(file);
-    iterator->_file[file.len] = '\0';
+    _file.append(file);
+    _file[file.len] = '\0';
 
     return io::Result::ok();
 }
@@ -106,7 +109,7 @@ namespace fs {
 
 io::Result DirectoryIterator::advance() {
     errno = 0;
-    dirent* dirent = readdir((DIR*)dir);
+    dirent* dirent = readdir((DIR*)_dir);
     if (dirent) {
         Str file = dirent->d_name;
         if (file == "." || file == "..") {
@@ -129,23 +132,24 @@ io::Result DirectoryIterator::advance() {
 }
 
 io::Result DirectoryIterator::destroy() {
-    int ret = closedir((DIR*)dir);
+    _file.drop(_allocator);
+    int ret = closedir((DIR*)_dir);
     (void)ret;
     CZ_DEBUG_ASSERT(ret == 0);
     return io::Result::ok();
 }
 
-io::Result iterate_files(const char* cstr_path, DirectoryIterator* iterator) {
+io::Result DirectoryIterator::create(const char* cstr_path) {
     DIR* dir = opendir(cstr_path);
     if (!dir) {
         return io::Result::last_error();
     }
 
     // NAME_MAX doesn't account for null terminator
-    iterator->_file.reserve(iterator->_allocator, NAME_MAX + 1);
-    iterator->dir = dir;
+    _file.reserve(_allocator, NAME_MAX + 1);
+    _dir = dir;
 
-    auto result = iterator->advance();
+    auto result = advance();
     if (result.is_err()) {
         closedir(dir);
     }
@@ -161,7 +165,7 @@ namespace fs {
 
 io::Result files(mem::Allocator allocator, const char* cstr_path, Vector<String>* paths) {
     DirectoryIterator iterator(allocator);
-    CZ_TRY(iterate_files(cstr_path, &iterator));
+    CZ_TRY(iterator.create(cstr_path));
 
     while (!iterator.done()) {
         paths->reserve(allocator, 1);

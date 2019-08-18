@@ -14,9 +14,9 @@ class DirectoryIterator {
     bool _done = false;
 
 #ifdef _WIN32
-    /* HANDLE */ void* handle /* uninitialized */;
+    /* HANDLE */ void* _handle /* uninitialized */;
 #else
-    /* DIR* */ void* dir /* uninitialized */;
+    /* DIR* */ void* _dir /* uninitialized */;
 #endif
 
 public:
@@ -25,14 +25,17 @@ public:
     Str file() const { return _file; }
     bool done() const { return _done; }
 
+    /// Create the iterator for the files in the directory \c cstr_path.
+    ///
+    /// The path may be followed by a \c / .
+    io::Result create(const char* cstr_path);
     io::Result advance();
     io::Result destroy();
-
-    friend io::Result iterate_files(const char* cstr_path, DirectoryIterator* iterator);
 };
 
-io::Result iterate_files(const char* cstr_path, DirectoryIterator* iterator);
-
+/// Get the files in the directory \c cstr_path.
+///
+/// The path may be followed by a \c / .
 io::Result files(mem::Allocator allocator, const char* cstr_path, Vector<String>* paths);
 
 }
