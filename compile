@@ -17,13 +17,13 @@ echo "Output directory: $OUTPUT"
 echo "Build type: $BUILD_TYPE"
 if [ "$BUILD_TESTS" ]; then
     echo "Tests enabled"
-    TARGETS=""
+    CZ_BUILD_TESTS="-DCZ_BUILD_TESTS=1"
 else
     echo "Tests disabled"
-    TARGETS="cz"
+    CZ_BUILD_TESTS=""
 fi
-cmake "$ROOT" -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
+cmake "$ROOT" -DCMAKE_BUILD_TYPE="$BUILD_TYPE" $CZ_BUILD_TESTS
 
 echo
 echo "Make:"
-make -k $TARGETS
+make -k
