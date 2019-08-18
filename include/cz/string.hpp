@@ -20,14 +20,28 @@ public:
     /// Ensure there are \c extra bytes available in the buffer.
     void reserve(mem::Allocator, size_t extra);
 
+    /// Push the \c char onto the end of the string.
+    ///
+    /// Panics if there isn't enough space.
+    void push(char ch) { append({&ch, 1}); }
     /// Append the \c Str to the buffer.
     ///
     /// Panics if there isn't enough space.
     void append(Str str);
+
+    /// Insert the \c char into the middle of the buffer.
+    ///
+    /// Panics if there isn't enough space or if \c index is greater than \c len.
+    void insert(size_t index, char ch) { insert_str(index, {&ch, 1}); }
     /// Insert the \c Str into the middle of the buffer.
     ///
     /// Panics if there isn't enough space or if \c index is greater than \c len.
-    void insert(size_t index, Str str);
+    void insert_str(size_t index, Str str);
+
+    /// Pop the last \c char off the string.
+    ///
+    /// Panics if there is no character.
+    char pop();
 
     /// Reallocate the buffer so that the length is the same as the capacity.
     ///
@@ -60,6 +74,9 @@ public:
     const char* start() const { return buffer(); }
     char* end() { return buffer() + len(); }
     const char* end() const { return buffer() + len(); }
+
+    bool starts_with(Str prefix) const { return as_str().starts_with(prefix); }
+    bool ends_with(Str postfix) const { return as_str().ends_with(postfix); }
 
     /// Get a \c Str representing this \c String in its current state.
     Str as_str() const;

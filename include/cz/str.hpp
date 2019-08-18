@@ -24,6 +24,25 @@ struct Str : public Slice<const char> {
     /// Create a new \c String with the same contents in a unique memory buffer.
     String duplicate(mem::Allocator) const;
 
+    constexpr const char* start() const { return elems; }
+    constexpr const char* end() const { return elems + len; }
+
+    bool starts_with(Str prefix) const {
+        if (len < prefix.len) {
+            return false;
+        } else {
+            return memcmp(elems, prefix.elems, prefix.len) == 0;
+        }
+    }
+
+    bool ends_with(Str postfix) const {
+        if (len < postfix.len) {
+            return false;
+        } else {
+            return memcmp(elems + (len - postfix.len), postfix.elems, postfix.len) == 0;
+        }
+    }
+
     bool operator==(const Str& other) const {
         return len == other.len && memcmp(elems, other.elems, len) == 0;
     }
