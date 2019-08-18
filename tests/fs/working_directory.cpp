@@ -12,7 +12,7 @@ TEST_CASE("get_working_directory() returns non-empty") {
     mem::Allocator allocator = mem::heap_allocator();
     CZ_DEFER(path.drop(allocator));
 
-    REQUIRE(cz::is_ok(get_working_directory(allocator, &path)));
+    REQUIRE(!cz::is_err(get_working_directory(allocator, &path)));
     cz::io::put("cwd: ", path);
 
     REQUIRE(path != "");
