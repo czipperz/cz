@@ -2,13 +2,13 @@
 
 set -e
 
-export OUTPUT="${OUTPUT:-out}"
 export BUILD_TYPE="${BUILD_TYPE:-Debug}"
+export OUTPUT="${OUTPUT:-build}"
 export BUILD_TESTS=t
 
 cd "$(dirname "$0")"
 
-time ./build
+time ./compile
 
 echo
 echo "Test:"

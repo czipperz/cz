@@ -2,11 +2,13 @@
 
 set -e
 
-OUTPUT="${OUTPUT:-target}"
 BUILD_TYPE="${BUILD_TYPE:-Release}"
+OUTPUT="${OUTPUT:-build}"
 
 # cd to /$OUTPUT, creating it if it doesn't exist.
 cd "$(dirname "$0")"
+ROOT="$(pwd)"
+
 mkdir -p "$OUTPUT"
 cd "$OUTPUT"
 
@@ -20,7 +22,7 @@ else
     echo "Tests disabled"
     TARGETS="cz"
 fi
-cmake .. -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
+cmake "$ROOT" -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
 
 echo
 echo "Make:"
