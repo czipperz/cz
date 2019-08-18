@@ -14,3 +14,13 @@ List of features:
 * `String` and `Vector<T>` data structures.
 * `Str` and `Slice<T>` views into data structures.
 * Helpful macro utilities.
+
+## Building
+
+Requirements: `cmake` and a C++ compiler that supports C++11.
+
+Suggested: clone the repository and include it in your cmake build via
+`add_subdirectory()`.
+
+Alternative: Build locally using `cmake` and then link the resulting library
+into your program.
