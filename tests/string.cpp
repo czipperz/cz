@@ -281,7 +281,7 @@ TEST_CASE("Str<Str both empty") {
 }
 
 TEST_CASE("String::realloc does nothing when len == cap") {
-    Array<MemSlice, 1> mems;
+    ArrayList<MemSlice, 1> mems;
     CZ_DEFER(heap_dealloc_all(mems));
 
     String string;
