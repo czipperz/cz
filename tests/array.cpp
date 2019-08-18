@@ -1,6 +1,6 @@
 #include "test_base.hpp"
 
-#include "cz/array.hpp"
+#include <cz/array.hpp>
 
 using namespace cz;
 

@@ -1,6 +1,6 @@
 #include "test_base.hpp"
 
-#include "cz/str.hpp"
+#include <cz/str.hpp>
 
 using cz::Str;
 

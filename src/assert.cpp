@@ -1,7 +1,7 @@
-#include "cz/assert.hpp"
+#include <cz/assert.hpp>
 
 #include <stdlib.h>
-#include "cz/logger.hpp"
+#include <cz/logger.hpp>
 
 namespace cz {
 
