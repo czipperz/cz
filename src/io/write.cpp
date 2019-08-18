@@ -10,8 +10,8 @@ namespace io {
 
 static Result string_writer_write_str(void* _string, Str str) {
     auto string = static_cast<mem::Allocated<String>*>(_string);
-    string->reserve(string->allocator, str.len);
-    string->append(str);
+    string->object.reserve(string->allocator, str.len);
+    string->object.append(str);
     return Result::ok();
 }
 

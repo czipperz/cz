@@ -37,10 +37,9 @@ struct Allocator {
 };
 
 template <class T>
-struct Allocated : T {
+struct Allocated {
+    T object;
     Allocator allocator;
-
-    constexpr Allocated(Allocator allocator) : allocator(allocator) {}
 };
 
 }
