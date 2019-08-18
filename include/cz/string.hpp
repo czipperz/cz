@@ -32,11 +32,11 @@ public:
     /// Insert the \c char into the middle of the buffer.
     ///
     /// Panics if there isn't enough space or if \c index is greater than \c len.
-    void insert(size_t index, char ch) { insert_str(index, {&ch, 1}); }
+    void insert(size_t index, char ch) { insert(index, {&ch, 1}); }
     /// Insert the \c Str into the middle of the buffer.
     ///
     /// Panics if there isn't enough space or if \c index is greater than \c len.
-    void insert_str(size_t index, Str str);
+    void insert(size_t index, Str str);
 
     /// Pop the last \c char off the string.
     ///

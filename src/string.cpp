@@ -52,10 +52,10 @@ void String::append(Str str) {
     CZ_DEBUG_ASSERT(_len <= _cap);
 }
 
-void String::insert_str(size_t index, Str str) {
+void String::insert(size_t index, Str str) {
     CZ_ASSERT(index <= _len);
     if (_cap - _len < str.len) {
-        CZ_PANIC("String::insert_str(): Length exceeded");
+        CZ_PANIC("String::insert(): Length exceeded");
     }
     memmove(_buffer + index + str.len, _buffer + index, len() - index);
     memcpy(_buffer + index, str.elems, str.len);
