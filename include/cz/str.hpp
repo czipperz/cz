@@ -10,11 +10,14 @@ namespace cz {
 
 class String;
 
-struct Str : public Slice<const char> {
-    constexpr Str() : Slice(nullptr, 0) {}
+struct Str {
+    const char* buffer;
+    size_t len;
+
+    constexpr Str() : buffer(nullptr), len(0) {}
     constexpr Str(std::nullptr_t) : Str() {}
-    Str(const char* cstr) : Slice(cstr, strlen(cstr)) {}
-    constexpr Str(const char* buffer, size_t len) : Slice(buffer, len) {}
+    Str(const char* cstr) : buffer(cstr), len(strlen(cstr)) {}
+    constexpr Str(const char* buffer, size_t len) : buffer(buffer), len(len) {}
 
     template <size_t len>
     static constexpr Str cstr(const char (&str)[len]) {
@@ -24,14 +27,14 @@ struct Str : public Slice<const char> {
     /// Create a new \c String with the same contents in a unique memory buffer.
     String duplicate(mem::Allocator) const;
 
-    constexpr const char* start() const { return elems; }
-    constexpr const char* end() const { return elems + len; }
+    constexpr const char* start() const { return buffer; }
+    constexpr const char* end() const { return buffer + len; }
 
     bool starts_with(Str prefix) const {
         if (len < prefix.len) {
             return false;
         } else {
-            return memcmp(elems, prefix.elems, prefix.len) == 0;
+            return memcmp(buffer, prefix.buffer, prefix.len) == 0;
         }
     }
 
@@ -39,17 +42,19 @@ struct Str : public Slice<const char> {
         if (len < postfix.len) {
             return false;
         } else {
-            return memcmp(elems + (len - postfix.len), postfix.elems, postfix.len) == 0;
+            return memcmp(buffer + (len - postfix.len), postfix.buffer, postfix.len) == 0;
         }
     }
 
+    constexpr char operator[](size_t index) const { return buffer[index]; }
+
     bool operator==(const Str& other) const {
-        return len == other.len && memcmp(elems, other.elems, len) == 0;
+        return len == other.len && memcmp(buffer, other.buffer, len) == 0;
     }
     bool operator!=(const Str& other) const { return !(*this == other); }
 
     bool operator<(const Str& other) const {
-        auto x = memcmp(elems, other.elems, len < other.len ? len : other.len);
+        auto x = memcmp(buffer, other.buffer, len < other.len ? len : other.len);
         if (x == 0) {
             return len < other.len;
         }

@@ -21,7 +21,7 @@ Writer string_writer(mem::Allocated<String>* string) {
 
 static Result file_writer_write_str(void* _file, Str str) {
     auto file = static_cast<FILE*>(_file);
-    auto ret = fwrite(str.elems, sizeof(char), str.len, file);
+    auto ret = fwrite(str.buffer, sizeof(char), str.len, file);
 
     if (ret == str.len) {
         return Result::ok();

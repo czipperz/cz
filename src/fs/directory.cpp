@@ -56,7 +56,7 @@ io::Result iterate_files(const char* cstr_path, DirectoryIterator* iterator) {
     char buffer[_MAX_PATH];
     Str str_path = cstr_path;
     str_path.len = min(sizeof(buffer) - sizeof("\\*"), str_path.len);
-    memcpy(buffer, str_path.elems, str_path.len);
+    memcpy(buffer, str_path.buffer, str_path.len);
     strcpy(buffer + str_path.len, "\\*");
 
     WIN32_FIND_DATA data;

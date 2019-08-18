@@ -5,7 +5,7 @@ namespace io {
 
 Result sstring_writer_write_str(void* _string, Str str) {
     auto string = static_cast<std::string*>(_string);
-    string->append(str.elems, str.len);
+    string->append(str.buffer, str.len);
     return Result::ok();
 }
 
