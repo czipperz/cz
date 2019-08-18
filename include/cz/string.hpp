@@ -56,6 +56,11 @@ public:
     /// Get the capacity of the string in bytes.
     size_t cap() const;
 
+    char* start() { return buffer(); }
+    const char* start() const { return buffer(); }
+    char* end() { return buffer() + len(); }
+    const char* end() const { return buffer() + len(); }
+
     /// Get a \c Str representing this \c String in its current state.
     Str as_str() const;
     /// See \c String::as_str().
