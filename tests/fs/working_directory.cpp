@@ -13,7 +13,6 @@ TEST_CASE("get_working_directory() returns non-empty") {
     CZ_DEFER(path.drop(allocator));
 
     REQUIRE(!cz::is_err(get_working_directory(allocator, &path)));
-    cz::io::put("cwd: ", path);
 
     REQUIRE(path != "");
 }

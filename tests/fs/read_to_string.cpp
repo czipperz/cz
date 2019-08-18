@@ -10,8 +10,7 @@ using namespace cz;
 using namespace cz::fs;
 using cz::io::Result;
 
-static void set_wd() {
-#if _WIN32
+void set_wd() {
     static bool already_set = false;
     if (already_set) {
         return;
@@ -23,15 +22,18 @@ static void set_wd() {
 
     REQUIRE(!cz::is_err(get_working_directory(allocator, &path)));
 
+    cz::io::put("cwd: ", path);
+
+#if _WIN32
     Str end = "\\out\\build\\x64-Debug";
     if (path.ends_with(end)) {
         path.set_len(path.len() - end.len);
         path.push('\0');
         set_working_directory(path.buffer());
     }
+#endif
 
     already_set = true;
-#endif
 }
 
 TEST_CASE("read_to_string invalid file") {
