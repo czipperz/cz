@@ -3,6 +3,9 @@
 A common library for build data-oriented C++ applications.  This mostly contains
 a variety of data structures, memory allocators, and utility classes.
 
+Cz is licensed under the MIT license as described in the file `LICENSE` in the
+root of the repository.
+
 List of features:
 
 * `Context` class allows injecting allocation and logging facilities to applicable functions.
