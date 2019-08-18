@@ -1,9 +1,9 @@
-#include "read_to_string.hpp"
+#include "cz/fs/read_to_string.hpp"
 
 #include <stdio.h>
-#include "../defer.hpp"
-#include "../string.hpp"
-#include "../sys.hpp"
+#include "cz/defer.hpp"
+#include "cz/string.hpp"
+#include "cz/sys.hpp"
 
 namespace cz {
 namespace fs {
@@ -54,11 +54,13 @@ static io::Result read_to_string_(mem::Allocator allocator, String* string, FILE
 }
 
 io::Result read_to_string(mem::Allocator allocator, String* string, const char* cstr_file_name) {
-	return read_to_string_(allocator, string, fopen(cstr_file_name, "r"));
+    return read_to_string_(allocator, string, fopen(cstr_file_name, "r"));
 }
 
-io::Result read_to_string_binary(mem::Allocator allocator, String* string, const char* cstr_file_name) {
-	return read_to_string_(allocator, string, fopen(cstr_file_name, "rb"));
+io::Result read_to_string_binary(mem::Allocator allocator,
+                                 String* string,
+                                 const char* cstr_file_name) {
+    return read_to_string_(allocator, string, fopen(cstr_file_name, "rb"));
 }
 
 }

@@ -1,6 +1,6 @@
 #include "../test_base.hpp"
 
-#include "../../src/mem/alloc_info.hpp"
+#include "cz/mem/alloc_info.hpp"
 
 TEST_CASE("AllocInfo()") {
     cz::mem::AllocInfo info;

@@ -1,7 +1,7 @@
 #include "context.hpp"
 
-#include "../src/context.hpp"
-#include "../src/logger.hpp"
+#include "cz/context.hpp"
+#include "cz/logger.hpp"
 #include "mem/mock_allocate.hpp"
 
 namespace cz {

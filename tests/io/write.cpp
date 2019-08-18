@@ -1,9 +1,9 @@
 #include "../test_base.hpp"
 
-#include "../../src/defer.hpp"
-#include "../../src/io/write.hpp"
-#include "../../src/mem.hpp"
 #include "../context.hpp"
+#include "cz/defer.hpp"
+#include "cz/io/write.hpp"
+#include "cz/mem.hpp"
 
 using namespace cz;
 using namespace cz::io;

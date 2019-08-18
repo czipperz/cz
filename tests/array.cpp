@@ -1,10 +1,10 @@
 #include "test_base.hpp"
 
-#include "../src/array.hpp"
+#include "cz/array.hpp"
 
 using namespace cz;
 
-TEST_CASE("Array construction")  {
+TEST_CASE("Array construction") {
     Array<int, 5> ref;
 
     CHECK(ref.elems() != nullptr);

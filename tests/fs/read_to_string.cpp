@@ -1,9 +1,9 @@
 #include "../test_base.hpp"
 
-#include "../../src/defer.hpp"
-#include "../../src/fs/read_to_string.hpp"
-#include "../../src/mem/heap.hpp"
 #include "../context.hpp"
+#include "cz/defer.hpp"
+#include "cz/fs/read_to_string.hpp"
+#include "cz/mem/heap.hpp"
 
 using namespace cz;
 using cz::fs::read_to_string;

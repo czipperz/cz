@@ -1,10 +1,10 @@
-#include "string.hpp"
+#include "cz/string.hpp"
 
 #include <string.h>
-#include "assert.hpp"
-#include "context.hpp"
-#include "mem.hpp"
-#include "util.hpp"
+#include "cz/assert.hpp"
+#include "cz/context.hpp"
+#include "cz/mem.hpp"
+#include "cz/util.hpp"
 
 namespace cz {
 

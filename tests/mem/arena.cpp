@@ -1,8 +1,8 @@
 #include "../test_base.hpp"
 
 #include <string.h>
-#include "../../src/mem.hpp"
 #include "../context.hpp"
+#include "cz/mem.hpp"
 #include "mock_allocate.hpp"
 
 using namespace cz;

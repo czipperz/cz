@@ -1,8 +1,8 @@
 #pragma once
 
 #include <stdio.h>
-#include "../mem/allocator.hpp"
 #include "../io/result.hpp"
+#include "../mem/allocator.hpp"
 
 namespace cz {
 namespace fs {

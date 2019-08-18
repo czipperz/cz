@@ -1,7 +1,7 @@
 #include "test_base.hpp"
 
-#include "../src/array_ref.hpp"
-#include "../src/util.hpp"
+#include "cz/array_ref.hpp"
+#include "cz/util.hpp"
 
 using namespace cz;
 

@@ -1,6 +1,6 @@
 #include "test_base.hpp"
 
-#include "../src/relptr.hpp"
+#include "cz/relptr.hpp"
 
 struct S {
     char bytes[8];

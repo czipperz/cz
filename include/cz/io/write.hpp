@@ -22,8 +22,12 @@ struct Writer {
 
 Writer file_writer(FILE* file);
 Writer string_writer(mem::Allocated<String>* string);
-inline Writer cout() { return file_writer(stdout); }
-inline Writer cerr() { return file_writer(stderr); }
+inline Writer cout() {
+    return file_writer(stdout);
+}
+inline Writer cerr() {
+    return file_writer(stderr);
+}
 
 template <class T1, class T2, class... Ts>
 Result write(Writer writer, T1 t1, T2 t2, Ts... ts) {

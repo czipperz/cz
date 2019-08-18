@@ -1,7 +1,7 @@
 #include "mock_allocate.hpp"
 
-#include "../../src/mem/heap.hpp"
 #include "../test_base.hpp"
+#include "cz/mem/heap.hpp"
 
 namespace cz {
 namespace test {

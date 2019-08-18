@@ -1,6 +1,6 @@
 #include "test_base.hpp"
 
-#include "../src/slice.hpp"
+#include "cz/slice.hpp"
 
 TEST_CASE("slice()") {
     auto slice = cz::slice<int>();

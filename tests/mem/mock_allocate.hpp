@@ -1,8 +1,8 @@
 #pragma once
 
 #include <stddef.h>
-#include "../../src/array.hpp"
-#include "../../src/mem/allocator.hpp"
+#include "cz/array.hpp"
+#include "cz/mem/allocator.hpp"
 
 namespace cz {
 namespace test {

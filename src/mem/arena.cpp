@@ -1,10 +1,10 @@
-#include "arena.hpp"
+#include "cz/mem/arena.hpp"
 
 #include <string.h>
-#include "../assert.hpp"
-#include "../context.hpp"
-#include "alloc_utils.hpp"
-#include "allocator.hpp"
+#include "cz/assert.hpp"
+#include "cz/context.hpp"
+#include "cz/mem/alloc_utils.hpp"
+#include "cz/mem/allocator.hpp"
 
 namespace cz {
 namespace mem {

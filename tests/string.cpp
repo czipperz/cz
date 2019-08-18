@@ -1,10 +1,10 @@
 #include "test_base.hpp"
 
-#include "../src/assert.hpp"
-#include "../src/defer.hpp"
-#include "../src/mem.hpp"
-#include "../src/string.hpp"
 #include "context.hpp"
+#include "cz/assert.hpp"
+#include "cz/defer.hpp"
+#include "cz/mem.hpp"
+#include "cz/string.hpp"
 #include "mem/mock_allocate.hpp"
 
 using namespace cz;

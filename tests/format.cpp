@@ -1,9 +1,9 @@
 #include "test_base.hpp"
 
-#include "../src/defer.hpp"
-#include "../src/format.hpp"
-#include "../src/mem/arena.hpp"
 #include "context.hpp"
+#include "cz/defer.hpp"
+#include "cz/format.hpp"
+#include "cz/mem/arena.hpp"
 #include "mem/mock_allocate.hpp"
 
 using namespace cz;

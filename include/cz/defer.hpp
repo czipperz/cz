@@ -1,7 +1,7 @@
 #pragma once
 
-#include <utility>
 #include <functional>
+#include <utility>
 #include "token_concat.hpp"
 
 #define CZ_DEFER(code) CZ_DEFER_FUNCTION([&]() { code; })

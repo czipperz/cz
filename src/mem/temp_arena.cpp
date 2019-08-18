@@ -1,6 +1,6 @@
-#include "temp_arena.hpp"
+#include "cz/mem/temp_arena.hpp"
 
-#include "../util.hpp"
+#include "cz/util.hpp"
 
 namespace cz {
 namespace mem {

@@ -1,4 +1,4 @@
-#include "../sys.hpp"
+#include "cz/sys.hpp"
 
 #ifndef _WIN32
 

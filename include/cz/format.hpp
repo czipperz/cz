@@ -1,8 +1,8 @@
 #pragma once
 
-#include "string.hpp"
-#include "io/write.hpp"
 #include "context.hpp"
+#include "io/write.hpp"
+#include "string.hpp"
 
 namespace cz {
 namespace format {
