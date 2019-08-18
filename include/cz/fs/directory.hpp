@@ -35,7 +35,8 @@ public:
 
 /// Get the files in the directory \c cstr_path.
 ///
-/// The path may be followed by a \c / .
+/// Path should be expressed with forward slashes not back slashes.  The path
+/// may be followed by a trailing slash.
 io::Result files(mem::Allocator allocator, const char* cstr_path, Vector<String>* paths);
 
 }

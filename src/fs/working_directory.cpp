@@ -57,6 +57,7 @@ io::Result get_working_directory(mem::Allocator allocator, String* path) {
     size_t size;
     CZ_TRY(get_path_max(&size));
 
+    path->clear();
     path->reserve(allocator, size);
 
     while (!getcwd(path->end(), size)) {
@@ -70,7 +71,16 @@ io::Result get_working_directory(mem::Allocator allocator, String* path) {
         }
     }
 
-    path->set_len(path->len() + strlen(path->end()));
+    path->set_len(strlen(path->buffer()));
+
+#ifdef _WIN32
+    // replace '\' with '/' on windows
+    for (size_t i = 0; i < path->len(); ++i) {
+        if ((*path)[i] == '\\') {
+            (*path)[i] = '/';
+        }
+    }
+#endif
 
     return io::Result::ok();
 }

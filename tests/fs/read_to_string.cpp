@@ -25,7 +25,7 @@ void set_wd() {
     cz::io::put("cwd: ", path);
 
 #if _WIN32
-    Str end = "\\out\\build\\x64-Debug";
+    Str end = "/out/build/x64-Debug";
     if (path.ends_with(end)) {
         path.set_len(path.len() - end.len);
         path.push('\0');
