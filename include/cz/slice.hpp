@@ -9,15 +9,15 @@ namespace cz {
 /// If you want the inner type to be \c void, instead use \c MemSlice.
 template <class T>
 struct Slice {
-    T* buffer;
+    T* elems;
     size_t len;
 
-    constexpr Slice() : buffer(nullptr), len(0) {}
+    constexpr Slice() : elems(nullptr), len(0) {}
     template <size_t len>
-    constexpr Slice(T (&buffer)[len]) : buffer(buffer), len(len) {}
-    constexpr Slice(T* buffer, size_t len) : buffer(buffer), len(len) {}
+    constexpr Slice(T (&elems)[len]) : elems(elems), len(len) {}
+    constexpr Slice(T* elems, size_t len) : elems(elems), len(len) {}
 
-    constexpr T& operator[](size_t index) const { return buffer[index]; }
+    constexpr T& operator[](size_t index) const { return elems[index]; }
 };
 
 template <class T>
@@ -31,8 +31,8 @@ constexpr Slice<T> slice(T (&arr)[len]) {
 }
 
 template <class T>
-constexpr Slice<T> slice(T* buffer, size_t len) {
-    return {buffer, len};
+constexpr Slice<T> slice(T* elems, size_t len) {
+    return {elems, len};
 }
 
 /// A slice of memory with an unspecified type.
@@ -48,7 +48,7 @@ struct MemSlice {
     template <size_t size>
     constexpr MemSlice(char (&buffer)[size]) : buffer(buffer), size(size) {}
     template <class T>
-    constexpr MemSlice(Slice<T> slice) : buffer(slice.buffer), size(slice.len * sizeof(T)) {}
+    constexpr MemSlice(Slice<T> slice) : buffer(slice.elems), size(slice.len * sizeof(T)) {}
     constexpr MemSlice(void* buffer, size_t size) : buffer(buffer), size(size) {}
 
     constexpr bool operator==(MemSlice other) const {

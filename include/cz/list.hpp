@@ -31,7 +31,7 @@ public:
         if (_cap - _len < slice.len) {
             CZ_PANIC("List::append(): length exceeded");
         }
-        memcpy(_elems, slice.buffer, slice.len * sizeof(T));
+        memcpy(_elems, slice.elems, slice.len * sizeof(T));
         _len += slice.len;
     }
 

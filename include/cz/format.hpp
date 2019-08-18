@@ -62,7 +62,7 @@ Result write(Writer writer, format::Debug<Slice<T>> debug_slice) {
             CZ_TRY(write(writer, ", "));
         }
 
-        CZ_TRY(write(writer, format::debug(slice.buffer[i])));
+        CZ_TRY(write(writer, format::debug(slice[i])));
     }
 
     return write(writer, ']');
