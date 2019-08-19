@@ -78,6 +78,12 @@ public:
     bool starts_with(Str prefix) const { return as_str().starts_with(prefix); }
     bool ends_with(Str postfix) const { return as_str().ends_with(postfix); }
 
+    char* find(char pattern) { return const_cast<char*>(as_str().find(pattern)); }
+    const char* find(char pattern) const { return as_str().find(pattern); }
+
+    char* rfind(char pattern) { return const_cast<char*>(as_str().rfind(pattern)); }
+    const char* rfind(char pattern) const { return as_str().rfind(pattern); }
+
     /// Get a \c Str representing this \c String in its current state.
     Str as_str() const;
     /// See \c String::as_str().

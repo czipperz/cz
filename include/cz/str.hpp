@@ -46,6 +46,11 @@ struct Str {
         }
     }
 
+    const char* find(char pattern) const {
+        return static_cast<const char*>(memchr(buffer, pattern, len));
+    }
+    const char* rfind(char pattern) const;
+
     constexpr char operator[](size_t index) const { return buffer[index]; }
 
     bool operator==(const Str& other) const {
