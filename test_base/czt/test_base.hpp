@@ -6,4 +6,4 @@
 #include <cz/format.hpp>
 #include <cz/io/std_string_writer.hpp>
 
-#include "catch.hpp"
+#include "../catch.hpp"
