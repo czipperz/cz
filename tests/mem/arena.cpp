@@ -1,9 +1,9 @@
-#include "../test_base.hpp"
+#include <czt/test_base.hpp>
 
 #include <string.h>
 #include <cz/mem.hpp>
+#include <czt/mock_allocate.hpp>
 #include "../context.hpp"
-#include "mock_allocate.hpp"
 
 using namespace cz;
 using namespace cz::test;

@@ -2,7 +2,7 @@
 
 #include <cz/context.hpp>
 #include <cz/logger.hpp>
-#include "mem/mock_allocate.hpp"
+#include <czt/mock_allocate.hpp>
 
 namespace cz {
 namespace test {
