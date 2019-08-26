@@ -39,5 +39,7 @@ public:
 /// may be followed by a trailing slash.
 io::Result files(mem::Allocator allocator, const char* cstr_path, Vector<String>* paths);
 
+Str directory_component(Str);
+
 }
 }

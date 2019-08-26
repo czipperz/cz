@@ -33,3 +33,23 @@ TEST_CASE("fs::files works") {
         REQUIRE(iterator.advance().is_ok());
     }
 }
+
+TEST_CASE("fs::directory_component() empty input empty output") {
+    REQUIRE(directory_component("") == "");
+}
+
+TEST_CASE("fs::directory_component() no directory is empty output") {
+    REQUIRE(directory_component("abc") == "");
+}
+
+TEST_CASE("fs::directory_component() gets directory subset") {
+    REQUIRE(directory_component("abc/def.txt") == "abc/");
+}
+
+TEST_CASE("fs::directory_component() gets directory subset multiple directories") {
+    REQUIRE(directory_component("abc/def/ghi") == "abc/def/");
+}
+
+TEST_CASE("fs::directory_component() trailing slash returns input") {
+    REQUIRE(directory_component("abc/def/") == "abc/def/");
+}
