@@ -85,3 +85,13 @@ TEST_CASE("Str::rfind('\0') doesn't run over end") {
     Str str("abc");
     REQUIRE(str.rfind('\0') == nullptr);
 }
+
+TEST_CASE("Str::find in empty string is null") {
+    Str str("");
+    REQUIRE(str.find('a') == nullptr);
+}
+
+TEST_CASE("Str::rfind in empty string is null") {
+    Str str("");
+    REQUIRE(str.rfind('a') == nullptr);
+}
