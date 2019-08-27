@@ -39,6 +39,10 @@ public:
 /// may be followed by a trailing slash.
 io::Result files(mem::Allocator allocator, const char* cstr_path, Vector<String>* paths);
 
+/// Get the directory component of the path, including the trailing slash.
+///
+/// Returns empty string if it is just a file name.  Does nothing if the string
+/// ends in /.
 Str directory_component(Str);
 
 }
