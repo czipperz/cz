@@ -16,9 +16,6 @@ String Str::duplicate(mem::Allocator allocator) const {
 
 const char* Str::rfind(char pattern) const {
 #ifdef _GNU_SOURCE
-    if (len == 0) {
-        return nullptr;
-    }
     return static_cast<const char*>(::memrchr(buffer, pattern, len));
 #else
     for (size_t i = len; i > 0; --i) {
