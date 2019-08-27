@@ -7,11 +7,24 @@
 namespace cz {
 namespace log {
 
-LogInfo::LogInfo(const char* file, size_t line, LogLevel level, Str message)
-    : file(file), line(line), level(level), message(message) {}
+LogInfo::LogInfo(const char* file, size_t line, LogLevel level)
+    : file(file), line(line), level(level) {}
 
 Logger ignore() {
-    return {[](void*, LogInfo) {}, nullptr};
+    static const Logger::VTable vtable = {
+        [](void*, const LogInfo&) { return io::Result::ok(); },
+        [](void*, const LogInfo&, Str) { return io::Result::ok(); },
+        [](void*, const LogInfo&) { return io::Result::ok(); }};
+    return {&vtable, nullptr};
+}
+
+static io::Result log_writer_write_str(void* data, Str str) {
+    auto log_writer = static_cast<LogWriter*>(data);
+    return log_writer->logger.write_chunk(log_writer->info, str);
+}
+
+io::Writer LogWriter::writer() {
+    return {{log_writer_write_str}, this};
 }
 
 }

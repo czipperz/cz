@@ -25,16 +25,25 @@ struct LogInfo {
     const char* file;
     size_t line;
     LogLevel level;
-    Str message;
 
-    explicit LogInfo(const char* file, size_t line, LogLevel level, Str message);
+    LogInfo(const char* file, size_t line, LogLevel level);
 };
 
 struct Logger {
-    void (*impl)(void* data, LogInfo info);
+    struct VTable {
+        io::Result (*write_prefix)(void* data, const LogInfo& info);
+        io::Result (*write_chunk)(void* data, const LogInfo& info, Str chunk);
+        io::Result (*write_suffix)(void* data, const LogInfo& info);
+    };
+
+    const VTable* vtable;
     void* data;
 
-    void log(LogInfo info) const { return impl(data, info); }
+    io::Result write_prefix(const LogInfo& info) const { return vtable->write_prefix(data, info); }
+    io::Result write_chunk(const LogInfo& info, Str chunk) const {
+        return vtable->write_chunk(data, info, chunk);
+    }
+    io::Result write_suffix(const LogInfo& info) const { return vtable->write_suffix(data, info); }
 };
 
 }

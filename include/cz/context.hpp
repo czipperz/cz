@@ -12,15 +12,6 @@ struct Context {
 
     log::Logger logger;
     log::LogLevel max_log_level;
-
-    /// Log the following information.
-    void log(log::LogInfo info) const {
-        if (info.level <= max_log_level) {
-            return logger.log(info);
-        } else {
-            return;
-        }
-    }
 };
 
 }
