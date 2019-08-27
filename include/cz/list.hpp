@@ -21,7 +21,7 @@ protected:
 public:
     void push(T t) {
         if (_cap - _len < 1) {
-            CZ_PANIC("List::push(): length exceeded");
+            CZ_PANIC("List::push(): Length exceeded");
         }
         _elems[_len] = t;
         ++_len;
@@ -29,7 +29,7 @@ public:
 
     void append(Slice<T> slice) {
         if (_cap - _len < slice.len) {
-            CZ_PANIC("List::append(): length exceeded");
+            CZ_PANIC("List::append(): Length exceeded");
         }
         memcpy(_elems, slice.elems, slice.len * sizeof(T));
         _len += slice.len;
@@ -46,7 +46,7 @@ public:
     void insert(size_t index, T t) {
         CZ_DEBUG_ASSERT(index <= _len);
         if (_cap - _len < 1) {
-            CZ_PANIC("List::insert(): length exceeded");
+            CZ_PANIC("List::insert(): Length exceeded");
         }
         memmove(_elems + index + 1, _elems + index, (_len - index) * sizeof(T));
         _elems[index] = t;
