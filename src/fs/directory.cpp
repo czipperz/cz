@@ -1,5 +1,6 @@
 #include <cz/fs/directory.hpp>
 
+#include <ctype.h>
 #include <cz/defer.hpp>
 
 #ifdef _WIN32
@@ -191,5 +192,65 @@ Str directory_component(Str str) {
     }
 }
 
+void flatten_path(char* buffer, size_t* len) {
+    size_t index = 0;
+
+#ifdef _WIN32
+    if (*len >= 3 && isalpha(buffer[0]) && buffer[1] == ':' && buffer[2] == '/') {
+        index += 3;
+    } else if (*len >= 1 && buffer[0] == '/') {
+        index += 1;
+    }
+#else
+    if (*len >= 1 && buffer[0] == '/') {
+        index += 1;
+    }
+#endif
+
+    size_t directories = 0;
+
+    while (1) {
+        if (index + 1 < *len && buffer[index] == '.' && buffer[index + 1] == '.' &&
+            (index + 2 == *len || buffer[index + 2] == '/')) {
+            if (directories > 0) {
+                const char* point = Str{buffer, index - 1}.rfind('/');
+
+                size_t start;
+                if (point) {
+                    start = point - buffer + 1;
+                } else {
+                    start = 0;
+                }
+
+                // abc/def/..
+                //     ------
+                // abc/def/../ghi
+                //     -------
+                size_t end = index + 2 + (index + 2 != *len);
+                memmove(buffer + start, buffer + end, *len - end);
+                *len -= end - start;
+                index = start;
+                --directories;
+            } else {
+                index += 2 + (index + 2 != *len);
+            }
+        } else if (index < *len && buffer[index] == '.' &&
+                   (index + 1 == *len || buffer[index + 1] == '/')) {
+            size_t offset = 1 + (index + 1 != *len);
+            memmove(buffer + index, buffer + index + offset, *len - index - offset);
+            *len -= offset;
+        } else {
+            const char* point = Str{buffer + index, *len - index}.find('/');
+            if (!point) {
+                break;
+            }
+
+            // get the point after the /
+            index = point - buffer + 1;
+
+            ++directories;
+        }
+    }
+}
 }
 }

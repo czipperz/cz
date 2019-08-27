@@ -45,5 +45,11 @@ io::Result files(mem::Allocator allocator, const char* cstr_path, Vector<String>
 /// ends in /.
 Str directory_component(Str);
 
+/// Flatten the path, removing \c .. and \c . inplace.
+/// Prefers leaving trailing \c / rather than removing them.
+///
+/// Does not put in a null terminator.
+void flatten_path(char* buffer, size_t* len);
+
 }
 }
