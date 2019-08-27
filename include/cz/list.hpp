@@ -44,7 +44,7 @@ public:
     }
 
     void insert(size_t index, T t) {
-        CZ_ASSERT(index <= _len);
+        CZ_DEBUG_ASSERT(index <= _len);
         if (_cap - _len < 1) {
             CZ_PANIC("List::insert(): length exceeded");
         }

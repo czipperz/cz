@@ -53,7 +53,7 @@ void String::append(Str str) {
 }
 
 void String::insert(size_t index, Str str) {
-    CZ_ASSERT(index <= _len);
+    CZ_DEBUG_ASSERT(index <= _len);
     if (_cap - _len < str.len) {
         CZ_PANIC("String::insert(): Length exceeded");
     }
@@ -64,7 +64,9 @@ void String::insert(size_t index, Str str) {
 }
 
 char String::pop() {
-    CZ_ASSERT(len() >= 1);
+    if (_len < 1) {
+        CZ_PANIC("String::pop(): No element to pop");
+    }
     _len--;
     return _buffer[_len];
 }
@@ -82,19 +84,13 @@ void String::clear() {
 }
 
 void String::shrink_to(size_t new_len) {
-    if (new_len <= len()) {
-        set_len(new_len);
-    } else {
-        CZ_PANIC("String::shrink_to(): new_len > String::len()");
-    }
+    CZ_DEBUG_ASSERT(new_len <= len());
+    set_len(new_len);
 }
 
 void String::set_len(size_t new_len) {
-    if (new_len <= cap()) {
-        _len = new_len;
-    } else {
-        CZ_PANIC("String::set_len(): new_len > String::cap()");
-    }
+    CZ_DEBUG_ASSERT(new_len <= cap());
+    _len = new_len;
 }
 
 void String::drop(mem::Allocator allocator) {
