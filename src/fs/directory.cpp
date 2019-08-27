@@ -185,7 +185,7 @@ io::Result files(mem::Allocator allocator, const char* cstr_path, Vector<String>
 Str directory_component(Str str) {
     const char* ptr = str.rfind('/');
     if (ptr) {
-        return {str.buffer, ptr + 1 - str.buffer};
+        return {str.buffer, static_cast<size_t>(ptr + 1 - str.buffer)};
     } else {
         return {};
     }
