@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <cstddef>
+#include "assert.hpp"
 #include "mem/allocator.hpp"
 #include "slice.hpp"
 
@@ -51,7 +52,10 @@ struct Str {
     }
     const char* rfind(char pattern) const;
 
-    constexpr char operator[](size_t index) const { return buffer[index]; }
+    char operator[](size_t index) const {
+        CZ_DEBUG_ASSERT(index < len);
+        return buffer[index];
+    }
 
     bool operator==(const Str& other) const {
         return len == other.len && memcmp(buffer, other.buffer, len) == 0;

@@ -31,7 +31,7 @@ io::Result DirectoryIterator::advance() {
         _file.append(file);
 
         CZ_DEBUG_ASSERT(_file.cap() - _file.len() >= 1);
-        _file[file.len] = '\0';
+        *_file.end() = '\0';
 
         return io::Result::ok();
     } else if (GetLastError() == ERROR_NO_MORE_FILES) {
@@ -89,12 +89,16 @@ io::Result DirectoryIterator::create(const char* cstr_path) {
         }
     }
 
+    CZ_DEBUG_ASSERT(_file.len() == 0);
+
     // _MAX_PATH (= 260) accounts for null terminator
     _file.reserve(_allocator, sizeof(buffer));
 
     Str file = data.cFileName;
     _file.append(file);
-    _file[file.len] = '\0';
+
+    CZ_DEBUG_ASSERT(_file.cap() - _file.len() >= 1);
+    *_file.end() = '\0';
 
     return io::Result::ok();
 }
@@ -121,7 +125,7 @@ io::Result DirectoryIterator::advance() {
         _file.append(file);
 
         CZ_DEBUG_ASSERT(_file.cap() - _file.len() >= 1);
-        _file[file.len] = '\0';
+        *_file.end() = '\0';
 
         return io::Result::ok();
     } else if (errno == 0) {

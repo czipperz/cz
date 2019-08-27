@@ -53,11 +53,23 @@ public:
         ++_len;
     }
 
-    T& last() { return (*this)[len() - 1]; }
-    constexpr const T& last() const { return (*this)[len() - 1]; }
+    T& last() {
+        CZ_DEBUG_ASSERT(len() > 0);
+        return (*this)[len() - 1];
+    }
+    constexpr const T& last() const {
+        CZ_DEBUG_ASSERT(len() > 0);
+        return (*this)[len() - 1];
+    }
 
-    T& operator[](size_t i) { return elems()[i]; }
-    constexpr const T& operator[](size_t i) const { return elems()[i]; }
+    T& operator[](size_t i) {
+        CZ_DEBUG_ASSERT(i < len());
+        return elems()[i];
+    }
+    constexpr const T& operator[](size_t i) const {
+        CZ_DEBUG_ASSERT(i < len());
+        return elems()[i];
+    }
 
     operator Slice<T>() { return {elems(), _len}; }
     constexpr operator Slice<const T>() const { return {elems(), _len}; }
