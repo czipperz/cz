@@ -42,7 +42,6 @@ TEST_CASE("write str") {
 
     Writer writer = string_writer(&string);
     Result result;
-    SECTION("use Writer::write_str") { result = writer.write_str("abc"); }
     SECTION("use Writer::write_str") { result = write(writer, "abc"); }
 
     REQUIRE(string.object == "abc");

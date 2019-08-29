@@ -10,7 +10,7 @@ Result sstring_writer_write_str(void* _string, Str str) {
 }
 
 Writer sstring_writer(std::string* string) {
-    return {{sstring_writer_write_str}, string};
+    return {sstring_writer_write_str, string};
 }
 
 }

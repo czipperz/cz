@@ -16,7 +16,7 @@ static Result string_writer_write_str(void* _string, Str str) {
 }
 
 Writer string_writer(mem::Allocated<String>* string) {
-    return {{string_writer_write_str}, string};
+    return {string_writer_write_str, string};
 }
 
 static Result file_writer_write_str(void* _file, Str str) {
@@ -31,7 +31,7 @@ static Result file_writer_write_str(void* _file, Str str) {
 }
 
 Writer file_writer(FILE* file) {
-    return {{file_writer_write_str}, file};
+    return {file_writer_write_str, file};
 }
 
 template <class T>

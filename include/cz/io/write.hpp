@@ -9,15 +9,9 @@
 namespace cz {
 namespace io {
 
-struct Write {
-    Result (*write_str)(void* data, Str str);
-};
-
 struct Writer {
-    Write write;
+    Result (*write_str)(void* data, Str str);
     void* data;
-
-    Result write_str(Str str) { return write.write_str(data, str); }
 };
 
 Writer file_writer(FILE* file);
@@ -40,11 +34,11 @@ Result put(Ts... ts) {
     return write(cout(), ts..., '\n');
 }
 
-inline Result write(Writer writer, char ch) {
-    return writer.write_str({&ch, 1});
-}
 inline Result write(Writer writer, Str str) {
-    return writer.write_str(str);
+    return writer.write_str(writer.data, str);
+}
+inline Result write(Writer writer, char ch) {
+    return write(writer, Str{&ch, 1});
 }
 
 Result write(Writer writer, short);

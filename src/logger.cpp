@@ -24,7 +24,7 @@ static io::Result log_writer_write_str(void* data, Str str) {
 }
 
 io::Writer LogWriter::writer() {
-    return {{log_writer_write_str}, this};
+    return {log_writer_write_str, this};
 }
 
 }
