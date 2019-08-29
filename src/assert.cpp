@@ -5,12 +5,8 @@
 
 namespace cz {
 
-PanicReachedException::PanicReachedException(SourceLocation loc, const char* message)
-    : loc(loc), message(message) {}
-
-void PanicReachedException::log(C* c) {
-    CZ_LOG(c, Fatal, loc.file, ':', loc.line, ": ", message, '\n');
-}
+PanicReachedException::PanicReachedException(const char* message)
+    : message(message) {}
 
 const char* PanicReachedException::what() const noexcept {
     return message;
@@ -18,8 +14,8 @@ const char* PanicReachedException::what() const noexcept {
 
 namespace impl {
 
-void panic_reached(SourceLocation loc, const char* message) {
-    throw PanicReachedException(loc, message);
+void panic_reached(const char* message) {
+    throw PanicReachedException(message);
 }
 
 }

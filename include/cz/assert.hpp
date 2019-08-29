@@ -1,7 +1,7 @@
 #pragma once
 
 #include <exception>
-#include "exception.hpp"
+#include "context_decl.hpp"
 #include "source_location.hpp"
 #include "stringify.hpp"
 
@@ -13,23 +13,21 @@
 
 #define CZ_ASSERT(val) ((val) ? ((void)0) : CZ_PANIC("Assertion failed: " CZ_STRINGIFY(val)))
 
-#define CZ_PANIC(message) (cz::impl::panic_reached(CZ_SOURCE_LOCATION, message))
+#define CZ_PANIC(message) \
+    (cz::impl::panic_reached(__FILE__ ":" CZ_STRINGIFY(__LINE__) ": " message))
 
 namespace cz {
 
-struct PanicReachedException : Exception, std::exception {
-    SourceLocation loc;
+struct PanicReachedException : std::exception {
     const char* message;
 
-    PanicReachedException(SourceLocation loc, const char* message);
+    PanicReachedException(const char* message);
 
-    virtual void log(C* c) override;
     virtual const char* what() const noexcept override;
 };
 
 namespace impl {
-
-[[noreturn]] void panic_reached(SourceLocation, const char* message);
-
+[[noreturn]] void panic_reached(const char* message);
 }
+
 }
