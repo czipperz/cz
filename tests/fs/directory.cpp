@@ -29,7 +29,7 @@ TEST_CASE("fs::files works") {
 
     size_t i = 0;
     while (!iterator.done()) {
-        cz::io::put("ls: ", iterator.file());
+        cz::println("ls: ", iterator.file());
         REQUIRE(iterator.file() == paths[i++]);
         REQUIRE(iterator.advance().is_ok());
     }

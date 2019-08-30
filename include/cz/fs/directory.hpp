@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../io/result.hpp"
 #include "../mem/allocator.hpp"
+#include "../result.hpp"
 #include "../string.hpp"
 #include "../vector.hpp"
 
@@ -28,16 +28,16 @@ public:
     /// Create the iterator for the files in the directory \c cstr_path.
     ///
     /// The path may be followed by a \c / .
-    io::Result create(const char* cstr_path);
-    io::Result advance();
-    io::Result destroy();
+    Result create(const char* cstr_path);
+    Result advance();
+    Result destroy();
 };
 
 /// Get the files in the directory \c cstr_path.
 ///
 /// Path should be expressed with forward slashes not back slashes.  The path
 /// may be followed by a trailing slash.
-io::Result files(mem::Allocator allocator, const char* cstr_path, Vector<String>* paths);
+Result files(mem::Allocator allocator, const char* cstr_path, Vector<String>* paths);
 
 /// Get the directory component of the path, including the trailing slash.
 ///

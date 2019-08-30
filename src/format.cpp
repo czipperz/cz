@@ -1,7 +1,7 @@
 #include <cz/format.hpp>
 
 namespace cz {
-namespace io {
+
 using namespace format;
 
 Result write(Writer writer, Debug<Str> str) {
@@ -28,5 +28,4 @@ Result write(Writer writer, Debug<mem::AllocInfo> info) {
     return write(writer, "AllocInfo{ ", info.val.size, ", ", info.val.alignment, " }");
 }
 
-}
 }

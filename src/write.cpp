@@ -1,4 +1,4 @@
-#include <cz/io/write.hpp>
+#include <cz/write.hpp>
 
 #include <stdint.h>
 #include <cz/context.hpp>
@@ -6,7 +6,6 @@
 #include <cz/try.hpp>
 
 namespace cz {
-namespace io {
 
 static Result string_writer_write_str(void* _string, Str str) {
     auto string = static_cast<mem::Allocated<String>*>(_string);
@@ -84,5 +83,4 @@ Result write(Writer writer, format::Address addr) {
     return write_base<intptr_t>(writer, (intptr_t)addr.val, 16);
 }
 
-}
 }

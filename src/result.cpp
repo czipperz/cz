@@ -1,13 +1,11 @@
-#include <cz/io/result.hpp>
+#include <cz/result.hpp>
 
 #include <errno.h>
 
 namespace cz {
-namespace io {
 
 Result Result::last_error() {
     return {errno};
 }
 
-}
 }

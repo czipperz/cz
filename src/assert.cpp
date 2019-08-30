@@ -5,8 +5,7 @@
 
 namespace cz {
 
-PanicReachedException::PanicReachedException(const char* message)
-    : message(message) {}
+PanicReachedException::PanicReachedException(const char* message) : message(message) {}
 
 const char* PanicReachedException::what() const noexcept {
     return message;

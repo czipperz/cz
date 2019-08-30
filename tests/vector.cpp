@@ -1,16 +1,15 @@
 #include <czt/test_base.hpp>
 
 #include <cz/defer.hpp>
-#include <cz/io/write.hpp>
 #include <cz/mem.hpp>
 #include <cz/vector.hpp>
+#include <cz/write.hpp>
 #include <czt/mock_allocate.hpp>
 #include "context.hpp"
 
 using namespace cz;
 using namespace cz::test;
 using namespace cz::mem;
-using namespace cz::io;
 
 TEST_CASE("Vector::drop while small does nothing") {
     SmallVector<int, 0> vec;

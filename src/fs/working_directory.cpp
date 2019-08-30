@@ -20,18 +20,18 @@
 namespace cz {
 namespace fs {
 
-io::Result set_working_directory(const char* cstr_path) {
+Result set_working_directory(const char* cstr_path) {
     if (chdir(cstr_path) < 0) {
-        return io::Result::last_error();
+        return Result::last_error();
     } else {
-        return io::Result::ok();
+        return Result::ok();
     }
 }
 
-static io::Result get_path_max(size_t* size) {
+static Result get_path_max(size_t* size) {
 #ifdef _WIN32
     *size = _MAX_PATH;
-    return io::Result::ok();
+    return Result::ok();
 #else
     errno = 0;
 
@@ -40,7 +40,7 @@ static io::Result get_path_max(size_t* size) {
     if (path_max == -1) {
         // errno is only set if there is a limit
         if (errno != 0) {
-            return io::Result::last_error();
+            return Result::last_error();
         } else {
             // @RandomConstant: no limit to the path size
             path_max = 128;
@@ -49,11 +49,11 @@ static io::Result get_path_max(size_t* size) {
 
     *size = path_max;
 
-    return io::Result::ok();
+    return Result::ok();
 #endif
 }
 
-io::Result get_working_directory(mem::Allocator allocator, String* path) {
+Result get_working_directory(mem::Allocator allocator, String* path) {
     size_t size;
     CZ_TRY(get_path_max(&size));
 
@@ -67,7 +67,7 @@ io::Result get_working_directory(mem::Allocator allocator, String* path) {
             path->reserve(allocator, size);
         } else {
             // actual error
-            return io::Result::last_error();
+            return Result::last_error();
         }
     }
 
@@ -82,7 +82,7 @@ io::Result get_working_directory(mem::Allocator allocator, String* path) {
     }
 #endif
 
-    return io::Result::ok();
+    return Result::ok();
 }
 
 }

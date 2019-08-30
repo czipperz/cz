@@ -1,7 +1,7 @@
 #pragma once
 
 #include "context_decl.hpp"
-#include "io/write.hpp"
+#include "write.hpp"
 #include "str.hpp"
 
 namespace cz {
@@ -31,24 +31,23 @@ struct LogInfo {
 
 struct Logger {
     struct VTable {
-        io::Result (*write_prefix)(void* data, const LogInfo& info);
-        io::Result (*write_chunk)(void* data, const LogInfo& info, Str chunk);
-        io::Result (*write_suffix)(void* data, const LogInfo& info);
+        Result (*write_prefix)(void* data, const LogInfo& info);
+        Result (*write_chunk)(void* data, const LogInfo& info, Str chunk);
+        Result (*write_suffix)(void* data, const LogInfo& info);
     };
 
     const VTable* vtable;
     void* data;
 
-    io::Result write_prefix(const LogInfo& info) const { return vtable->write_prefix(data, info); }
-    io::Result write_chunk(const LogInfo& info, Str chunk) const {
+    Result write_prefix(const LogInfo& info) const { return vtable->write_prefix(data, info); }
+    Result write_chunk(const LogInfo& info, Str chunk) const {
         return vtable->write_chunk(data, info, chunk);
     }
-    io::Result write_suffix(const LogInfo& info) const { return vtable->write_suffix(data, info); }
+    Result write_suffix(const LogInfo& info) const { return vtable->write_suffix(data, info); }
 };
 
 }
 
-namespace io {
 Result write(Writer, log::LogLevel);
-}
+
 }

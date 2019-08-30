@@ -16,13 +16,13 @@ static_assert(std::is_same<void*, HANDLE>::value, "HANDLE must be void* on windo
 namespace cz {
 namespace fs {
 
-static io::Result get_last_error() {
-    io::Result result;
+static Result get_last_error() {
+    Result result;
     result.code = GetLastError();
     return result;
 }
 
-io::Result DirectoryIterator::advance() {
+Result DirectoryIterator::advance() {
     WIN32_FIND_DATA data;
     if (FindNextFileA(_handle, &data)) {
         _file.clear();
@@ -33,25 +33,25 @@ io::Result DirectoryIterator::advance() {
         CZ_DEBUG_ASSERT(_file.cap() - _file.len() >= 1);
         *_file.end() = '\0';
 
-        return io::Result::ok();
+        return Result::ok();
     } else if (GetLastError() == ERROR_NO_MORE_FILES) {
         _done = true;
-        return io::Result::ok();
+        return Result::ok();
     } else {
         return get_last_error();
     }
 }
 
-io::Result DirectoryIterator::destroy() {
+Result DirectoryIterator::destroy() {
     _file.drop(_allocator);
     if (FindClose(_handle)) {
-        return io::Result::ok();
+        return Result::ok();
     } else {
         return get_last_error();
     }
 }
 
-io::Result DirectoryIterator::create(const char* cstr_path) {
+Result DirectoryIterator::create(const char* cstr_path) {
     // Windows doesn't list the files in a directory, it findes files matching criteria.  Thus we
     // must append \c "\*" to get all files in the directory \c cstr_path.
     char buffer[_MAX_PATH];
@@ -73,7 +73,7 @@ io::Result DirectoryIterator::create(const char* cstr_path) {
     if (strcmp(data.cFileName, ".") == 0 && !FindNextFileA(handle, &data)) {
         if (GetLastError() == ERROR_NO_MORE_FILES) {
             _done = true;
-            return io::Result::ok();
+            return Result::ok();
         } else {
             destroy();
             return get_last_error();
@@ -82,7 +82,7 @@ io::Result DirectoryIterator::create(const char* cstr_path) {
     if (strcmp(data.cFileName, "..") == 0 && !FindNextFileA(handle, &data)) {
         if (GetLastError() == ERROR_NO_MORE_FILES) {
             _done = true;
-            return io::Result::ok();
+            return Result::ok();
         } else {
             destroy();
             return get_last_error();
@@ -100,7 +100,7 @@ io::Result DirectoryIterator::create(const char* cstr_path) {
     CZ_DEBUG_ASSERT(_file.cap() - _file.len() >= 1);
     *_file.end() = '\0';
 
-    return io::Result::ok();
+    return Result::ok();
 }
 
 }
@@ -112,7 +112,7 @@ io::Result DirectoryIterator::create(const char* cstr_path) {
 namespace cz {
 namespace fs {
 
-io::Result DirectoryIterator::advance() {
+Result DirectoryIterator::advance() {
     errno = 0;
     dirent* dirent = readdir((DIR*)_dir);
     if (dirent) {
@@ -127,27 +127,27 @@ io::Result DirectoryIterator::advance() {
         CZ_DEBUG_ASSERT(_file.cap() - _file.len() >= 1);
         *_file.end() = '\0';
 
-        return io::Result::ok();
+        return Result::ok();
     } else if (errno == 0) {
         _done = true;
-        return io::Result::ok();
+        return Result::ok();
     } else {
-        return io::Result::last_error();
+        return Result::last_error();
     }
 }
 
-io::Result DirectoryIterator::destroy() {
+Result DirectoryIterator::destroy() {
     _file.drop(_allocator);
     int ret = closedir((DIR*)_dir);
     (void)ret;
     CZ_DEBUG_ASSERT(ret == 0);
-    return io::Result::ok();
+    return Result::ok();
 }
 
-io::Result DirectoryIterator::create(const char* cstr_path) {
+Result DirectoryIterator::create(const char* cstr_path) {
     DIR* dir = opendir(cstr_path);
     if (!dir) {
-        return io::Result::last_error();
+        return Result::last_error();
     }
 
     // NAME_MAX doesn't account for null terminator
@@ -168,7 +168,7 @@ io::Result DirectoryIterator::create(const char* cstr_path) {
 namespace cz {
 namespace fs {
 
-io::Result files(mem::Allocator allocator, const char* cstr_path, Vector<String>* paths) {
+Result files(mem::Allocator allocator, const char* cstr_path, Vector<String>* paths) {
     DirectoryIterator iterator(allocator);
     CZ_TRY(iterator.create(cstr_path));
 

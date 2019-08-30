@@ -1,13 +1,12 @@
 #pragma once
 
 #include <stdio.h>
-#include "../slice.hpp"
-#include "../string.hpp"
-#include "../try.hpp"
 #include "result.hpp"
+#include "slice.hpp"
+#include "string.hpp"
+#include "try.hpp"
 
 namespace cz {
-namespace io {
 
 struct Writer {
     Result (*write_str)(void* data, Str str);
@@ -30,8 +29,18 @@ Result write(Writer writer, T1 t1, T2 t2, Ts... ts) {
 }
 
 template <class... Ts>
-Result put(Ts... ts) {
-    return write(cout(), ts..., '\n');
+Result writeln(Writer writer, Ts... ts) {
+    return write(writer, ts..., '\n');
+}
+
+template <class... Ts>
+Result print(Ts... ts) {
+    return write(cout(), ts...);
+}
+
+template <class... Ts>
+Result println(Ts... ts) {
+    return print(ts..., '\n');
 }
 
 inline Result write(Writer writer, Str str) {
@@ -50,5 +59,4 @@ Result write(Writer writer, unsigned long);
 Result write(Writer writer, long long);
 Result write(Writer writer, unsigned long long);
 
-}
 }

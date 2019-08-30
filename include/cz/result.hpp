@@ -1,10 +1,6 @@
 #pragma once
 
-#include "../context_decl.hpp"
-#include "../str.hpp"
-
 namespace cz {
-namespace io {
 
 struct Result {
     int code;
@@ -16,9 +12,7 @@ struct Result {
     constexpr bool is_err() const { return code != 0; }
 };
 
-}
-
-inline bool is_err(io::Result r) {
+inline bool is_err(Result r) {
     return r.is_err();
 }
 

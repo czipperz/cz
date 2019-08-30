@@ -1,7 +1,6 @@
 #include <cz/logger.hpp>
 
 #include <cz/assert.hpp>
-#include <cz/io.hpp>
 #include <cz/mem.hpp>
 
 namespace cz {
@@ -12,24 +11,22 @@ LogInfo::LogInfo(const char* file, size_t line, LogLevel level)
 
 Logger ignore() {
     static const Logger::VTable vtable = {
-        [](void*, const LogInfo&) { return io::Result::ok(); },
-        [](void*, const LogInfo&, Str) { return io::Result::ok(); },
-        [](void*, const LogInfo&) { return io::Result::ok(); }};
+        [](void*, const LogInfo&) { return Result::ok(); },
+        [](void*, const LogInfo&, Str) { return Result::ok(); },
+        [](void*, const LogInfo&) { return Result::ok(); }};
     return {&vtable, nullptr};
 }
 
-static io::Result log_writer_write_str(void* data, Str str) {
+static Result log_writer_write_str(void* data, Str str) {
     auto log_writer = static_cast<LogWriter*>(data);
     return log_writer->logger.write_chunk(log_writer->info, str);
 }
 
-io::Writer LogWriter::writer() {
+Writer LogWriter::writer() {
     return {log_writer_write_str, this};
 }
 
 }
-
-namespace io {
 
 Result write(Writer writer, log::LogLevel level) {
     switch (level) {
@@ -50,8 +47,6 @@ Result write(Writer writer, log::LogLevel level) {
         default:
             CZ_PANIC("write(): Invalid log level");
     }
-}
-
 }
 
 }

@@ -13,7 +13,7 @@ TEST_CASE("sprint works") {
     mem::AlignedBuffer<32> buffer;
     mem::Arena arena;
     arena.mem = buffer;
-    auto string = format::sprint(arena.allocator(), 123, " + ", 456);
+    auto string = sprint(arena.allocator(), 123, " + ", 456);
 
     REQUIRE(string == "123 + 456");
 }

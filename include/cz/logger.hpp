@@ -12,18 +12,18 @@ struct LogWriter {
     Logger logger;
     LogInfo info;
 
-    io::Writer writer();
+    Writer writer();
 };
 
 template <class... Ts>
-io::Result log(C* c, LogLevel level, const char* file, size_t line, Ts... ts) {
+Result log(C* c, LogLevel level, const char* file, size_t line, Ts... ts) {
     if (level <= c->max_log_level) {
         LogWriter log_writer = {c->logger, {file, line, level}};
         CZ_TRY(c->logger.write_prefix(log_writer.info));
-        CZ_TRY(cz::io::write(log_writer.writer(), ts...));
+        CZ_TRY(cz::write(log_writer.writer(), ts...));
         CZ_TRY(c->logger.write_suffix(log_writer.info));
     }
-    return io::Result::ok();
+    return Result::ok();
 }
 
 #define CZ_LOG(c, level, ...) (CZ_LOGL(c, cz::log::LogLevel::level, __VA_ARGS__))

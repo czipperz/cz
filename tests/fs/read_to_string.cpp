@@ -8,7 +8,7 @@
 
 using namespace cz;
 using namespace cz::fs;
-using cz::io::Result;
+using cz::Result;
 
 void set_wd() {
     static bool already_set = false;
@@ -22,7 +22,7 @@ void set_wd() {
 
     REQUIRE(!cz::is_err(get_working_directory(allocator, &path)));
 
-    cz::io::put("cwd: ", path);
+    cz::println("cwd: ", path);
 
 #if _WIN32
     Str end = "/out/build/x64-Debug";

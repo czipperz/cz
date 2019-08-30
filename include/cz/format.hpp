@@ -1,18 +1,19 @@
 #pragma once
 
 #include "context.hpp"
-#include "io/write.hpp"
 #include "string.hpp"
+#include "write.hpp"
 
 namespace cz {
-namespace format {
 
 template <class... Ts>
 String sprint(mem::Allocator allocator, Ts... ts) {
     mem::Allocated<String> string = {{}, allocator};
-    io::write(io::string_writer(&string), ts...);
+    write(string_writer(&string), ts...);
     return string.object;
 }
+
+namespace format {
 
 struct Address {
     void* val;
@@ -31,9 +32,9 @@ template <class T>
 inline Debug<T> debug(T val) {
     return {val};
 }
+
 }
 
-namespace io {
 Result write(Writer writer, format::Address addr);
 
 template <class T>
@@ -68,5 +69,4 @@ Result write(Writer writer, format::Debug<Slice<T>> debug_slice) {
     return write(writer, ']');
 }
 
-}
 }

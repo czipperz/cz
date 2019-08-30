@@ -15,7 +15,7 @@ static bool read(mem::Allocator allocator, String* string, FILE* file, size_t si
     return bytes_read == size;
 }
 
-io::Result read_to_string(mem::Allocator allocator, String* string, FILE* file) {
+Result read_to_string(mem::Allocator allocator, String* string, FILE* file) {
     const size_t chunk_size = sys::page_size();
 
     while (true) {
@@ -23,17 +23,17 @@ io::Result read_to_string(mem::Allocator allocator, String* string, FILE* file) 
             if (feof(file)) {
                 break;
             } else {
-                return io::Result::last_error();
+                return Result::last_error();
             }
         }
     }
 
-    return io::Result::ok();
+    return Result::ok();
 }
 
-static io::Result read_to_string_(mem::Allocator allocator, String* string, FILE* file) {
+static Result read_to_string_(mem::Allocator allocator, String* string, FILE* file) {
     if (!file) {
-        return io::Result::last_error();
+        return Result::last_error();
     }
     CZ_DEFER(fclose(file));
 
@@ -43,9 +43,9 @@ static io::Result read_to_string_(mem::Allocator allocator, String* string, FILE
         rewind(file);
         if (!read(allocator, string, file, len)) {
             if (feof(file)) {
-                return io::Result::ok();
+                return Result::ok();
             } else {
-                return io::Result::last_error();
+                return Result::last_error();
             }
         }
     }
@@ -53,11 +53,11 @@ static io::Result read_to_string_(mem::Allocator allocator, String* string, FILE
     return read_to_string(allocator, string, file);
 }
 
-io::Result read_to_string(mem::Allocator allocator, String* string, const char* cstr_file_name) {
+Result read_to_string(mem::Allocator allocator, String* string, const char* cstr_file_name) {
     return read_to_string_(allocator, string, fopen(cstr_file_name, "r"));
 }
 
-io::Result read_to_string_binary(mem::Allocator allocator,
+Result read_to_string_binary(mem::Allocator allocator,
                                  String* string,
                                  const char* cstr_file_name) {
     return read_to_string_(allocator, string, fopen(cstr_file_name, "rb"));
