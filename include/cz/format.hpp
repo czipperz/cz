@@ -24,6 +24,17 @@ inline Address addr(void* val) {
 }
 
 template <class T>
+struct WidthSpecified {
+    T val;
+    size_t width;
+};
+
+template <class T>
+inline WidthSpecified<T> width(size_t width, T val) {
+    return {val, width};
+}
+
+template <class T>
 struct Debug {
     T val;
 };
@@ -36,6 +47,15 @@ inline Debug<T> debug(T val) {
 }
 
 Result write(Writer writer, format::Address addr);
+
+Result write(Writer writer, format::WidthSpecified<short>);
+Result write(Writer writer, format::WidthSpecified<unsigned short>);
+Result write(Writer writer, format::WidthSpecified<int>);
+Result write(Writer writer, format::WidthSpecified<unsigned int>);
+Result write(Writer writer, format::WidthSpecified<long>);
+Result write(Writer writer, format::WidthSpecified<unsigned long>);
+Result write(Writer writer, format::WidthSpecified<long long>);
+Result write(Writer writer, format::WidthSpecified<unsigned long long>);
 
 template <class T>
 Result write(Writer writer, format::Debug<T> debug) {
