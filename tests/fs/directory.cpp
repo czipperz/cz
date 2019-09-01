@@ -22,7 +22,7 @@ TEST_CASE("fs::files works") {
     REQUIRE(iterator.create(dir).is_ok());
     CZ_DEFER(REQUIRE(iterator.destroy().is_ok()));
 
-    SmallVector<String, 0> paths;
+    Vector<String> paths;
     CZ_DEFER(paths.drop(allocator));
     CZ_DEFER(for (size_t i = 0; i < paths.len(); ++i) { paths[i].drop(allocator); });
     REQUIRE(files(allocator, dir, &paths).is_ok());
