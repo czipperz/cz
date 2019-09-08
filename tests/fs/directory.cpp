@@ -219,3 +219,32 @@ TEST_CASE("fs::flatten_path() starting with multiple ../ unchanged") {
 
     REQUIRE(Str{buffer, size} == "../../ooga_booga.txt");
 }
+
+#ifdef _WIN32
+TEST_CASE("fs::flatten_path() absolute path with drive windows") {
+    char buffer[] = "c:/../abc";
+    size_t size = sizeof(buffer) - 1;
+
+    flatten_path(buffer, &size);
+
+    REQUIRE(Str{buffer, size} == "c:/../abc");
+}
+
+TEST_CASE("fs::flatten_path() relative path with drive windows") {
+    char buffer[] = "c:../abc";
+    size_t size = sizeof(buffer) - 1;
+
+    flatten_path(buffer, &size);
+
+    REQUIRE(Str{buffer, size} == "c:../abc");
+}
+#endif
+
+TEST_CASE("fs::flatten_path() absolute path") {
+    char buffer[] = "/../abc";
+    size_t size = sizeof(buffer) - 1;
+
+    flatten_path(buffer, &size);
+
+    REQUIRE(Str{buffer, size} == "/../abc");
+}

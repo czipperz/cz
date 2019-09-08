@@ -200,16 +200,18 @@ void flatten_path(char* buffer, size_t* len) {
     size_t index = 0;
 
 #ifdef _WIN32
-    if (*len >= 3 && isalpha(buffer[0]) && buffer[1] == ':' && buffer[2] == '/') {
-        index += 3;
-    } else if (*len >= 1 && buffer[0] == '/') {
-        index += 1;
-    }
-#else
-    if (*len >= 1 && buffer[0] == '/') {
-        index += 1;
+    // On Windows absolute paths are separate from drive specifiers.  Thus all
+    // of the following are valid: C:/x/y, C:x/y, /x/y, x/y.  So we can remove
+    // the drive here to standardize to the unix standard (/x/y or x/y).
+    // https://docs.microsoft.com/en-us/dotnet/standard/io/file-path-formats
+    if (*len >= 2 && isalpha(buffer[0]) && buffer[1] == ':') {
+        index += 2;
     }
 #endif
+
+    if (*len >= 1 && buffer[index] == '/') {
+        index += 1;
+    }
 
     size_t directories = 0;
 
@@ -256,5 +258,6 @@ void flatten_path(char* buffer, size_t* len) {
         }
     }
 }
+
 }
 }

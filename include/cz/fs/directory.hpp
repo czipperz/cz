@@ -48,6 +48,8 @@ Str directory_component(Str);
 /// Flatten the path, removing \c .. and \c . inplace.
 /// Prefers leaving trailing \c / rather than removing them.
 ///
+/// This will leave \c .. s at the start since they cannot be flattened.
+///
 /// Does not put in a null terminator.
 void flatten_path(char* buffer, size_t* len);
 
