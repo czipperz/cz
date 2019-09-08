@@ -4,6 +4,17 @@
 #include <stdint.h>
 
 namespace cz {
+namespace utf32 {
+
+/// Convert the code point to utf8.
+///
+/// Returns the number of bytes written.  The code point argument must be a
+/// valid utf32 code point.  The output buffer must be at least 4 bytes long to
+/// prevent buffer overruns.
+size_t to_utf8(uint32_t code_point, uint8_t out_buffer[4]);
+
+}
+
 namespace utf8 {
 
 /// Check if the buffer is valid utf8.
