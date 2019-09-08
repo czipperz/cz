@@ -31,26 +31,28 @@ namespace cz {
 namespace utf32 {
 
 size_t to_utf8(uint32_t code_point, uint8_t out_buffer[4]) {
-    if ((code_point & (UTF8_MASK_4_VALUE << 18)) != 0) {
-        out_buffer[0] = UTF8_MASK_4_INDICATOR | ((code_point >> 18) & UTF8_MASK_4_VALUE);
-        out_buffer[1] =
-            UTF8_MASK_TRAILING_INDICATOR | ((code_point >> 12) & UTF8_MASK_TRAILING_VALUE);
-        out_buffer[2] =
-            UTF8_MASK_TRAILING_INDICATOR | ((code_point >> 6) & UTF8_MASK_TRAILING_VALUE);
-        out_buffer[3] = UTF8_MASK_TRAILING_INDICATOR | (code_point & UTF8_MASK_TRAILING_VALUE);
+    // utf8 width | bits
+    // 1          | 7
+    // 2          | 11
+    // 3          | 16
+    // 4          | 21
+    if ((code_point & ((1 << 4 | 1 << 3 | 1 << 2 | 1 << 1 | 1) << 16)) != 0) {
+        out_buffer[0] = UTF8_SET_4_BYTE | ((code_point >> 18) & UTF8_MASK_4_VALUE);
+        out_buffer[1] = UTF8_SET_TRAILING_BYTE | ((code_point >> 12) & UTF8_MASK_TRAILING_VALUE);
+        out_buffer[2] = UTF8_SET_TRAILING_BYTE | ((code_point >> 6) & UTF8_MASK_TRAILING_VALUE);
+        out_buffer[3] = UTF8_SET_TRAILING_BYTE | (code_point & UTF8_MASK_TRAILING_VALUE);
         return 4;
-    } else if ((code_point & (UTF8_MASK_3_VALUE << 12)) != 0) {
-        out_buffer[0] = UTF8_MASK_3_INDICATOR | ((code_point >> 12) & UTF8_MASK_3_VALUE);
-        out_buffer[1] =
-            UTF8_MASK_TRAILING_INDICATOR | ((code_point >> 6) & UTF8_MASK_TRAILING_VALUE);
-        out_buffer[2] = UTF8_MASK_TRAILING_INDICATOR | (code_point & UTF8_MASK_TRAILING_VALUE);
+    } else if ((code_point & ((1 << 3 | 1 << 2 | 1 << 1 | 1) << 11)) != 0) {
+        out_buffer[0] = UTF8_SET_3_BYTE | ((code_point >> 12) & UTF8_MASK_3_VALUE);
+        out_buffer[1] = UTF8_SET_TRAILING_BYTE | ((code_point >> 6) & UTF8_MASK_TRAILING_VALUE);
+        out_buffer[2] = UTF8_SET_TRAILING_BYTE | (code_point & UTF8_MASK_TRAILING_VALUE);
         return 3;
-    } else if ((code_point & (UTF8_MASK_2_VALUE << 6)) != 0) {
-        out_buffer[0] = UTF8_MASK_2_INDICATOR | ((code_point >> 6) & UTF8_MASK_2_VALUE);
-        out_buffer[1] = UTF8_MASK_TRAILING_INDICATOR | (code_point & UTF8_MASK_TRAILING_VALUE);
+    } else if ((code_point & ((1 << 3 | 1 << 2 | 1 << 1 | 1) << 7)) != 0) {
+        out_buffer[0] = UTF8_SET_2_BYTE | ((code_point >> 6) & UTF8_MASK_2_VALUE);
+        out_buffer[1] = UTF8_SET_TRAILING_BYTE | (code_point & UTF8_MASK_TRAILING_VALUE);
         return 2;
     } else {
-        out_buffer[0] = UTF8_MASK_1_INDICATOR | (code_point & UTF8_MASK_1_VALUE);
+        out_buffer[0] = UTF8_SET_1_BYTE | (code_point & UTF8_MASK_1_VALUE);
         return 1;
     }
 }

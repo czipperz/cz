@@ -79,7 +79,7 @@ TEST_CASE("backward() 4 byte letter") {
 }
 
 TEST_CASE("to_utf32() ascii") {
-    REQUIRE(to_utf32((const uint8_t*)u8"a") == (uint32_t)(u8"a"[0]));
+    REQUIRE(to_utf32((const uint8_t*)u8"a") == u8"a"[0]);
 }
 
 TEST_CASE("to_utf32() greek letter") {
@@ -94,4 +94,34 @@ TEST_CASE("to_utf32() 3 byte letter") {
 TEST_CASE("to_utf32() 4 byte letter") {
     const uint8_t str[] = {0xF0, 0x91, 0xAB, 0x85};
     REQUIRE(to_utf32(str) == 0x11AC5);
+}
+
+TEST_CASE("to_utf8() ascii") {
+    uint8_t buffer[4];
+    REQUIRE(cz::utf32::to_utf8(u8"a"[0], buffer) == 1);
+    REQUIRE(buffer[0] == u8"a"[0]);
+}
+
+TEST_CASE("to_utf8() greek letter") {
+    uint8_t buffer[4];
+    REQUIRE(cz::utf32::to_utf8(0x03BC, buffer) == 2);
+    REQUIRE(buffer[0] == 0xCE);
+    REQUIRE(buffer[1] == 0xBC);
+}
+
+TEST_CASE("to_utf8() 3 byte letter") {
+    uint8_t buffer[4];
+    REQUIRE(cz::utf32::to_utf8(0x0C4A, buffer) == 3);
+    REQUIRE(buffer[0] == 0xE0);
+    REQUIRE(buffer[1] == 0xB1);
+    REQUIRE(buffer[2] == 0x8A);
+}
+
+TEST_CASE("to_utf8() 4 byte letter") {
+    uint8_t buffer[4];
+    REQUIRE(cz::utf32::to_utf8(0x11AC5, buffer) == 4);
+    REQUIRE(buffer[0] == 0xF0);
+    REQUIRE(buffer[1] == 0x91);
+    REQUIRE(buffer[2] == 0xAB);
+    REQUIRE(buffer[3] == 0x85);
 }
