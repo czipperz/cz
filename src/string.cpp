@@ -38,6 +38,7 @@ void String::reserve(mem::Allocator allocator, size_t extra) {
             new_buffer = static_cast<char*>(allocator.alloc(new_cap).buffer);
         }
         CZ_ASSERT(new_buffer != nullptr);
+
         _buffer = new_buffer;
         _cap = new_cap;
     }

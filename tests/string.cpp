@@ -169,7 +169,7 @@ TEST_CASE("String::insert end") {
 }
 
 TEST_CASE("String::insert with resize") {
-    AlignedBuffer<Arena::alignment> buffer;
+    char buffer[4];
     Arena arena;
     arena.mem = buffer;
     String string;
