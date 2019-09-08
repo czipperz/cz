@@ -33,9 +33,9 @@ void String::reserve(mem::Allocator allocator, size_t extra) {
         size_t new_cap = max(_len + extra, _cap * 2);
         char* new_buffer;
         if (_buffer) {
-            new_buffer = static_cast<char*>(allocator.realloc({_buffer, _cap}, new_cap).buffer);
+            new_buffer = static_cast<char*>(allocator.realloc({_buffer, _cap}, {new_cap, 1}).buffer);
         } else {
-            new_buffer = static_cast<char*>(allocator.alloc(new_cap).buffer);
+            new_buffer = static_cast<char*>(allocator.alloc({new_cap, 1}).buffer);
         }
         CZ_ASSERT(new_buffer != nullptr);
 
