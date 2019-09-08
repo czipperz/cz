@@ -2,38 +2,56 @@
 
 #include <cz/assert.hpp>
 
+/* 10xxxxxx */
+#define UTF8_MASK_TRAILING_INDICATOR (1 << 7 | 1 << 6)
+#define UTF8_SET_TRAILING_BYTE (1 << 7)
+#define UTF8_MASK_TRAILING_VALUE (1 << 5 | 1 << 4 | 1 << 3 | 1 << 2 | 1 << 1 | 1)
+
+/* 0xxxxxxx */
+#define UTF8_MASK_1_INDICATOR (1 << 7)
+#define UTF8_SET_1_BYTE 0
+#define UTF8_MASK_1_VALUE (1 << 6 | 1 << 5 | 1 << 4 | 1 << 3 | 1 << 2 | 1 << 1 | 1)
+
+/* 110xxxxx */
+#define UTF8_MASK_2_INDICATOR (1 << 7 | 1 << 6 | 1 << 5)
+#define UTF8_SET_2_BYTE (1 << 7 | 1 << 6)
+#define UTF8_MASK_2_VALUE (1 << 4 | 1 << 3 | 1 << 2 | 1 << 1 | 1)
+
+/* 1110xxxx */
+#define UTF8_MASK_3_INDICATOR (1 << 7 | 1 << 6 | 1 << 5 | 1 << 4)
+#define UTF8_SET_3_BYTE (1 << 7 | 1 << 6 | 1 << 5)
+#define UTF8_MASK_3_VALUE (1 << 3 | 1 << 2 | 1 << 1 | 1)
+
+/* 11110xxx */
+#define UTF8_MASK_4_INDICATOR (1 << 7 | 1 << 6 | 1 << 5 | 1 << 4 | 1 << 3)
+#define UTF8_SET_4_BYTE (1 << 7 | 1 << 6 | 1 << 5 | 1 << 4)
+#define UTF8_MASK_4_VALUE (1 << 2 | 1 << 1 | 1)
+
 namespace cz {
 namespace utf8 {
 
 static bool is_trailing_byte(uint8_t unit) {
-    /* 10xxxxxx */
-    return (unit & (1 << 7 | 1 << 6)) == (1 << 7);
+    return (unit & UTF8_MASK_TRAILING_INDICATOR) == UTF8_SET_TRAILING_BYTE;
 }
 
 static uint32_t trailing_byte_value(uint8_t unit) {
-    /* __xxxxxx */
-    return unit & (1 << 5 | 1 << 4 | 1 << 3 | 1 << 2 | 1 << 1 | 1);
+    return unit & UTF8_MASK_TRAILING_VALUE;
 }
 
 static bool is_1_byte_sequence(uint8_t unit) {
-    /* 0xxxxxxx */
-    return (unit & (1 << 7)) == 0;
+    return (unit & UTF8_MASK_1_INDICATOR) == UTF8_SET_1_BYTE;
 }
 
 static bool is_2_byte_sequence(uint8_t unit) {
-    /* 110xxxxx */
-    return (unit & (1 << 7 | 1 << 6 | 1 << 5)) == (1 << 7 | 1 << 6);
+    return (unit & UTF8_MASK_2_INDICATOR) == UTF8_SET_2_BYTE;
 }
 
 static bool is_3_byte_sequence(uint8_t unit) {
-    /* 1110xxxx */
-    return (unit & (1 << 7 | 1 << 6 | 1 << 5 | 1 << 4)) == (1 << 7 | 1 << 6 | 1 << 5);
+    return (unit & UTF8_MASK_3_INDICATOR) == UTF8_SET_3_BYTE;
 }
 
 static bool is_4_byte_sequence(uint8_t unit) {
-    /* 11110xxx */
-    return (unit & (1 << 7 | 1 << 6 | 1 << 5 | 1 << 4 | 1 << 3)) ==
-           (1 << 7 | 1 << 6 | 1 << 5 | 1 << 4);
+    return (unit & UTF8_MASK_4_INDICATOR) == UTF8_SET_4_BYTE;
 }
 
 bool is_valid(const uint8_t* buffer, size_t len) {
@@ -134,15 +152,13 @@ uint32_t to_utf32(const uint8_t* buffer) {
     if (is_1_byte_sequence(buffer[0])) {
         return buffer[0];
     } else if (is_2_byte_sequence(buffer[0])) {
-        return ((buffer[0] & (1 << 4 | 1 << 3 | 1 << 2 | 1 << 1 | 1)) << 6) |
-               trailing_byte_value(buffer[1]);
+        return ((buffer[0] & UTF8_MASK_2_VALUE) << 6) | trailing_byte_value(buffer[1]);
     } else if (is_3_byte_sequence(buffer[0])) {
-        return ((buffer[0] & (1 << 3 | 1 << 2 | 1 << 1 | 1)) << 12) |
-               (trailing_byte_value(buffer[1]) << 6) | trailing_byte_value(buffer[2]);
+        return ((buffer[0] & UTF8_MASK_3_VALUE) << 12) | (trailing_byte_value(buffer[1]) << 6) |
+               trailing_byte_value(buffer[2]);
     } else if (is_4_byte_sequence(buffer[0])) {
-        return ((buffer[0] & (1 << 2 | 1 << 1 | 1)) << 18) |
-               (trailing_byte_value(buffer[1]) << 12) | (trailing_byte_value(buffer[2]) << 6) |
-               trailing_byte_value(buffer[3]);
+        return ((buffer[0] & UTF8_MASK_4_VALUE) << 18) | (trailing_byte_value(buffer[1]) << 12) |
+               (trailing_byte_value(buffer[2]) << 6) | trailing_byte_value(buffer[3]);
     } else {
         CZ_PANIC("cz::utf8::to_utf32(): Invalid utf8");
     }

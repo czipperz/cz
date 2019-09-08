@@ -11,7 +11,7 @@ namespace utf8 {
 /// Does do bounds checking.
 bool is_valid(const uint8_t* buffer, size_t len);
 
-/// Get the next utf32 code point.
+/// Get the next code point in utf32 format.
 ///
 /// The buffer must be valid utf8.  Does not do bounds checking.
 uint32_t to_utf32(const uint8_t* utf8_buffer);
