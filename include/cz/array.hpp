@@ -21,8 +21,6 @@ class Array {
     T _elems[sizeof(T) * Length];
 
 public:
-    constexpr Array() {}
-
     T* elems() { return _elems; }
     const T* elems() const { return _elems; }
 
@@ -33,9 +31,6 @@ public:
 
     operator Slice<T>() { return as_slice(); }
     operator Slice<const T>() const { return as_slice(); }
-
-    Array(const Array& other) = default;
-    Array& operator=(const Array& other) = default;
 };
 
 }
