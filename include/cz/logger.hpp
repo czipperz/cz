@@ -1,36 +1,50 @@
 #pragma once
 
-#include "context.hpp"
-#include "defer.hpp"
-#include "format.hpp"
-#include "logger_decl.hpp"
+#include "context_decl.hpp"
+#include "str.hpp"
+#include "write.hpp"
 
 namespace cz {
-namespace log {
 
-struct LogWriter {
-    Logger logger;
-    LogInfo info;
+namespace LogLevel_ {
+enum LogLevel {
+    Off = -1,
+    Fatal,
+    Error,
+    Warning,
+    Important,
+    Information,
+    Debug,
+    Trace,
+};
+}
+using LogLevel_::LogLevel;
 
-    Writer writer();
+struct LogInfo {
+    const char* file;
+    size_t line;
+    LogLevel level;
+
+    LogInfo(const char* file, size_t line, LogLevel level);
 };
 
-template <class... Ts>
-Result log(C* c, LogLevel level, const char* file, size_t line, Ts... ts) {
-    if (level <= c->max_log_level) {
-        LogWriter log_writer = {c->logger, {file, line, level}};
-        CZ_TRY(c->logger.write_prefix(log_writer.info));
-        CZ_TRY(cz::write(log_writer.writer(), ts...));
-        CZ_TRY(c->logger.write_suffix(log_writer.info));
+struct Logger {
+    struct VTable {
+        Result (*write_prefix)(void* data, const LogInfo& info);
+        Result (*write_chunk)(void* data, const LogInfo& info, Str chunk);
+        Result (*write_suffix)(void* data, const LogInfo& info);
+    };
+
+    const VTable* vtable;
+    void* data;
+
+    Result write_prefix(const LogInfo& info) const { return vtable->write_prefix(data, info); }
+    Result write_chunk(const LogInfo& info, Str chunk) const {
+        return vtable->write_chunk(data, info, chunk);
     }
-    return Result::ok();
-}
+    Result write_suffix(const LogInfo& info) const { return vtable->write_suffix(data, info); }
+};
 
-#define CZ_LOG(c, level, ...) (CZ_LOGL(c, cz::log::LogLevel::level, __VA_ARGS__))
-#define CZ_LOGL(c, level, ...) (cz::log::log(c, level, __FILE__, __LINE__, __VA_ARGS__))
-
-Logger ignore();
-
-}
+Result write(Writer, LogLevel);
 
 }
