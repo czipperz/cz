@@ -11,7 +11,7 @@ using namespace cz::test;
 TEST_CASE("Arena alloc returns null when no space left") {
     char buffer[1] = {0};
     Arena arena({buffer, 0});
-    REQUIRE(arena.allocator().alloc({1, 1}) == MemSlice{NULL, 0});
+    REQUIRE(arena.allocator().alloc({1, 1}) == MemSlice{nullptr, 0});
 }
 
 TEST_CASE("Arena alloc succeeds when exactly enough space left") {
@@ -33,7 +33,7 @@ TEST_CASE("Arena alloc succeeds after first failure") {
     Arena arena(buffer);
     REQUIRE(arena.allocator().alloc({2, 1}) == MemSlice{buffer, 2});
     REQUIRE(arena.allocator().alloc({4, 1}) == MemSlice{buffer + 2, 4});
-    REQUIRE(arena.allocator().alloc({4, 1}) == MemSlice{NULL, 0});
+    REQUIRE(arena.allocator().alloc({4, 1}) == MemSlice{nullptr, 0});
     REQUIRE(arena.allocator().alloc({2, 1}) == MemSlice{buffer + 6, 2});
 }
 
@@ -95,7 +95,7 @@ TEST_CASE("Arena realloc in place expanding failure boundary error") {
     REQUIRE(mem == MemSlice{buffer + 2, 4});
 
     mem = arena.allocator().realloc(mem, {7, 1});
-    REQUIRE(mem == MemSlice{NULL, 0});
+    REQUIRE(mem == MemSlice{nullptr, 0});
 }
 
 TEST_CASE("Arena realloc not enough space returns null") {
@@ -103,7 +103,7 @@ TEST_CASE("Arena realloc not enough space returns null") {
     Arena arena(buffer);
 
     auto mem = arena.allocator().alloc({4, 1});
-    REQUIRE(arena.allocator().realloc(mem, {10, 1}).buffer == NULL);
+    REQUIRE(arena.allocator().realloc(mem, {10, 1}).buffer == nullptr);
 
     REQUIRE(arena.offset == 4);
 }
