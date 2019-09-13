@@ -43,6 +43,8 @@ struct Logger {
         return vtable->write_chunk(data, info, chunk);
     }
     Result write_suffix(const LogInfo& info) const { return vtable->write_suffix(data, info); }
+
+    static Logger ignore();
 };
 
 Result write(Writer, LogLevel);

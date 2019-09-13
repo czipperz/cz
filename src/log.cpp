@@ -7,14 +7,6 @@ namespace cz {
 LogInfo::LogInfo(const char* file, size_t line, LogLevel level)
     : file(file), line(line), level(level) {}
 
-Logger ignore() {
-    static const Logger::VTable vtable = {
-        [](void*, const LogInfo&) { return Result::ok(); },
-        [](void*, const LogInfo&, Str) { return Result::ok(); },
-        [](void*, const LogInfo&) { return Result::ok(); }};
-    return {&vtable, nullptr};
-}
-
 static Result log_writer_write_str(void* data, Str str) {
     auto log_writer = static_cast<LogWriter*>(data);
     return log_writer->logger.write_chunk(log_writer->info, str);

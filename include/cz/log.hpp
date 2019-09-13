@@ -28,6 +28,4 @@ Result log(C* c, LogLevel level, const char* file, size_t line, Ts... ts) {
 #define CZ_LOG(c, level, ...) (CZ_LOGL(c, cz::LogLevel::level, __VA_ARGS__))
 #define CZ_LOGL(c, level, ...) (cz::log(c, level, __FILE__, __LINE__, __VA_ARGS__))
 
-Logger ignore();
-
 }

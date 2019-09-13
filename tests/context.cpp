@@ -8,7 +8,7 @@ namespace cz {
 namespace test {
 
 Context ctxt(Allocator allocator) {
-    return {allocator, {}, log::ignore(), log::LogLevel::Off};
+    return {allocator, {}, Logger::ignore(), LogLevel::Off};
 }
 
 }
