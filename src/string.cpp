@@ -45,9 +45,7 @@ void String::reserve(Allocator allocator, size_t extra) {
 }
 
 void String::append(Str str) {
-    if (_cap - _len < str.len) {
-        CZ_PANIC("String::append(): Length exceeded");
-    }
+    CZ_DEBUG_ASSERT(_cap - _len >= str.len);
     memcpy(_buffer + _len, str.buffer, str.len);
     _len += str.len;
     CZ_DEBUG_ASSERT(_len <= _cap);
@@ -55,9 +53,7 @@ void String::append(Str str) {
 
 void String::insert(size_t index, Str str) {
     CZ_DEBUG_ASSERT(index <= _len);
-    if (_cap - _len < str.len) {
-        CZ_PANIC("String::insert(): Length exceeded");
-    }
+    CZ_DEBUG_ASSERT(_cap - _len >= str.len);
     memmove(_buffer + index + str.len, _buffer + index, len() - index);
     memcpy(_buffer + index, str.buffer, str.len);
     _len += str.len;
@@ -65,9 +61,7 @@ void String::insert(size_t index, Str str) {
 }
 
 char String::pop() {
-    if (_len < 1) {
-        CZ_PANIC("String::pop(): No element to pop");
-    }
+    CZ_DEBUG_ASSERT(_len >= 1);
     _len--;
     return _buffer[_len];
 }

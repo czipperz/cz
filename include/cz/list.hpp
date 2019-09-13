@@ -20,34 +20,26 @@ protected:
 
 public:
     void push(T t) {
-        if (_cap - _len < 1) {
-            CZ_PANIC("List::push(): Length exceeded");
-        }
+        CZ_DEBUG_ASSERT(_cap - _len >= 1);
         _elems[_len] = t;
         ++_len;
     }
 
     void append(Slice<T> slice) {
-        if (_cap - _len < slice.len) {
-            CZ_PANIC("List::append(): Length exceeded");
-        }
+        CZ_DEBUG_ASSERT(_cap - _len >= slice.len);
         memcpy(_elems, slice.elems, slice.len * sizeof(T));
         _len += slice.len;
     }
 
     T pop() {
-        if (_len < 1) {
-            CZ_PANIC("List::pop(): No element to pop");
-        }
+        CZ_DEBUG_ASSERT(_len >= 1);
         --_len;
         return _elems[_len];
     }
 
     void insert(size_t index, T t) {
         CZ_DEBUG_ASSERT(index <= _len);
-        if (_cap - _len < 1) {
-            CZ_PANIC("List::insert(): Length exceeded");
-        }
+        CZ_DEBUG_ASSERT(_cap - _len >= 1);
         memmove(_elems + index + 1, _elems + index, (_len - index) * sizeof(T));
         _elems[index] = t;
         ++_len;
