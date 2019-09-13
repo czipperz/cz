@@ -24,7 +24,7 @@ Result write(Writer writer, Debug<Str> str) {
 Result write(Writer writer, Debug<MemSlice> slice) {
     return write(writer, "MemSlice{ ", addr(slice.val.buffer), ", ", slice.val.size, " }");
 }
-Result write(Writer writer, Debug<mem::AllocInfo> info) {
+Result write(Writer writer, Debug<AllocInfo> info) {
     return write(writer, "AllocInfo{ ", info.val.size, ", ", info.val.alignment, " }");
 }
 

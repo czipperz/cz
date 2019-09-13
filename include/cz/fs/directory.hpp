@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../mem/allocator.hpp"
+#include "../allocator.hpp"
 #include "../result.hpp"
 #include "../string.hpp"
 #include "../vector.hpp"
@@ -9,7 +9,7 @@ namespace cz {
 namespace fs {
 
 class DirectoryIterator {
-    mem::Allocator _allocator;
+    Allocator _allocator;
     String _file;
     bool _done = false;
 
@@ -20,7 +20,7 @@ class DirectoryIterator {
 #endif
 
 public:
-    DirectoryIterator(mem::Allocator allocator) : _allocator(allocator) {}
+    DirectoryIterator(Allocator allocator) : _allocator(allocator) {}
 
     Str file() const { return _file; }
     bool done() const { return _done; }
@@ -37,7 +37,7 @@ public:
 ///
 /// Path should be expressed with forward slashes not back slashes.  The path
 /// may be followed by a trailing slash.
-Result files(mem::Allocator allocator, const char* cstr_path, Vector<String>* paths);
+Result files(Allocator allocator, const char* cstr_path, Vector<String>* paths);
 
 /// Get the directory component of the path, including the trailing slash.
 ///

@@ -3,7 +3,6 @@
 #include <stddef.h>
 
 namespace cz {
-namespace mem {
 
 struct AllocInfo {
     size_t size;
@@ -22,5 +21,4 @@ AllocInfo alloc_info() {
     return {sizeof(T), alignof(T)};
 }
 
-}
 }

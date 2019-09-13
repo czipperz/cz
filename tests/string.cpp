@@ -2,13 +2,11 @@
 
 #include <cz/assert.hpp>
 #include <cz/defer.hpp>
-#include <cz/mem.hpp>
 #include <cz/string.hpp>
 #include <czt/mock_allocate.hpp>
 #include "context.hpp"
 
 using namespace cz;
-using namespace cz::mem;
 using namespace cz::test;
 
 TEST_CASE("String::String() is empty") {

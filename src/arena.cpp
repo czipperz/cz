@@ -1,13 +1,12 @@
-#include <cz/mem/arena.hpp>
+#include <cz/arena.hpp>
 
 #include <string.h>
+#include <cz/alloc_utils.hpp>
+#include <cz/allocator.hpp>
 #include <cz/assert.hpp>
 #include <cz/context.hpp>
-#include <cz/mem/alloc_utils.hpp>
-#include <cz/mem/allocator.hpp>
 
 namespace cz {
-namespace mem {
 
 static MemSlice arena_alloc(void* _arena, AllocInfo info) {
     auto arena = static_cast<Arena*>(_arena);
@@ -77,5 +76,4 @@ Allocator Arena::allocator() {
     return {&vtable, this};
 }
 
-}
 }

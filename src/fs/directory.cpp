@@ -168,7 +168,7 @@ Result DirectoryIterator::create(const char* cstr_path) {
 namespace cz {
 namespace fs {
 
-Result files(mem::Allocator allocator, const char* cstr_path, Vector<String>* paths) {
+Result files(Allocator allocator, const char* cstr_path, Vector<String>* paths) {
     DirectoryIterator iterator(allocator);
     CZ_TRY(iterator.create(cstr_path));
 

@@ -8,14 +8,14 @@
 namespace cz {
 namespace fs {
 
-static bool read(mem::Allocator allocator, String* string, FILE* file, size_t size) {
+static bool read(Allocator allocator, String* string, FILE* file, size_t size) {
     string->reserve(allocator, size);
     auto bytes_read = fread(string->buffer() + string->len(), 1, size, file);
     string->set_len(string->len() + bytes_read);
     return bytes_read == size;
 }
 
-Result read_to_string(mem::Allocator allocator, String* string, FILE* file) {
+Result read_to_string(Allocator allocator, String* string, FILE* file) {
     const size_t chunk_size = sys::page_size();
 
     while (true) {
@@ -31,7 +31,7 @@ Result read_to_string(mem::Allocator allocator, String* string, FILE* file) {
     return Result::ok();
 }
 
-static Result read_to_string_(mem::Allocator allocator, String* string, FILE* file) {
+static Result read_to_string_(Allocator allocator, String* string, FILE* file) {
     if (!file) {
         return Result::last_error();
     }
@@ -53,13 +53,11 @@ static Result read_to_string_(mem::Allocator allocator, String* string, FILE* fi
     return read_to_string(allocator, string, file);
 }
 
-Result read_to_string(mem::Allocator allocator, String* string, const char* cstr_file_name) {
+Result read_to_string(Allocator allocator, String* string, const char* cstr_file_name) {
     return read_to_string_(allocator, string, fopen(cstr_file_name, "r"));
 }
 
-Result read_to_string_binary(mem::Allocator allocator,
-                                 String* string,
-                                 const char* cstr_file_name) {
+Result read_to_string_binary(Allocator allocator, String* string, const char* cstr_file_name) {
     return read_to_string_(allocator, string, fopen(cstr_file_name, "rb"));
 }
 

@@ -7,7 +7,7 @@
 
 namespace cz {
 
-String Str::duplicate(mem::Allocator allocator) const {
+String Str::duplicate(Allocator allocator) const {
     auto ptr = static_cast<char*>(allocator.alloc({len, 1}).buffer);
     CZ_ASSERT(ptr != nullptr);
     memcpy(ptr, buffer, len);

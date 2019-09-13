@@ -7,8 +7,8 @@
 namespace cz {
 
 template <class... Ts>
-String sprint(mem::Allocator allocator, Ts... ts) {
-    mem::Allocated<String> string = {{}, allocator};
+String sprint(Allocator allocator, Ts... ts) {
+    Allocated<String> string = {{}, allocator};
     write(string_writer(&string), ts...);
     return string.object;
 }
@@ -71,7 +71,7 @@ inline Result write(Writer writer, format::Debug<String> string) {
 }
 
 Result write(Writer writer, format::Debug<MemSlice>);
-Result write(Writer writer, format::Debug<mem::AllocInfo>);
+Result write(Writer writer, format::Debug<AllocInfo>);
 
 template <class T>
 Result write(Writer writer, format::Debug<Slice<T>> debug_slice) {

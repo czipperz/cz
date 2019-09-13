@@ -1,4 +1,4 @@
-#include <cz/mem/heap.hpp>
+#include <cz/heap.hpp>
 
 #if defined(_WIN32) || _ISOC11_SOURCE
 #include <malloc.h>
@@ -10,7 +10,6 @@
 #include <cz/util.hpp>
 
 namespace cz {
-namespace mem {
 
 static MemSlice heap_alloc(void*, AllocInfo info) {
 #ifdef _WIN32
@@ -62,5 +61,4 @@ Allocator heap_allocator() {
     return {&vtable, nullptr};
 }
 
-}
 }

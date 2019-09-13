@@ -1,7 +1,7 @@
 #include <czt/test_base.hpp>
 
 #include <cz/defer.hpp>
-#include <cz/mem.hpp>
+#include <cz/heap.hpp>
 #include <cz/vector.hpp>
 #include <cz/write.hpp>
 #include <czt/mock_allocate.hpp>
@@ -9,7 +9,6 @@
 
 using namespace cz;
 using namespace cz::test;
-using namespace cz::mem;
 
 TEST_CASE("Vector constructor makes empty vector no capacity") {
     Vector<int> vec;

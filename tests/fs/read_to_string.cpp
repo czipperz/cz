@@ -3,7 +3,7 @@
 #include <cz/defer.hpp>
 #include <cz/fs/read_to_string.hpp>
 #include <cz/fs/working_directory.hpp>
-#include <cz/mem/heap.hpp>
+#include <cz/heap.hpp>
 #include "../context.hpp"
 
 using namespace cz;
@@ -16,7 +16,7 @@ void set_wd() {
         return;
     }
 
-    mem::Allocator allocator = mem::heap_allocator();
+    Allocator allocator = heap_allocator();
     String path;
     CZ_DEFER(path.drop(allocator));
 
@@ -40,7 +40,7 @@ TEST_CASE("read_to_string invalid file") {
     set_wd();
 
     String string;
-    auto allocator = mem::heap_allocator();
+    auto allocator = heap_allocator();
     CZ_DEFER(string.drop(allocator));
 
     REQUIRE(read_to_string(allocator, &string, "tests/fs/test_file_that_does_not_exist").is_err());
@@ -52,7 +52,7 @@ TEST_CASE("read_to_string empty file") {
     set_wd();
 
     String string;
-    auto allocator = mem::heap_allocator();
+    auto allocator = heap_allocator();
     CZ_DEFER(string.drop(allocator));
 
     REQUIRE(read_to_string(allocator, &string, "tests/fs/test_empty_file.txt").is_ok());
@@ -64,7 +64,7 @@ TEST_CASE("read_to_string small file") {
     set_wd();
 
     String string;
-    auto allocator = mem::heap_allocator();
+    auto allocator = heap_allocator();
     CZ_DEFER(string.drop(allocator));
 
     REQUIRE(read_to_string(allocator, &string, "tests/fs/test_small_file.txt").is_ok());
@@ -76,7 +76,7 @@ TEST_CASE("read_to_string large file") {
     set_wd();
 
     String string;
-    auto allocator = mem::heap_allocator();
+    auto allocator = heap_allocator();
     CZ_DEFER(string.drop(allocator));
 
     REQUIRE(read_to_string(allocator, &string, "tests/fs/test_large_file.txt").is_ok());

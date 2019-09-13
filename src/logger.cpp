@@ -1,7 +1,6 @@
 #include <cz/logger.hpp>
 
 #include <cz/assert.hpp>
-#include <cz/mem.hpp>
 
 namespace cz {
 namespace log {

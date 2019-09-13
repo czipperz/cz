@@ -1,11 +1,10 @@
 #pragma once
 
 #include <stddef.h>
-#include "../context_decl.hpp"
+#include "context_decl.hpp"
 #include "allocator.hpp"
 
 namespace cz {
-namespace mem {
 
 struct Arena {
     MemSlice mem;
@@ -30,5 +29,4 @@ struct AlignedBuffer {
     operator MemSlice() { return mem(); }
 };
 
-}
 }

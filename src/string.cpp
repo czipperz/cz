@@ -3,7 +3,6 @@
 #include <string.h>
 #include <cz/assert.hpp>
 #include <cz/context.hpp>
-#include <cz/mem.hpp>
 #include <cz/util.hpp>
 
 namespace cz {
@@ -28,12 +27,13 @@ Str String::as_str() const {
     return {_buffer, _len};
 }
 
-void String::reserve(mem::Allocator allocator, size_t extra) {
+void String::reserve(Allocator allocator, size_t extra) {
     if (_cap - _len < extra) {
         size_t new_cap = max(_len + extra, _cap * 2);
         char* new_buffer;
         if (_buffer) {
-            new_buffer = static_cast<char*>(allocator.realloc({_buffer, _cap}, {new_cap, 1}).buffer);
+            new_buffer =
+                static_cast<char*>(allocator.realloc({_buffer, _cap}, {new_cap, 1}).buffer);
         } else {
             new_buffer = static_cast<char*>(allocator.alloc({new_cap, 1}).buffer);
         }
@@ -72,7 +72,7 @@ char String::pop() {
     return _buffer[_len];
 }
 
-void String::realloc(mem::Allocator allocator) {
+void String::realloc(Allocator allocator) {
     auto res = allocator.realloc({_buffer, _cap}, {_len, 1}).buffer;
     if (res) {
         _buffer = (char*)res;
@@ -94,7 +94,7 @@ void String::set_len(size_t new_len) {
     _len = new_len;
 }
 
-void String::drop(mem::Allocator allocator) {
+void String::drop(Allocator allocator) {
     allocator.dealloc({_buffer, _cap});
 }
 

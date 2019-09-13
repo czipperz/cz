@@ -1,12 +1,10 @@
 #include "mock_allocate.hpp"
 
-#include <cz/mem/heap.hpp>
+#include <cz/heap.hpp>
 #include "test_base.hpp"
 
 namespace cz {
 namespace test {
-
-using namespace cz::mem;
 
 MockAllocate::MockAllocate(void* buffer, MemSlice expected_old_mem, AllocInfo expected_new_info)
     : buffer(buffer), expected_old_mem(expected_old_mem), expected_new_info(expected_new_info) {}
@@ -80,7 +78,7 @@ static void test_multiple_dealloc(void* _mocks, MemSlice old_mem) {
     test_multiple_realloc(_mocks, old_mem, {0, 0});
 }
 
-mem::Allocator MockAllocateMultiple::allocator() {
+Allocator MockAllocateMultiple::allocator() {
     static const Allocator::VTable vtable = {test_multiple_alloc, test_multiple_dealloc,
                                              test_multiple_realloc};
     return {&vtable, this};

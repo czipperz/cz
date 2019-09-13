@@ -1,13 +1,12 @@
 #include <czt/test_base.hpp>
 
 #include <string.h>
-#include <cz/mem.hpp>
+#include <cz/arena.hpp>
 #include <czt/mock_allocate.hpp>
 #include "../context.hpp"
 
 using namespace cz;
 using namespace cz::test;
-using namespace cz::mem;
 
 TEST_CASE("Arena alloc returns null when no space left") {
     char buffer[1] = {0};

@@ -3,8 +3,8 @@
 #include <stddef.h>
 #include <string.h>
 #include <cstddef>
+#include "allocator.hpp"
 #include "assert.hpp"
-#include "mem/allocator.hpp"
 #include "slice.hpp"
 
 namespace cz {
@@ -26,7 +26,7 @@ struct Str {
     }
 
     /// Create a new \c String with the same contents in a unique memory buffer.
-    String duplicate(mem::Allocator) const;
+    String duplicate(Allocator) const;
 
     constexpr const char* start() const { return buffer; }
     constexpr const char* end() const { return buffer + len; }

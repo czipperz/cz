@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stddef.h>
-#include "mem/allocator.hpp"
+#include "allocator.hpp"
 #include "str.hpp"
 
 namespace cz {
@@ -18,7 +18,7 @@ public:
     explicit String(char* buffer, size_t len, size_t cap);
 
     /// Ensure there are \c extra bytes available in the buffer.
-    void reserve(mem::Allocator, size_t extra);
+    void reserve(Allocator, size_t extra);
 
     /// Push the \c char onto the end of the string.
     ///
@@ -46,7 +46,7 @@ public:
     /// Reallocate the buffer so that the length is the same as the capacity.
     ///
     /// If the reallocation fails, nothing happens.
-    void realloc(mem::Allocator);
+    void realloc(Allocator);
 
     /// Set the \c len to \c 0.
     void clear();
@@ -56,10 +56,10 @@ public:
     void set_len(size_t new_len);
 
     /// Create a new \c String with the same contents in a unique memory buffer.
-    String clone(mem::Allocator allocator) const { return as_str().duplicate(allocator); }
+    String clone(Allocator allocator) const { return as_str().duplicate(allocator); }
 
     /// Dealloc the \c buffer.
-    void drop(mem::Allocator);
+    void drop(Allocator);
 
     /// Get the byte buffer backing the string.
     char* buffer();

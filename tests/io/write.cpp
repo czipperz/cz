@@ -1,7 +1,7 @@
 #include <czt/test_base.hpp>
 
+#include <cz/arena.hpp>
 #include <cz/defer.hpp>
-#include <cz/mem.hpp>
 #include <cz/write.hpp>
 #include "../context.hpp"
 
@@ -9,10 +9,10 @@ using namespace cz;
 using cz::test::ctxt;
 
 TEST_CASE("write multiple arguments works") {
-    mem::AlignedBuffer<32> buffer;
-    mem::Arena arena;
+    AlignedBuffer<32> buffer;
+    Arena arena;
     arena.mem = buffer;
-    mem::Allocated<String> string = {{}, arena.allocator()};
+    Allocated<String> string = {{}, arena.allocator()};
 
     Writer writer = string_writer(&string);
     write(writer, 123, " + ", 456);
@@ -21,10 +21,10 @@ TEST_CASE("write multiple arguments works") {
 }
 
 TEST_CASE("write multiple arguments with debug") {
-    mem::AlignedBuffer<32> buffer;
-    mem::Arena arena;
+    AlignedBuffer<32> buffer;
+    Arena arena;
     arena.mem = buffer;
-    mem::Allocated<String> string = {{}, arena.allocator()};
+    Allocated<String> string = {{}, arena.allocator()};
 
     Writer writer = string_writer(&string);
     int elems[3] = {10, 30, 40};
@@ -34,10 +34,10 @@ TEST_CASE("write multiple arguments with debug") {
 }
 
 TEST_CASE("write str") {
-    mem::AlignedBuffer<32> buffer;
-    mem::Arena arena;
+    AlignedBuffer<32> buffer;
+    Arena arena;
     arena.mem = buffer;
-    mem::Allocated<String> string = {{}, arena.allocator()};
+    Allocated<String> string = {{}, arena.allocator()};
 
     Writer writer = string_writer(&string);
     Result result;
@@ -48,10 +48,10 @@ TEST_CASE("write str") {
 }
 
 TEST_CASE("write char") {
-    mem::AlignedBuffer<32> buffer;
-    mem::Arena arena;
+    AlignedBuffer<32> buffer;
+    Arena arena;
     arena.mem = buffer;
-    mem::Allocated<String> string = {{}, arena.allocator()};
+    Allocated<String> string = {{}, arena.allocator()};
 
     Writer writer = string_writer(&string);
     Result result = write(writer, 'a');
@@ -61,10 +61,10 @@ TEST_CASE("write char") {
 }
 
 TEST_CASE("write(int = 123)") {
-    mem::AlignedBuffer<32> buffer;
-    mem::Arena arena;
+    AlignedBuffer<32> buffer;
+    Arena arena;
     arena.mem = buffer;
-    mem::Allocated<String> string = {{}, arena.allocator()};
+    Allocated<String> string = {{}, arena.allocator()};
 
     Writer writer = string_writer(&string);
     Result result = write(writer, 123);
@@ -74,10 +74,10 @@ TEST_CASE("write(int = 123)") {
 }
 
 TEST_CASE("write(int = 0)") {
-    mem::AlignedBuffer<32> buffer;
-    mem::Arena arena;
+    AlignedBuffer<32> buffer;
+    Arena arena;
     arena.mem = buffer;
-    mem::Allocated<String> string = {{}, arena.allocator()};
+    Allocated<String> string = {{}, arena.allocator()};
 
     Writer writer = string_writer(&string);
     Result result = write(writer, 0);
@@ -87,10 +87,10 @@ TEST_CASE("write(int = 0)") {
 }
 
 TEST_CASE("write(int = 9)") {
-    mem::AlignedBuffer<32> buffer;
-    mem::Arena arena;
+    AlignedBuffer<32> buffer;
+    Arena arena;
     arena.mem = buffer;
-    mem::Allocated<String> string = {{}, arena.allocator()};
+    Allocated<String> string = {{}, arena.allocator()};
 
     Writer writer = string_writer(&string);
     Result result = write(writer, 9);
@@ -100,10 +100,10 @@ TEST_CASE("write(int = 9)") {
 }
 
 TEST_CASE("write(int = -47)") {
-    mem::AlignedBuffer<32> buffer;
-    mem::Arena arena;
+    AlignedBuffer<32> buffer;
+    Arena arena;
     arena.mem = buffer;
-    mem::Allocated<String> string = {{}, arena.allocator()};
+    Allocated<String> string = {{}, arena.allocator()};
 
     Writer writer = string_writer(&string);
     Result result = write(writer, -47);
@@ -113,10 +113,10 @@ TEST_CASE("write(int = -47)") {
 }
 
 TEST_CASE("write(Address(nullptr))") {
-    mem::AlignedBuffer<32> buffer;
-    mem::Arena arena;
+    AlignedBuffer<32> buffer;
+    Arena arena;
     arena.mem = buffer;
-    mem::Allocated<String> string = {{}, arena.allocator()};
+    Allocated<String> string = {{}, arena.allocator()};
 
     Writer writer = string_writer(&string);
     Result result = write(writer, format::addr(nullptr));
@@ -126,10 +126,10 @@ TEST_CASE("write(Address(nullptr))") {
 }
 
 TEST_CASE("write(Address(arbitrary) starts with 0x)") {
-    mem::AlignedBuffer<32> buffer;
-    mem::Arena arena;
+    AlignedBuffer<32> buffer;
+    Arena arena;
     arena.mem = buffer;
-    mem::Allocated<String> string = {{}, arena.allocator()};
+    Allocated<String> string = {{}, arena.allocator()};
 
     Writer writer = string_writer(&string);
     Result result = write(writer, format::addr(&string));

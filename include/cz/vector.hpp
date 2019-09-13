@@ -13,7 +13,7 @@ struct Vector : List<T> {
     Vector(const Vector&) = default;
     Vector& operator=(const Vector&) = default;
 
-    void reserve(mem::Allocator allocator, size_t extra) {
+    void reserve(Allocator allocator, size_t extra) {
         if (this->cap() - this->len() < extra) {
             size_t new_cap = max(this->len() + extra, this->cap() * 2);
 
@@ -35,7 +35,7 @@ struct Vector : List<T> {
         }
     }
 
-    void drop(mem::Allocator allocator) {
+    void drop(Allocator allocator) {
         if (this->elems()) {
             allocator.dealloc({this->elems(), this->cap() * sizeof(T)});
         }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../mem/allocator.hpp"
+#include "../allocator.hpp"
 #include "../result.hpp"
 #include "../string.hpp"
 
@@ -15,7 +15,7 @@ Result set_working_directory(const char* cstr_path);
 ///
 /// This will place a null terminator past the end of the path (allocating
 /// memory for it).  The path will be expressed with forward slashes.
-Result get_working_directory(mem::Allocator allocator, String* path);
+Result get_working_directory(Allocator allocator, String* path);
 
 }
 }

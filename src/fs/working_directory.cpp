@@ -53,7 +53,7 @@ static Result get_path_max(size_t* size) {
 #endif
 }
 
-Result get_working_directory(mem::Allocator allocator, String* path) {
+Result get_working_directory(Allocator allocator, String* path) {
     size_t size;
     CZ_TRY(get_path_max(&size));
 

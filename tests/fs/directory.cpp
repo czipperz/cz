@@ -2,11 +2,10 @@
 
 #include <cz/defer.hpp>
 #include <cz/fs/directory.hpp>
-#include <cz/mem/heap.hpp>
+#include <cz/heap.hpp>
 #include <cz/string.hpp>
 
 using namespace cz;
-using namespace cz::mem;
 using namespace cz::fs;
 
 void set_wd();

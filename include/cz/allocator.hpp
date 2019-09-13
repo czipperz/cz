@@ -1,11 +1,10 @@
 #pragma once
 
 #include <stddef.h>
-#include "../slice.hpp"
+#include "slice.hpp"
 #include "alloc_info.hpp"
 
 namespace cz {
-namespace mem {
 
 /// A memory allocator.
 struct Allocator {
@@ -42,5 +41,4 @@ struct Allocated {
     Allocator allocator;
 };
 
-}
 }

@@ -4,7 +4,6 @@
 #include "arena.hpp"
 
 namespace cz {
-namespace mem {
 
 struct TempArena {
     Arena arena;
@@ -13,5 +12,4 @@ struct TempArena {
     Allocator allocator();
 };
 
-}
 }

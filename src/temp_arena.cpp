@@ -1,9 +1,8 @@
-#include <cz/mem/temp_arena.hpp>
+#include <cz/temp_arena.hpp>
 
 #include <cz/util.hpp>
 
 namespace cz {
-namespace mem {
 
 static void set_max_result(TempArena* ta) {
     ta->max_offset = max(ta->max_offset, ta->arena.offset);
@@ -34,5 +33,4 @@ Allocator TempArena::allocator() {
     return {&vtable, this};
 }
 
-}
 }
