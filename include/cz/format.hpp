@@ -8,9 +8,10 @@ namespace cz {
 
 template <class... Ts>
 String sprint(Allocator allocator, Ts... ts) {
-    Allocated<String> string = {{}, allocator};
+    AllocatedString string;
+    string.allocator = allocator;
     write(string_writer(&string), ts...);
-    return string.object;
+    return /* slice */ string;
 }
 
 namespace format {

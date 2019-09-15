@@ -35,10 +35,4 @@ struct Allocator {
     }
 };
 
-template <class T>
-struct Allocated {
-    T object;
-    Allocator allocator;
-};
-
 }

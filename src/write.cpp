@@ -7,13 +7,13 @@
 namespace cz {
 
 static Result string_writer_write_str(void* _string, Str str) {
-    auto string = static_cast<Allocated<String>*>(_string);
-    string->object.reserve(string->allocator, str.len);
-    string->object.append(str);
+    auto string = static_cast<AllocatedString*>(_string);
+    string->reserve(str.len);
+    string->append(str);
     return Result::ok();
 }
 
-Writer string_writer(Allocated<String>* string) {
+Writer string_writer(AllocatedString* string) {
     return {string_writer_write_str, string};
 }
 

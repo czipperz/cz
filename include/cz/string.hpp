@@ -106,4 +106,12 @@ public:
     }
 };
 
+struct AllocatedString : String {
+    Allocator allocator;
+
+    void reserve(size_t extra) { String::reserve(allocator, extra); }
+    void realloc() { String::realloc(allocator); }
+    void drop() { String::drop(allocator); }
+};
+
 }

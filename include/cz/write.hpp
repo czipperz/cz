@@ -14,7 +14,7 @@ struct Writer {
 };
 
 Writer file_writer(FILE* file);
-Writer string_writer(Allocated<String>* string);
+Writer string_writer(AllocatedString* string);
 inline Writer cout() {
     return file_writer(stdout);
 }
