@@ -29,6 +29,11 @@ public:
     /// Panics if there isn't enough space.
     void append(Str str);
 
+    /// Push \c '\0' onto the end of the string without changing the length.
+    ///
+    /// Panics if there isn't enough space.
+    void null_terminate();
+
     /// Insert the \c char into the middle of the buffer.
     ///
     /// Panics if there isn't enough space or if \c index is greater than \c len.

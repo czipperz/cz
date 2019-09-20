@@ -51,6 +51,11 @@ void String::append(Str str) {
     CZ_DEBUG_ASSERT(_len <= _cap);
 }
 
+void String::null_terminate() {
+    CZ_DEBUG_ASSERT(_cap - _len >= 1);
+    *end() = '\0';
+}
+
 void String::insert(size_t index, Str str) {
     CZ_DEBUG_ASSERT(index <= _len);
     CZ_DEBUG_ASSERT(_cap - _len >= str.len);

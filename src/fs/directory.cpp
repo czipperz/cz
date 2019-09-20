@@ -29,9 +29,7 @@ Result DirectoryIterator::advance() {
 
         Str file = data.cFileName;
         _file.append(file);
-
-        CZ_DEBUG_ASSERT(_file.cap() - _file.len() >= 1);
-        *_file.end() = '\0';
+        _file.null_terminate();
 
         return Result::ok();
     } else if (GetLastError() == ERROR_NO_MORE_FILES) {
@@ -96,9 +94,7 @@ Result DirectoryIterator::create(const char* cstr_path) {
 
     Str file = data.cFileName;
     _file.append(file);
-
-    CZ_DEBUG_ASSERT(_file.cap() - _file.len() >= 1);
-    *_file.end() = '\0';
+    _file.null_terminate();
 
     return Result::ok();
 }
@@ -123,9 +119,7 @@ Result DirectoryIterator::advance() {
 
         _file.set_len(0);
         _file.append(file);
-
-        CZ_DEBUG_ASSERT(_file.cap() - _file.len() >= 1);
-        *_file.end() = '\0';
+        _file.null_terminate();
 
         return Result::ok();
     } else if (errno == 0) {
