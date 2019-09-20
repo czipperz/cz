@@ -17,5 +17,8 @@ Result set_working_directory(const char* cstr_path);
 /// memory for it).  The path will be expressed with forward slashes.
 Result get_working_directory(Allocator allocator, String* path);
 
+/// Make an absolute path out of the relative path.
+Result make_absolute(Str relative, Allocator allocator, String* path);
+
 }
 }
