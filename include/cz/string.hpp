@@ -53,6 +53,11 @@ public:
     /// If the reallocation fails, nothing happens.
     void realloc(Allocator);
 
+    /// Reallocate the buffer so that the capacity is one greater than the length.
+    ///
+    /// Panics if the reallocation fails.
+    void realloc_null_terminate(Allocator);
+
     /// Set the \c len to \c new_len.  Panics if \c new_len is greater than \c cap.
     void set_len(size_t new_len);
 

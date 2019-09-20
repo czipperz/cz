@@ -79,6 +79,14 @@ void String::realloc(Allocator allocator) {
     }
 }
 
+void String::realloc_null_terminate(Allocator allocator) {
+    char* res = static_cast<char*>(allocator.realloc({_buffer, _cap}, {_len + 1, 1}).buffer);
+    CZ_ASSERT(res);
+    _buffer = res;
+    _buffer[_len] = '\0';
+    _cap = _len;
+}
+
 void String::set_len(size_t new_len) {
     CZ_DEBUG_ASSERT(new_len <= cap());
     _len = new_len;
