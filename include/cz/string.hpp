@@ -48,10 +48,6 @@ public:
     /// If the reallocation fails, nothing happens.
     void realloc(Allocator);
 
-    /// Set the \c len to \c 0.
-    void clear();
-    /// Set the \c len to \c new_len.  Panics if \c new_len is greater than \c len.
-    void shrink_to(size_t new_len);
     /// Set the \c len to \c new_len.  Panics if \c new_len is greater than \c cap.
     void set_len(size_t new_len);
 

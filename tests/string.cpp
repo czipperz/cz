@@ -200,11 +200,11 @@ TEST_CASE("String::insert into long string") {
     CHECK(string == "once upon a time in a land far far away");
 }
 
-TEST_CASE("String::clear sets len to 0 but doesn't drop") {
+TEST_CASE("String::set_len(0) doesn't drop") {
     char buffer[3] = "ab";
     String string(buffer, 2, 3);
 
-    string.clear();
+    string.set_len(0);
 
     CHECK(string.buffer() == buffer);
     CHECK(string.len() == 0);

@@ -121,7 +121,7 @@ Result DirectoryIterator::advance() {
             return advance();
         }
 
-        _file.clear();
+        _file.set_len(0);
         _file.append(file);
 
         CZ_DEBUG_ASSERT(_file.cap() - _file.len() >= 1);

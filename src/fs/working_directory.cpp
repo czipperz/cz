@@ -57,7 +57,7 @@ Result get_working_directory(Allocator allocator, String* path) {
     size_t size;
     CZ_TRY(get_path_max(&size));
 
-    path->clear();
+    path->set_len(0);
     path->reserve(allocator, size);
 
     while (!getcwd(path->end(), size)) {

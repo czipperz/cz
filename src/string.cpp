@@ -74,15 +74,6 @@ void String::realloc(Allocator allocator) {
     }
 }
 
-void String::clear() {
-    set_len(0);
-}
-
-void String::shrink_to(size_t new_len) {
-    CZ_DEBUG_ASSERT(new_len <= len());
-    set_len(new_len);
-}
-
 void String::set_len(size_t new_len) {
     CZ_DEBUG_ASSERT(new_len <= cap());
     _len = new_len;
