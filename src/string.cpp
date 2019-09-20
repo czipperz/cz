@@ -72,9 +72,9 @@ char String::pop() {
 }
 
 void String::realloc(Allocator allocator) {
-    auto res = allocator.realloc({_buffer, _cap}, {_len, 1}).buffer;
+    char* res = static_cast<char*>(allocator.realloc({_buffer, _cap}, {_len, 1}).buffer);
     if (res) {
-        _buffer = (char*)res;
+        _buffer = res;
         _cap = _len;
     }
 }
