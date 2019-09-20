@@ -53,5 +53,8 @@ Str directory_component(Str);
 /// Does not put in a null terminator.
 void flatten_path(char* buffer, size_t* len);
 
+/// See \c flatten_path(char*, size_t*) .
+void flatten_path(cz::String* string);
+
 }
 }

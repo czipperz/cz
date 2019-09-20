@@ -253,5 +253,11 @@ void flatten_path(char* buffer, size_t* len) {
     }
 }
 
+void flatten_path(cz::String* string) {
+    size_t len = string->len();
+    flatten_path(string->buffer(), &len);
+    string->set_len(len);
+}
+
 }
 }

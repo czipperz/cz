@@ -124,11 +124,8 @@ Result make_absolute(Str file, Allocator allocator, String* path) {
     path->reserve(allocator, 1 + file.len + 1);
     path->push('/');
     path->append(file);
+    flatten_path(path);
     path->null_terminate();
-
-    size_t len = path->len();
-    flatten_path(path->buffer(), &len);
-    path->set_len(len);
 
     return Result::ok();
 }
