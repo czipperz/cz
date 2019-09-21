@@ -17,7 +17,7 @@
 #include "result.hpp"
 
 namespace cz {
-namespace fs {
+namespace path {
 
 /// Get the directory component of the path, including the trailing slash.
 ///
@@ -31,10 +31,10 @@ Str directory_component(Str path);
 /// This will leave \c .. s at the start since they cannot be flattened.
 ///
 /// Does not put in a null terminator.
-void flatten_path(char* path, size_t* len);
+void flatten(char* path, size_t* len);
 
 /// See \c flatten_path(char*, size_t*) .
-void flatten_path(String* path);
+void flatten(String* path);
 
 /// Test if the path is absolute.
 ///

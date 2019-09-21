@@ -5,7 +5,7 @@
 #include <cz/try.hpp>
 
 namespace cz {
-namespace fs {
+namespace path {
 
 Str directory_component(Str str) {
     const char* ptr = str.rfind('/');
@@ -16,7 +16,7 @@ Str directory_component(Str str) {
     }
 }
 
-void flatten_path(char* buffer, size_t* len) {
+void flatten(char* buffer, size_t* len) {
     size_t index = 0;
 
 #ifdef _WIN32
@@ -77,7 +77,7 @@ void flatten_path(char* buffer, size_t* len) {
     }
 }
 
-void flatten_path(cz::String* string) {
+void flatten(cz::String* string) {
     size_t len = string->len();
     flatten_path(string->buffer(), &len);
     string->set_len(len);
