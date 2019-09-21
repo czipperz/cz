@@ -114,7 +114,7 @@ TEST_CASE("Vector reserve reallocates while empty") {
     auto allocator = heap_allocator();
     vector.reserve(allocator, 4);
     REQUIRE(vector.cap() == 4);
-    int* elems;
+    int* elems = vector.elems();
     CZ_DEFER(allocator.dealloc({elems, 4 * sizeof(int)}));
 
     int buffer[8];
