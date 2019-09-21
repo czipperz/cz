@@ -39,22 +39,5 @@ public:
 /// may be followed by a trailing slash.
 Result files(Allocator allocator, const char* cstr_path, Vector<String>* paths);
 
-/// Get the directory component of the path, including the trailing slash.
-///
-/// Returns empty string if it is just a file name.  Does nothing if the string
-/// ends in /.
-Str directory_component(Str);
-
-/// Flatten the path, removing \c .. and \c . inplace.
-/// Prefers leaving trailing \c / rather than removing them.
-///
-/// This will leave \c .. s at the start since they cannot be flattened.
-///
-/// Does not put in a null terminator.
-void flatten_path(char* buffer, size_t* len);
-
-/// See \c flatten_path(char*, size_t*) .
-void flatten_path(cz::String* string);
-
 }
 }

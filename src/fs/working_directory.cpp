@@ -86,49 +86,5 @@ Result get_working_directory(Allocator allocator, String* path) {
     return Result::ok();
 }
 
-bool is_absolute(Str file) {
-#ifdef _WIN32
-    return file.len >= 3 && isalpha(file[0]) && file[1] == ':' && file[2] == '/';
-#else
-    return file.len >= 1 && file[0] == '/';
-#endif
-}
-
-Result make_absolute(Str file, Allocator allocator, String* path) {
-    if (is_absolute(file)) {
-        path->reserve(allocator, file.len + 1);
-        path->append(file);
-        path->null_terminate();
-        return Result::ok();
-    }
-
-    CZ_TRY(get_working_directory(allocator, path));
-
-#ifdef _WIN32
-    // Handle X:relpath
-    if (file.len >= 2 && isalpha(file[0]) && file[1] == ':') {
-        CZ_DEBUG_ASSERT(path->len() >= 2 && isalpha((*path)[0]) && (*path)[1] == ':');
-
-        // Don't currently support get_working_directory on different drives
-        if ((*path)[0] != file[0]) {
-            CZ_PANIC(
-                "cz::fs::make_absolute(): Unimplemented get_working_directory() for other drives");
-        }
-
-        // Remove X: prefix
-        file.buffer += 2;
-        file.len -= 2;
-    }
-#endif
-
-    path->reserve(allocator, 1 + file.len + 1);
-    path->push('/');
-    path->append(file);
-    flatten_path(path);
-    path->null_terminate();
-
-    return Result::ok();
-}
-
 }
 }
