@@ -1,5 +1,7 @@
 #include <cz/fs/path.hpp>
 
+#include <ctype.h>
+
 namespace cz {
 namespace fs {
 
