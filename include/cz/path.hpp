@@ -13,7 +13,8 @@
 
 #pragma once
 
-#include "../fs.hpp"
+#include "string.hpp"
+#include "result.hpp"
 
 namespace cz {
 namespace fs {

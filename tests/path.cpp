@@ -1,6 +1,6 @@
 #include <czt/test_base.hpp>
 
-#include <cz/fs/path.hpp>
+#include <cz/path.hpp>
 
 using namespace cz;
 using namespace cz::fs;
