@@ -25,7 +25,7 @@ static Result get_last_error() {
 Result DirectoryIterator::advance() {
     WIN32_FIND_DATA data;
     if (FindNextFileA(_handle, &data)) {
-        _file.clear();
+        _file.set_len(0);
 
         Str file = data.cFileName;
         _file.append(file);
