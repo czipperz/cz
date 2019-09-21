@@ -2,6 +2,7 @@
 
 #include <cz/fs/path.hpp>
 
+using namespace cz;
 using namespace cz::fs;
 
 TEST_CASE("fs::directory_component() empty input empty output") {
