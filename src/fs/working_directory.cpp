@@ -86,7 +86,7 @@ Result get_working_directory(Allocator allocator, String* path) {
     return Result::ok();
 }
 
-static bool is_absolute(Str file) {
+bool is_absolute(Str file) {
 #ifdef _WIN32
     return file.len >= 3 && isalpha(file[0]) && file[1] == ':' && file[2] == '/';
 #else
