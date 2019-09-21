@@ -107,10 +107,10 @@ Result make_absolute(Str file, Allocator allocator, String* path) {
 #ifdef _WIN32
     // Handle X:relpath
     if (file.len >= 2 && isalpha(file[0]) && file[1] == ':') {
-        CZ_DEBUG_ASSERT(path->len() >= 2 && isalpha(path[0]) && path[1] == ':');
+        CZ_DEBUG_ASSERT(path->len() >= 2 && isalpha((*path)[0]) && (*path)[1] == ':');
 
         // Don't currently support get_working_directory on different drives
-        if (path[0] != file[0]) {
+        if ((*path)[0] != file[0]) {
             CZ_PANIC(
                 "cz::fs::make_absolute(): Unimplemented get_working_directory() for other drives");
         }
