@@ -79,7 +79,7 @@ void flatten(char* buffer, size_t* len) {
 
 void flatten(cz::String* string) {
     size_t len = string->len();
-    flatten_path(string->buffer(), &len);
+    flatten(string->buffer(), &len);
     string->set_len(len);
 }
 
@@ -121,7 +121,7 @@ Result make_absolute(Str file, Allocator allocator, String* path) {
     path->reserve(allocator, 1 + file.len + 1);
     path->push('/');
     path->append(file);
-    flatten_path(path);
+    flatten(path);
     path->null_terminate();
 
     return Result::ok();
