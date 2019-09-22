@@ -1,11 +1,10 @@
 #include <czt/test_base.hpp>
 
 #include <cz/defer.hpp>
-#include <cz/fs/working_directory.hpp>
 #include <cz/heap.hpp>
+#include <cz/working_directory.hpp>
 
 using namespace cz;
-using namespace cz::fs;
 
 TEST_CASE("get_working_directory() returns non-empty") {
     String path;

@@ -1,11 +1,10 @@
 #pragma once
 
-#include "../allocator.hpp"
-#include "../result.hpp"
-#include "../string.hpp"
+#include "allocator.hpp"
+#include "result.hpp"
+#include "string.hpp"
 
 namespace cz {
-namespace fs {
 
 /// Set the current working directory to the null terminated string \c path.  It
 /// should be expressed with forward slashes.
@@ -17,5 +16,4 @@ Result set_working_directory(const char* cstr_path);
 /// memory for it).  The path will be expressed with forward slashes.
 Result get_working_directory(Allocator allocator, String* path);
 
-}
 }

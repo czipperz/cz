@@ -1,4 +1,4 @@
-#include <cz/fs/working_directory.hpp>
+#include <cz/working_directory.hpp>
 
 #include <cz/assert.hpp>
 #include <cz/fs/directory.hpp>
@@ -20,7 +20,6 @@
 #endif
 
 namespace cz {
-namespace fs {
 
 Result set_working_directory(const char* cstr_path) {
     if (chdir(cstr_path) < 0) {
@@ -87,5 +86,4 @@ Result get_working_directory(Allocator allocator, String* path) {
     return Result::ok();
 }
 
-}
 }

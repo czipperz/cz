@@ -1,8 +1,8 @@
 #include <cz/path.hpp>
 
 #include <ctype.h>
-#include <cz/fs/working_directory.hpp>
 #include <cz/try.hpp>
+#include <cz/working_directory.hpp>
 
 namespace cz {
 namespace path {
