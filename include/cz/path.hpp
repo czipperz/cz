@@ -13,11 +13,15 @@
 
 #pragma once
 
-#include "string.hpp"
 #include "result.hpp"
+#include "string.hpp"
 
 namespace cz {
 namespace path {
+
+/// Get the max length of a path on the current platform.  Does not write to the
+/// argument if there is no maximum.
+Result get_max_len(size_t* size);
 
 /// Get the directory component of the path, including the trailing slash.
 ///

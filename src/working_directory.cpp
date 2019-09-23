@@ -2,15 +2,16 @@
 
 #include <cz/assert.hpp>
 #include <cz/fs/directory.hpp>
+#include <cz/path.hpp>
 #include <cz/string.hpp>
 #include <cz/try.hpp>
 
 #include <ctype.h>
 #include <errno.h>
 
-// Although the headers are different, we can use the Windows "Posix" implementation to get similar
-// semantics.  We have to alias the system calls to the underscore-prefixed versions.  And we have
-// to use _MAX_PATH macro instead of using pathconf.
+// Although the headers are different, we can use the Windows "Posix"
+// implementation to get similar semantics.  We just have to alias the system
+// calls to the underscore-prefixed versions.
 #ifdef _WIN32
 #include <direct.h>
 #define getcwd _getcwd
@@ -29,34 +30,10 @@ Result set_working_directory(const char* cstr_path) {
     }
 }
 
-static Result get_path_max(size_t* size) {
-#ifdef _WIN32
-    *size = _MAX_PATH;
-    return Result::ok();
-#else
-    errno = 0;
-
-    long path_max = pathconf("/", _PC_PATH_MAX);
-
-    if (path_max == -1) {
-        // errno is only set if there is a limit
-        if (errno != 0) {
-            return Result::last_error();
-        } else {
-            // @RandomConstant: no limit to the path size
-            path_max = 128;
-        }
-    }
-
-    *size = path_max;
-
-    return Result::ok();
-#endif
-}
-
 Result get_working_directory(Allocator allocator, String* path) {
-    size_t size;
-    CZ_TRY(get_path_max(&size));
+    // @RandomConstant: for case where there is no limit to the path size
+    size_t size = 128;
+    CZ_TRY(path::get_max_len(&size));
 
     path->set_len(0);
     path->reserve(allocator, size);

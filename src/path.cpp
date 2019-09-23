@@ -4,8 +4,38 @@
 #include <cz/try.hpp>
 #include <cz/working_directory.hpp>
 
+#ifdef _WIN32
+#include <stdlib.h>
+#else
+#include <errno.h>
+#include <unistd.h>
+#endif
+
 namespace cz {
 namespace path {
+
+Result get_max_len(size_t* size) {
+#ifdef _WIN32
+    *size = _MAX_PATH;
+    return Result::ok();
+#else
+    errno = 0;
+
+    long path_max = pathconf("/", _PC_PATH_MAX);
+
+    if (path_max == -1) {
+        // errno is only set if there is a limit
+        if (errno != 0) {
+            return Result::last_error();
+        } else {
+            return Result::ok();
+        }
+    } else {
+        *size = path_max;
+        return Result::ok();
+    }
+#endif
+}
 
 Str directory_component(Str str) {
     const char* ptr = str.rfind('/');
