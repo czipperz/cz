@@ -27,6 +27,9 @@ struct Str {
 
     /// Create a new \c String with the same contents in a unique memory buffer.
     String duplicate(Allocator) const;
+    /// Create a new \c String with the same contents in a unique memory buffer
+    /// and allocate space for a null terminator.
+    String duplicate_null_terminate(Allocator) const;
 
     constexpr const char* start() const { return buffer; }
     constexpr const char* end() const { return buffer + len; }

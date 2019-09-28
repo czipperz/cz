@@ -14,6 +14,14 @@ String Str::duplicate(Allocator allocator) const {
     return String{ptr, len, len};
 }
 
+String Str::duplicate_null_terminate(Allocator allocator) const {
+    auto ptr = static_cast<char*>(allocator.alloc({len + 1, 1}).buffer);
+    CZ_ASSERT(ptr != nullptr);
+    memcpy(ptr, buffer, len);
+    ptr[len] = '\0';
+    return String{ptr, len, len + 1};
+}
+
 const char* Str::rfind(char pattern) const {
 #ifdef _GNU_SOURCE
     return static_cast<const char*>(::memrchr(buffer, pattern, len));
