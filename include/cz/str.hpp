@@ -9,7 +9,7 @@
 
 namespace cz {
 
-class String;
+struct String;
 
 struct Str {
     const char* buffer;

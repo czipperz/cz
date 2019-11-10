@@ -7,9 +7,6 @@
 
 namespace cz {
 
-String::String() : _buffer(nullptr), _len(0), _cap(0) {}
-String::String(char* buffer, size_t len, size_t cap) : _buffer(buffer), _len(len), _cap(cap) {}
-
 char* String::buffer() {
     return _buffer;
 }

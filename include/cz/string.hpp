@@ -6,16 +6,10 @@
 
 namespace cz {
 
-class String {
+struct String {
     char* _buffer;
     size_t _len;
     size_t _cap;
-
-public:
-    /// Create a new empty \c String.
-    String();
-    /// Create a new \c String using the \c buffer with initial length \c len and capacity \c cap.
-    explicit String(char* buffer, size_t len, size_t cap);
 
     /// Ensure there are \c extra bytes available in the buffer.
     void reserve(Allocator, size_t extra);
