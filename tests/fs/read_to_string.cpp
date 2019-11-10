@@ -17,7 +17,7 @@ void set_wd() {
     }
 
     Allocator allocator = heap_allocator();
-    String path;
+    String path = {};
     CZ_DEFER(path.drop(allocator));
 
     REQUIRE(!cz::is_err(get_working_directory(allocator, &path)));
@@ -39,7 +39,7 @@ void set_wd() {
 TEST_CASE("read_to_string invalid file") {
     set_wd();
 
-    String string;
+    String string = {};
     auto allocator = heap_allocator();
     CZ_DEFER(string.drop(allocator));
 
@@ -51,7 +51,7 @@ TEST_CASE("read_to_string invalid file") {
 TEST_CASE("read_to_string empty file") {
     set_wd();
 
-    String string;
+    String string = {};
     auto allocator = heap_allocator();
     CZ_DEFER(string.drop(allocator));
 
@@ -63,7 +63,7 @@ TEST_CASE("read_to_string empty file") {
 TEST_CASE("read_to_string small file") {
     set_wd();
 
-    String string;
+    String string = {};
     auto allocator = heap_allocator();
     CZ_DEFER(string.drop(allocator));
 
@@ -75,7 +75,7 @@ TEST_CASE("read_to_string small file") {
 TEST_CASE("read_to_string large file") {
     set_wd();
 
-    String string;
+    String string = {};
     auto allocator = heap_allocator();
     CZ_DEFER(string.drop(allocator));
 

@@ -12,7 +12,7 @@ TEST_CASE("write multiple arguments works") {
     AlignedBuffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
-    AllocatedString string;
+    AllocatedString string = {};
     string.allocator = arena.allocator();
 
     Writer writer = string_writer(&string);
@@ -25,7 +25,7 @@ TEST_CASE("write multiple arguments with debug") {
     AlignedBuffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
-    AllocatedString string;
+    AllocatedString string = {};
     string.allocator = arena.allocator();
 
     Writer writer = string_writer(&string);
@@ -39,7 +39,7 @@ TEST_CASE("write str") {
     AlignedBuffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
-    AllocatedString string;
+    AllocatedString string = {};
     string.allocator = arena.allocator();
 
     Writer writer = string_writer(&string);
@@ -54,7 +54,7 @@ TEST_CASE("write char") {
     AlignedBuffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
-    AllocatedString string;
+    AllocatedString string = {};
     string.allocator = arena.allocator();
 
     Writer writer = string_writer(&string);
@@ -68,7 +68,7 @@ TEST_CASE("write(int = 123)") {
     AlignedBuffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
-    AllocatedString string;
+    AllocatedString string = {};
     string.allocator = arena.allocator();
 
     Writer writer = string_writer(&string);
@@ -82,7 +82,7 @@ TEST_CASE("write(int = 0)") {
     AlignedBuffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
-    AllocatedString string;
+    AllocatedString string = {};
     string.allocator = arena.allocator();
 
     Writer writer = string_writer(&string);
@@ -96,7 +96,7 @@ TEST_CASE("write(int = 9)") {
     AlignedBuffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
-    AllocatedString string;
+    AllocatedString string = {};
     string.allocator = arena.allocator();
 
     Writer writer = string_writer(&string);
@@ -110,7 +110,7 @@ TEST_CASE("write(int = -47)") {
     AlignedBuffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
-    AllocatedString string;
+    AllocatedString string = {};
     string.allocator = arena.allocator();
 
     Writer writer = string_writer(&string);
@@ -124,7 +124,7 @@ TEST_CASE("write(Address(nullptr))") {
     AlignedBuffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
-    AllocatedString string;
+    AllocatedString string = {};
     string.allocator = arena.allocator();
 
     Writer writer = string_writer(&string);
@@ -138,7 +138,7 @@ TEST_CASE("write(Address(arbitrary) starts with 0x)") {
     AlignedBuffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
-    AllocatedString string;
+    AllocatedString string = {};
     string.allocator = arena.allocator();
 
     Writer writer = string_writer(&string);

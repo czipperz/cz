@@ -10,7 +10,7 @@ namespace fs {
 
 class DirectoryIterator {
     Allocator _allocator;
-    String _file;
+    String _file = {};
     bool _done = false;
 
 #ifdef _WIN32

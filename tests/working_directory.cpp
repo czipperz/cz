@@ -7,7 +7,7 @@
 using namespace cz;
 
 TEST_CASE("get_working_directory() returns non-empty") {
-    String path;
+    String path = {};
     Allocator allocator = heap_allocator();
     CZ_DEFER(path.drop(allocator));
 

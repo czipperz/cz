@@ -2,6 +2,7 @@
 
 #include <cz/assert.hpp>
 #include <cz/defer.hpp>
+#include <cz/heap.hpp>
 #include <cz/string.hpp>
 #include <czt/mock_allocate.hpp>
 #include "context.hpp"
@@ -10,14 +11,14 @@ using namespace cz;
 using namespace cz::test;
 
 TEST_CASE("String::String() is empty") {
-    String string;
+    String string = {};
 
     REQUIRE(string == "");
 }
 
 TEST_CASE("String::String(char*, size_t, size_t)") {
     char buffer[4] = "abc";
-    String string(buffer, 2, 4);
+    String string = {buffer, 2, 4};
 
     REQUIRE(string == "ab");
     REQUIRE(string.cap() == 4);
@@ -39,7 +40,7 @@ TEST_CASE("Str::duplicate(C*) clones") {
 
 TEST_CASE("String::clone(C*) clones") {
     char buffer[4] = "abc";
-    String string(buffer, 3, 4);
+    String string = {buffer, 3, 4};
 
     char clone_buffer[3] = {0};
     auto mock = mock_alloc(clone_buffer, {3, 1});
@@ -57,7 +58,7 @@ TEST_CASE("String::append from empty string") {
     Arena arena;
     arena.mem = buffer;
 
-    String string;
+    String string = {};
     string.reserve(arena.allocator(), 3);
     string.append("abc");
 
@@ -69,7 +70,7 @@ TEST_CASE("String::append from non-empty string and reallocates") {
     Arena arena;
     arena.mem = buffer;
 
-    String string;
+    String string = {};
     string.reserve(arena.allocator(), 3);
     string.append("abc");
     string.reserve(arena.allocator(), 33);
@@ -82,7 +83,7 @@ TEST_CASE("String::append no realloc") {
     char buffer[64];
     auto mock = mock_alloc(buffer, {64, 1});
 
-    String string;
+    String string = {};
     string.reserve(mock.allocator(), 64);
     mock.called = false;
 
@@ -97,7 +98,7 @@ TEST_CASE("String::append no realloc") {
 TEST_CASE("String::reserve allocates") {
     char buffer[64];
     auto mock = mock_alloc(buffer, {64, 1});
-    String string;
+    String string = {};
 
     string.reserve(mock.allocator(), 64);
 
@@ -108,7 +109,7 @@ TEST_CASE("String::reserve allocates") {
 }
 
 TEST_CASE("String::insert empty string") {
-    String string;
+    String string = {};
     string.insert(0, "");
 
     CHECK(string.buffer() == nullptr);
@@ -119,7 +120,7 @@ TEST_CASE("String::insert into empty string") {
     AlignedBuffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
-    String string;
+    String string = {};
 
     string.reserve(arena.allocator(), 3);
     string.insert(0, "abc");
@@ -132,7 +133,7 @@ TEST_CASE("String::insert into empty string") {
 
 TEST_CASE("String::insert beginning") {
     char buffer[10] = "xyz";
-    String string(buffer, 3, 10);
+    String string = {buffer, 3, 10};
 
     string.insert(0, "abc");
 
@@ -144,7 +145,7 @@ TEST_CASE("String::insert beginning") {
 
 TEST_CASE("String::insert middle") {
     char buffer[10] = "xyz";
-    String string(buffer, 3, 10);
+    String string = {buffer, 3, 10};
 
     string.insert(1, "abc");
 
@@ -156,7 +157,7 @@ TEST_CASE("String::insert middle") {
 
 TEST_CASE("String::insert end") {
     char buffer[10] = "xyz";
-    String string(buffer, 3, 10);
+    String string = {buffer, 3, 10};
 
     string.insert(3, "abc");
 
@@ -170,7 +171,7 @@ TEST_CASE("String::insert with resize") {
     char buffer[4];
     Arena arena;
     arena.mem = buffer;
-    String string;
+    String string = {};
 
     string.reserve(arena.allocator(), 3);
     string.insert(0, "abc");
@@ -181,7 +182,7 @@ TEST_CASE("String::insert with resize") {
 
 TEST_CASE("String::insert resize boundary") {
     char buffer[10] = "xyz";
-    String string(buffer, 3, 6);
+    String string = {buffer, 3, 6};
 
     string.insert(3, "abc");
 
@@ -193,7 +194,7 @@ TEST_CASE("String::insert resize boundary") {
 
 TEST_CASE("String::insert into long string") {
     char buffer[128] = "once upoa time in a land far far away";
-    String string(buffer, strlen(buffer), 128);
+    String string = {buffer, strlen(buffer), 128};
 
     string.insert(8, "n ");
 
@@ -202,7 +203,7 @@ TEST_CASE("String::insert into long string") {
 
 TEST_CASE("String::set_len(0) doesn't drop") {
     char buffer[3] = "ab";
-    String string(buffer, 2, 3);
+    String string = {buffer, 2, 3};
 
     string.set_len(0);
 
@@ -279,10 +280,12 @@ TEST_CASE("Str<Str both empty") {
 }
 
 TEST_CASE("String::realloc does nothing when len == cap") {
-    ArrayList<MemSlice, 1> mems;
+    Vector<MemSlice> mems = {};
+    mems.reserve(heap_allocator(), 1);
+    CZ_DEFER(mems.drop(heap_allocator()));
     CZ_DEFER(heap_dealloc_all(mems));
 
-    String string;
+    String string = {};
     string.reserve(capturing_heap_allocator(&mems), 4);
     REQUIRE(mems[0].size == 4);
 
