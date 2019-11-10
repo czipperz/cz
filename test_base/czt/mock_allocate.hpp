@@ -2,7 +2,7 @@
 
 #include <stddef.h>
 #include <cz/allocator.hpp>
-#include <cz/array.hpp>
+#include <cz/vector.hpp>
 
 namespace cz {
 namespace test {
@@ -43,7 +43,7 @@ struct MockAllocateMultiple {
 
 Allocator panic_allocator();
 
-Allocator capturing_heap_allocator(List<MemSlice>* mems);
+Allocator capturing_heap_allocator(Vector<MemSlice>* mems);
 void heap_dealloc_all(Slice<MemSlice> mems);
 
 }
