@@ -12,11 +12,6 @@ struct Slice {
     T* elems;
     size_t len;
 
-    constexpr Slice() : elems(nullptr), len(0) {}
-    template <size_t len>
-    constexpr Slice(T (&elems)[len]) : elems(elems), len(len) {}
-    constexpr Slice(T* elems, size_t len) : elems(elems), len(len) {}
-
     constexpr T& operator[](size_t index) const { return elems[index]; }
 };
 
@@ -27,7 +22,7 @@ constexpr Slice<T> slice() {
 
 template <class T, size_t len>
 constexpr Slice<T> slice(T (&arr)[len]) {
-    return {arr};
+    return {arr, len};
 }
 
 template <class T>
