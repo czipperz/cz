@@ -39,6 +39,17 @@ struct Vector {
         }
     }
 
+    void realloc(Allocator allocator) {
+        if (_elems) {
+            T* new_elems = static_cast<T*>(
+                allocator.realloc({_elems, _cap}, {_len * sizeof(T), alignof(T)}).buffer);
+            if (new_elems) {
+                _elems = new_elems;
+                _cap = _len;
+            }
+        }
+    }
+
     void push(T t) {
         CZ_DEBUG_ASSERT(_cap - _len >= 1);
         _elems[_len] = t;
