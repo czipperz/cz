@@ -4,13 +4,6 @@
 
 using cz::Str;
 
-TEST_CASE("Str::Str() is empty") {
-    Str str;
-
-    CHECK(str == "");
-    CHECK(str.len == 0);
-}
-
 TEST_CASE("Str::Str(\"\")") {
     Str str("");
 

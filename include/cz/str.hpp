@@ -15,8 +15,8 @@ struct Str {
     const char* buffer;
     size_t len;
 
-    constexpr Str() : buffer(nullptr), len(0) {}
-    constexpr Str(std::nullptr_t) : Str() {}
+    Str() = default;
+    constexpr Str(std::nullptr_t) : buffer(nullptr), len(0) {}
     Str(const char* cstr) : buffer(cstr), len(strlen(cstr)) {}
     constexpr Str(const char* buffer, size_t len) : buffer(buffer), len(len) {}
 
