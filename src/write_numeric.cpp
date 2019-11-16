@@ -54,7 +54,10 @@ static Result write_base(Writer writer, T val, T base) {
                                                                                          \
     Result write(Writer writer, format::WidthSpecified<unsigned type> v) {               \
         if (v.val == 0) {                                                                \
-            return write(writer, '0');                                                   \
+            for (size_t i = 0; i < v.width; ++i) {                                       \
+                CZ_TRY(write(writer, '0'));                                              \
+            }                                                                            \
+            return Result::ok();                                                         \
         }                                                                                \
                                                                                          \
         char buffer[BUFFER_SIZE];                                                        \
