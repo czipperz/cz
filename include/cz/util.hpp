@@ -29,7 +29,7 @@ using std::move;
 
 template <class T>
 T max(T a, T b) {
-    if (a > b) {
+    if (b < a) {
         return a;
     } else {
         return b;
