@@ -1,8 +1,11 @@
 #pragma once
 
 #include <stddef.h>
-#include "slice.hpp"
+#include <stdlib.h>
+#include <string.h>
+#include <new>
 #include "alloc_info.hpp"
+#include "slice.hpp"
 
 namespace cz {
 
@@ -24,6 +27,22 @@ struct Allocator {
     template <class T>
     T* alloc() const {
         return (T*)alloc(alloc_info<T>()).buffer;
+    }
+
+    /// Allocate and initialize an object of the given type using this allocator.
+    template <class T>
+    T* create() const {
+        T* obj = alloc<T>();
+        new (obj) T();
+        return obj;
+    }
+
+    /// Duplicate a slice of memory by allocating a copy of it using this allocator.
+    template <class T>
+    cz::Slice<T> duplicate(cz::Slice<T> slice) {
+        T* new_elems = static_cast<T*>(alloc({sizeof(T) * slice.len, alignof(T)}).buffer);
+        memcpy(new_elems, slice.elems, sizeof(T) * slice.len);
+        return {new_elems, slice.len};
     }
 
     /// Deallocate memory allocated using this allocator.
