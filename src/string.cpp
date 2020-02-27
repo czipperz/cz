@@ -62,6 +62,12 @@ void String::insert(size_t index, Str str) {
     CZ_DEBUG_ASSERT(_len <= _cap);
 }
 
+void String::remove(size_t index, size_t count) {
+    CZ_DEBUG_ASSERT(index + count <= _len);
+    memmove(_buffer + index, _buffer + index + count, len() - index - count);
+    _len -= count;
+}
+
 char String::pop() {
     CZ_DEBUG_ASSERT(_len >= 1);
     _len--;

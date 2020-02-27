@@ -37,6 +37,11 @@ struct String {
     /// Panics if there isn't enough space or if \c index is greater than \c len.
     void insert(size_t index, Str str);
 
+    /// Removes \c count characters start at \c index.
+    ///
+    /// Panics if there isn't enough space or if \c index+count is greater than \c len.
+    void remove(size_t index, size_t count);
+
     /// Pop the last \c char off the string.
     ///
     /// Panics if there is no character.
