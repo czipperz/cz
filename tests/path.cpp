@@ -5,24 +5,56 @@
 using namespace cz;
 using namespace cz::path;
 
-TEST_CASE("path::directory_component() empty input empty output") {
-    REQUIRE(directory_component("") == "");
+TEST_CASE("path::directory_component() empty input no output") {
+    REQUIRE_FALSE(directory_component("").is_present);
 }
 
-TEST_CASE("path::directory_component() no directory is empty output") {
-    REQUIRE(directory_component("abc") == "");
+TEST_CASE("path::directory_component() no directory no output") {
+    REQUIRE_FALSE(directory_component("abc").is_present);
 }
 
 TEST_CASE("path::directory_component() gets directory subset") {
-    REQUIRE(directory_component("abc/def.txt") == "abc/");
+    auto dc = directory_component("abc/def.txt");
+    REQUIRE(dc.is_present);
+    REQUIRE(dc.value == "abc/");
 }
 
 TEST_CASE("path::directory_component() gets directory subset multiple directories") {
-    REQUIRE(directory_component("abc/def/ghi") == "abc/def/");
+    auto dc = directory_component("abc/def/ghi");
+    REQUIRE(dc.is_present);
+    REQUIRE(dc.value == "abc/def/");
 }
 
 TEST_CASE("path::directory_component() trailing slash returns input") {
-    REQUIRE(directory_component("abc/def/") == "abc/def/");
+    auto dc = directory_component("abc/def/");
+    REQUIRE(dc.is_present);
+    REQUIRE(dc.value == "abc/def/");
+}
+
+TEST_CASE("path::name_component() empty input no output") {
+    REQUIRE_FALSE(name_component("").is_present);
+}
+
+TEST_CASE("path::name_component() no directory is name output") {
+    auto dc = name_component("abc");
+    REQUIRE(dc.is_present);
+    REQUIRE(dc.value == "abc");
+}
+
+TEST_CASE("path::name_component() gets name subset") {
+    auto dc = name_component("abc/def.txt");
+    REQUIRE(dc.is_present);
+    REQUIRE(dc.value == "def.txt");
+}
+
+TEST_CASE("path::name_component() gets name subset multiple directories") {
+    auto dc = name_component("abc/def/ghi");
+    REQUIRE(dc.is_present);
+    REQUIRE(dc.value == "ghi");
+}
+
+TEST_CASE("path::name_component() trailing slash no output") {
+    REQUIRE_FALSE(name_component("abc/def/").is_present);
 }
 
 TEST_CASE("path::flatten() empty input empty output") {

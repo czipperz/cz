@@ -37,10 +37,25 @@ Result get_max_len(size_t* size) {
 #endif
 }
 
-Str directory_component(Str str) {
+Option<Str> directory_component(Str str) {
     const char* ptr = str.rfind('/');
     if (ptr) {
-        return {str.buffer, static_cast<size_t>(ptr + 1 - str.buffer)};
+        return {{str.buffer, static_cast<size_t>(ptr + 1 - str.buffer)}};
+    } else {
+        return {};
+    }
+}
+
+Option<Str> name_component(Str str) {
+    const char* ptr = str.rfind('/');
+    if (ptr) {
+        if (ptr + 1 < str.end()) {
+            return {{ptr + 1, static_cast<size_t>(str.end() - (ptr + 1))}};
+        } else {
+            return {};
+        }
+    } else if (str.len > 0) {
+        return {str};
     } else {
         return {};
     }
@@ -107,7 +122,7 @@ void flatten(char* buffer, size_t* len) {
     }
 }
 
-void flatten(cz::String* string) {
+void flatten(String* string) {
     size_t len = string->len();
     flatten(string->buffer(), &len);
     string->set_len(len);
