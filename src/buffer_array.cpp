@@ -10,18 +10,17 @@ namespace cz {
 
 using namespace cz;
 
-void create(BufferArray* buffer_array) {
-    buffer_array->num_buffers = 4;
-    buffer_array->outer = 0;
+void BufferArray::create() {
+    num_buffers = 4;
+    outer = 0;
 
-    buffer_array->buffers =
-        static_cast<char**>(malloc(sizeof(*buffer_array->buffers) * buffer_array->num_buffers));
-    CZ_ASSERT(buffer_array->buffers);
+    buffers = static_cast<char**>(malloc(sizeof(*buffers) * num_buffers));
+    CZ_ASSERT(buffers);
 
     char* buffer = static_cast<char*>(malloc(BufferArray::buffer_size));
     CZ_ASSERT(buffer);
-    buffer_array->buffers[buffer_array->outer] = buffer;
-    buffer_array->inner = buffer;
+    buffers[outer] = buffer;
+    inner = buffer;
 }
 
 static void* buffer_array_alloc_inplace(BufferArray* buffer_array,
@@ -93,20 +92,20 @@ static MemSlice buffer_array_realloc(void* data, MemSlice old_mem, AllocInfo new
     return {ptr, new_info.size};
 }
 
-Allocator allocator(BufferArray* buffer_array) {
+Allocator BufferArray::allocator() {
     static const Allocator::VTable vtable = {
         buffer_array_alloc,
         buffer_array_dealloc,
         buffer_array_realloc,
     };
-    return {&vtable, buffer_array};
+    return {&vtable, this};
 }
 
-void drop(BufferArray* buffer_array) {
-    for (size_t i = 0; i <= buffer_array->outer; ++i) {
-        free(buffer_array->buffers[i]);
+void BufferArray::drop() {
+    for (size_t i = 0; i <= outer; ++i) {
+        free(buffers[i]);
     }
-    free(buffer_array->buffers);
+    free(buffers);
 }
 
 }

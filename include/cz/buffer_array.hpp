@@ -12,10 +12,10 @@ struct BufferArray {
     size_t num_buffers;
     size_t outer;
     char* inner;
-};
 
-void create(BufferArray* buffer_array);
-cz::Allocator allocator(BufferArray* buffer_array);
-void drop(BufferArray* buffer_array);
+    void create();
+    void drop();
+    Allocator allocator();
+};
 
 }
