@@ -13,6 +13,8 @@ struct Slice {
     size_t len;
 
     constexpr T& operator[](size_t index) const { return elems[index]; }
+
+    constexpr operator Slice<const T>() const { return {elems, len}; }
 };
 
 template <class T>
