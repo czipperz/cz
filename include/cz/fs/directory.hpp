@@ -37,7 +37,10 @@ public:
 ///
 /// Path should be expressed with forward slashes not back slashes.  The path
 /// may be followed by a trailing slash.
-Result files(Allocator allocator, const char* cstr_path, Vector<String>* paths);
+Result files(Allocator paths_allocator,
+             Allocator path_allocator,
+             const char* cstr_path,
+             Vector<String>* paths);
 
 }
 }

@@ -162,13 +162,16 @@ Result DirectoryIterator::create(const char* cstr_path) {
 namespace cz {
 namespace fs {
 
-Result files(Allocator allocator, const char* cstr_path, Vector<String>* paths) {
-    DirectoryIterator iterator(allocator);
+Result files(Allocator paths_allocator,
+             Allocator path_allocator,
+             const char* cstr_path,
+             Vector<String>* paths) {
+    DirectoryIterator iterator(paths_allocator);
     CZ_TRY(iterator.create(cstr_path));
 
     while (!iterator.done()) {
-        paths->reserve(allocator, 1);
-        paths->push(iterator.file().duplicate(allocator));
+        paths->reserve(paths_allocator, 1);
+        paths->push(iterator.file().duplicate(path_allocator));
 
         auto result = iterator.advance();
         if (result.is_err()) {
