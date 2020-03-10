@@ -4,12 +4,7 @@
 
 namespace cz {
 
-template <class T>
-void swap(T& a, T& b) {
-    T temp = a;
-    a = b;
-    b = temp;
-}
+using std::swap;
 
 template <class T>
 T take(T& p) {
