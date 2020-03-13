@@ -76,6 +76,12 @@ struct Vector {
         ++_len;
     }
 
+    void remove(size_t index) {
+        CZ_DEBUG_ASSERT(index < _len);
+        memmove(_elems + index, _elems + index + 1, sizeof(T) * (_len - index - 1));
+        --_len;
+    }
+
     void remove_range(size_t start, size_t end) {
         CZ_DEBUG_ASSERT(start <= end);
         CZ_DEBUG_ASSERT(end <= _len);
