@@ -50,6 +50,14 @@ struct Vector {
         }
     }
 
+    Vector clone(Allocator allocator) const {
+        Vector result = {};
+        result.reserve(allocator, _len);
+        memcpy(result._elems, _elems, _len * sizeof(T));
+        result._len = _len;
+        return result;
+    }
+
     void push(T t) {
         CZ_DEBUG_ASSERT(_cap - _len >= 1);
         _elems[_len] = t;
