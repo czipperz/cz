@@ -155,3 +155,18 @@ TEST_CASE("Vector copy operator copies pointer") {
     copy = original;
     CHECK(original.elems() == copy.elems());
 }
+
+TEST_CASE("Vector append") {
+    Vector<int> vector = {};
+    CZ_DEFER(vector.drop(heap_allocator()));
+    vector.reserve(heap_allocator(), 4);
+
+    vector.push(1);
+    int elems[] = {2, 3};
+    vector.append(cz::slice(elems));
+
+    REQUIRE(vector.len() == 3);
+    CHECK(vector[0] == 1);
+    CHECK(vector[1] == 2);
+    CHECK(vector[2] == 3);
+}

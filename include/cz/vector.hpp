@@ -64,9 +64,9 @@ struct Vector {
         ++_len;
     }
 
-    void append(Slice<T> slice) {
+    void append(Slice<const T> slice) {
         CZ_DEBUG_ASSERT(_cap - _len >= slice.len);
-        memcpy(_elems, slice.elems, slice.len * sizeof(T));
+        memcpy(_elems + _len, slice.elems, slice.len * sizeof(T));
         _len += slice.len;
     }
 
