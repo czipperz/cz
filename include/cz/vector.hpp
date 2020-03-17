@@ -84,6 +84,14 @@ struct Vector {
         ++_len;
     }
 
+    void insert_slice(size_t index, cz::Slice<const T> slice) {
+        CZ_DEBUG_ASSERT(index <= _len);
+        CZ_DEBUG_ASSERT(_cap - _len >= slice.len);
+        memmove(_elems + index + slice.len, _elems + index, (_len - index) * sizeof(T));
+        memcpy(_elems + index, slice.buffer, slice.len * sizeof(T));
+        _len += slice.len;
+    }
+
     void remove(size_t index) {
         CZ_DEBUG_ASSERT(index < _len);
         memmove(_elems + index, _elems + index + 1, sizeof(T) * (_len - index - 1));
