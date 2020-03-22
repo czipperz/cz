@@ -140,6 +140,7 @@ Result make_absolute(Str file, Allocator allocator, String* path) {
     if (is_absolute(file)) {
         path->reserve(allocator, file.len + 1);
         path->append(file);
+        flatten(path);
         path->null_terminate();
         return Result::ok();
     }

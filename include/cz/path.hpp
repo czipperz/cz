@@ -55,6 +55,9 @@ void flatten(String* path);
 bool is_absolute(Str path);
 
 /// Make an absolute path out of the relative path.
+///
+/// If the input path is not absolute, we append it to the current working directory.
+/// Then in either case we flatten the path.
 Result make_absolute(Str relative_path, Allocator allocator, String* absolute_path_out);
 
 }
