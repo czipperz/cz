@@ -184,5 +184,27 @@ Result files(Allocator paths_allocator,
     return iterator.destroy();
 }
 
+Result files(Allocator paths_allocator,
+             Allocator path_allocator,
+             const char* cstr_path,
+             Vector<Str>* paths) {
+    DirectoryIterator iterator(paths_allocator);
+    CZ_TRY(iterator.create(cstr_path));
+
+    while (!iterator.done()) {
+        paths->reserve(paths_allocator, 1);
+        paths->push(iterator.file().duplicate(path_allocator));
+
+        auto result = iterator.advance();
+        if (result.is_err()) {
+            // ignore errors in destruction
+            iterator.destroy();
+            return result;
+        }
+    }
+
+    return iterator.destroy();
+}
+
 }
 }
