@@ -4,7 +4,6 @@
 #include <cz/alloc_utils.hpp>
 #include <cz/allocator.hpp>
 #include <cz/assert.hpp>
-#include <cz/context.hpp>
 
 namespace cz {
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "context.hpp"
 #include "string.hpp"
 #include "write.hpp"
 

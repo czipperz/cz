@@ -1,7 +1,6 @@
 #pragma once
 
 #include <exception>
-#include "context_decl.hpp"
 #include "source_location.hpp"
 #include "stringify.hpp"
 

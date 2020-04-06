@@ -1,16 +1,16 @@
 #include <czt/test_base.hpp>
 
+#include <cz/aligned_buffer.hpp>
 #include <cz/arena.hpp>
 #include <cz/defer.hpp>
 #include <cz/format.hpp>
 #include <czt/mock_allocate.hpp>
-#include "context.hpp"
 
 using namespace cz;
 using namespace cz::test;
 
 TEST_CASE("sprint works") {
-    AlignedBuffer<32> buffer;
+    Aligned_Buffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
     auto string = sprint(arena.allocator(), 123, " + ", 456);

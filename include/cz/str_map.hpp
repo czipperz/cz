@@ -9,7 +9,7 @@
 namespace cz {
 
 template <class Value>
-struct StrMap {
+struct Str_Map {
     cz::Str* keys;
     Value* values;
     unsigned char* _masks;
@@ -24,7 +24,7 @@ struct StrMap {
 
     void reserve(cz::Allocator allocator, size_t extra) {
         if (count + extra + cap / 4 >= cap) {
-            StrMap<Value> new_this;
+            Str_Map<Value> new_this;
             new_this.cap = next_power_of_two(count + extra);
             new_this.count = 0;
 

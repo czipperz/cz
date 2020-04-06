@@ -2,6 +2,7 @@
 
 #include <ctype.h>
 #include <cz/defer.hpp>
+#include <cz/try.hpp>
 
 #ifdef _WIN32
 #include <windows.h>

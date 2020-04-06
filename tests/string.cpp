@@ -1,11 +1,12 @@
 #include <czt/test_base.hpp>
 
+#include <cz/aligned_buffer.hpp>
+#include <cz/arena.hpp>
 #include <cz/assert.hpp>
 #include <cz/defer.hpp>
 #include <cz/heap.hpp>
 #include <cz/string.hpp>
 #include <czt/mock_allocate.hpp>
-#include "context.hpp"
 
 using namespace cz;
 using namespace cz::test;
@@ -54,7 +55,7 @@ TEST_CASE("String::clone(C*) clones") {
 }
 
 TEST_CASE("String::append from empty string") {
-    AlignedBuffer<32> buffer;
+    Aligned_Buffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
 
@@ -66,7 +67,7 @@ TEST_CASE("String::append from empty string") {
 }
 
 TEST_CASE("String::append from non-empty string and reallocates") {
-    AlignedBuffer<64> buffer;
+    Aligned_Buffer<64> buffer;
     Arena arena;
     arena.mem = buffer;
 
@@ -117,7 +118,7 @@ TEST_CASE("String::insert empty string") {
 }
 
 TEST_CASE("String::insert into empty string") {
-    AlignedBuffer<32> buffer;
+    Aligned_Buffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
     String string = {};

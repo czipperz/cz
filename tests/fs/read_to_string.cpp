@@ -4,7 +4,6 @@
 #include <cz/fs/read_to_string.hpp>
 #include <cz/heap.hpp>
 #include <cz/working_directory.hpp>
-#include "../context.hpp"
 
 using namespace cz;
 using namespace cz::fs;

@@ -2,7 +2,6 @@
 
 #include <limits.h>
 #include <cz/assert.hpp>
-#include <cz/context.hpp>
 #include <cz/string.hpp>
 
 namespace cz {

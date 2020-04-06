@@ -8,7 +8,7 @@
 
 namespace cz {
 
-struct StrSet {
+struct Str_Set {
     cz::Str* keys;
     unsigned char* _masks;
     size_t cap;
@@ -21,7 +21,7 @@ struct StrSet {
 
     void reserve(cz::Allocator allocator, size_t extra) {
         if (count + extra + cap / 4 >= cap) {
-            StrSet new_this;
+            Str_Set new_this;
             new_this.cap = next_power_of_two(count + extra);
             new_this.count = 0;
 

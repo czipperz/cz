@@ -3,7 +3,6 @@
 #include <string.h>
 #include <cz/arena.hpp>
 #include <czt/mock_allocate.hpp>
-#include "../context.hpp"
 
 using namespace cz;
 using namespace cz::test;

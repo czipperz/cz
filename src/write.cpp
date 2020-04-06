@@ -1,6 +1,5 @@
 #include <cz/write.hpp>
 
-#include <cz/context.hpp>
 #include <cz/format.hpp>
 #include <cz/try.hpp>
 

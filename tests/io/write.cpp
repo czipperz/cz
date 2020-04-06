@@ -1,15 +1,14 @@
 #include <czt/test_base.hpp>
 
+#include <cz/aligned_buffer.hpp>
 #include <cz/arena.hpp>
 #include <cz/defer.hpp>
 #include <cz/write.hpp>
-#include "../context.hpp"
 
 using namespace cz;
-using cz::test::ctxt;
 
 TEST_CASE("write multiple arguments works") {
-    AlignedBuffer<32> buffer;
+    Aligned_Buffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
     AllocatedString string = {};
@@ -22,7 +21,7 @@ TEST_CASE("write multiple arguments works") {
 }
 
 TEST_CASE("write multiple arguments with debug") {
-    AlignedBuffer<32> buffer;
+    Aligned_Buffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
     AllocatedString string = {};
@@ -36,7 +35,7 @@ TEST_CASE("write multiple arguments with debug") {
 }
 
 TEST_CASE("write str") {
-    AlignedBuffer<32> buffer;
+    Aligned_Buffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
     AllocatedString string = {};
@@ -51,7 +50,7 @@ TEST_CASE("write str") {
 }
 
 TEST_CASE("write char") {
-    AlignedBuffer<32> buffer;
+    Aligned_Buffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
     AllocatedString string = {};
@@ -65,7 +64,7 @@ TEST_CASE("write char") {
 }
 
 TEST_CASE("write(int = 123)") {
-    AlignedBuffer<32> buffer;
+    Aligned_Buffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
     AllocatedString string = {};
@@ -79,7 +78,7 @@ TEST_CASE("write(int = 123)") {
 }
 
 TEST_CASE("write(int = 0)") {
-    AlignedBuffer<32> buffer;
+    Aligned_Buffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
     AllocatedString string = {};
@@ -93,7 +92,7 @@ TEST_CASE("write(int = 0)") {
 }
 
 TEST_CASE("write(int = 9)") {
-    AlignedBuffer<32> buffer;
+    Aligned_Buffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
     AllocatedString string = {};
@@ -107,7 +106,7 @@ TEST_CASE("write(int = 9)") {
 }
 
 TEST_CASE("write(int = -47)") {
-    AlignedBuffer<32> buffer;
+    Aligned_Buffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
     AllocatedString string = {};
@@ -121,7 +120,7 @@ TEST_CASE("write(int = -47)") {
 }
 
 TEST_CASE("write(Address(nullptr))") {
-    AlignedBuffer<32> buffer;
+    Aligned_Buffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
     AllocatedString string = {};
@@ -135,7 +134,7 @@ TEST_CASE("write(Address(nullptr))") {
 }
 
 TEST_CASE("write(Address(arbitrary) starts with 0x)") {
-    AlignedBuffer<32> buffer;
+    Aligned_Buffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
     AllocatedString string = {};

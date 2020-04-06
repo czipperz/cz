@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stddef.h>
-#include "context_decl.hpp"
 #include "allocator.hpp"
 
 namespace cz {
@@ -19,14 +18,6 @@ struct Arena {
     MemSlice remaining() const { return {point(), mem.size - offset}; }
     void* point() const { return (char*)mem.buffer + offset; }
     void set_point(void* p) { offset = (char*)p - (char*)mem.buffer; }
-};
-
-template <size_t size, size_t alignment = alignof(max_align_t)>
-struct AlignedBuffer {
-    alignas(alignment) char buffer[size];
-
-    MemSlice mem() { return {buffer, size}; }
-    operator MemSlice() { return mem(); }
 };
 
 }
