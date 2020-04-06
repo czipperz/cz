@@ -26,7 +26,7 @@ struct Allocator {
     /// Allocate memory to store a value of the given type using this allocator.
     template <class T>
     T* alloc() const {
-        return (T*)alloc(alloc_info<T>()).buffer;
+        return (T*)alloc(alloc_info<T>());
     }
 
     /// Allocate and initialize an object of the given type using this allocator.
