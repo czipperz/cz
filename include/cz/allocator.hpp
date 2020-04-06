@@ -12,16 +12,16 @@ namespace cz {
 /// A memory allocator.
 struct Allocator {
     struct VTable {
-        MemSlice (*alloc)(void* data, AllocInfo new_info);
+        void* (*alloc)(void* data, AllocInfo new_info);
         void (*dealloc)(void* data, MemSlice old_mem);
-        MemSlice (*realloc)(void* data, MemSlice old_mem, AllocInfo new_info);
+        void* (*realloc)(void* data, MemSlice old_mem, AllocInfo new_info);
     };
 
     const Allocator::VTable* vtable;
     void* data;
 
     /// Allocate memory using this allocator.
-    MemSlice alloc(AllocInfo info) const { return vtable->alloc(data, info); }
+    void* alloc(AllocInfo info) const { return vtable->alloc(data, info); }
 
     /// Allocate memory to store a value of the given type using this allocator.
     template <class T>
@@ -40,7 +40,7 @@ struct Allocator {
     /// Duplicate a slice of memory by allocating a copy of it using this allocator.
     template <class T>
     cz::Slice<T> duplicate(cz::Slice<T> slice) {
-        T* new_elems = static_cast<T*>(alloc({sizeof(T) * slice.len, alignof(T)}).buffer);
+        T* new_elems = static_cast<T*>(alloc({sizeof(T) * slice.len, alignof(T)}));
         memcpy(new_elems, slice.elems, sizeof(T) * slice.len);
         return {new_elems, slice.len};
     }
@@ -49,7 +49,7 @@ struct Allocator {
     void dealloc(MemSlice mem) const { return vtable->dealloc(data, mem); }
 
     /// Reallocate a section of memory allocated using this allocator.
-    MemSlice realloc(MemSlice old_mem, AllocInfo new_info) const {
+    void* realloc(MemSlice old_mem, AllocInfo new_info) const {
         return vtable->realloc(data, old_mem, new_info);
     }
 };

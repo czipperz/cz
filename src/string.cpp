@@ -28,10 +28,9 @@ void String::reserve(Allocator allocator, size_t extra) {
         size_t new_cap = max(_len + extra, _cap * 2);
         char* new_buffer;
         if (_buffer) {
-            new_buffer =
-                static_cast<char*>(allocator.realloc({_buffer, _cap}, {new_cap, 1}).buffer);
+            new_buffer = static_cast<char*>(allocator.realloc({_buffer, _cap}, {new_cap, 1}));
         } else {
-            new_buffer = static_cast<char*>(allocator.alloc({new_cap, 1}).buffer);
+            new_buffer = static_cast<char*>(allocator.alloc({new_cap, 1}));
         }
         CZ_ASSERT(new_buffer != nullptr);
 
@@ -74,7 +73,7 @@ char String::pop() {
 }
 
 void String::realloc(Allocator allocator) {
-    char* res = static_cast<char*>(allocator.realloc({_buffer, _cap}, {_len, 1}).buffer);
+    char* res = static_cast<char*>(allocator.realloc({_buffer, _cap}, {_len, 1}));
     if (res) {
         _buffer = res;
         _cap = _len;
@@ -82,7 +81,7 @@ void String::realloc(Allocator allocator) {
 }
 
 void String::realloc_null_terminate(Allocator allocator) {
-    char* res = static_cast<char*>(allocator.realloc({_buffer, _cap}, {_len + 1, 1}).buffer);
+    char* res = static_cast<char*>(allocator.realloc({_buffer, _cap}, {_len + 1, 1}));
     CZ_ASSERT(res);
     _buffer = res;
     _buffer[_len] = '\0';

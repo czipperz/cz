@@ -18,13 +18,10 @@ struct Vector {
 
             T* new_elems;
             if (this->elems()) {
-                new_elems = static_cast<T*>(allocator
-                                                .realloc({this->elems(), this->cap() * sizeof(T)},
-                                                         {new_cap * sizeof(T), alignof(T)})
-                                                .buffer);
+                new_elems = static_cast<T*>(allocator.realloc(
+                    {this->elems(), this->cap() * sizeof(T)}, {new_cap * sizeof(T), alignof(T)}));
             } else {
-                new_elems =
-                    static_cast<T*>(allocator.alloc({new_cap * sizeof(T), alignof(T)}).buffer);
+                new_elems = static_cast<T*>(allocator.alloc({new_cap * sizeof(T), alignof(T)}));
             }
 
             CZ_ASSERT(new_elems != nullptr);

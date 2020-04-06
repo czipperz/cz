@@ -29,12 +29,11 @@ struct Str_Map_Removable {
             new_this.count = 0;
 
             new_this.keys = static_cast<cz::Str*>(
-                allocator.alloc({sizeof(cz::Str) * new_this.cap, alignof(cz::Str)}).buffer);
+                allocator.alloc({sizeof(cz::Str) * new_this.cap, alignof(cz::Str)}));
             new_this.values = static_cast<Value*>(
-                allocator.alloc({sizeof(Value) * new_this.cap, alignof(Value)}).buffer);
+                allocator.alloc({sizeof(Value) * new_this.cap, alignof(Value)}));
             new_this._masks = static_cast<unsigned char*>(
-                allocator.alloc({bit_array::alloc_size(2 * new_this.cap), alignof(unsigned char)})
-                    .buffer);
+                allocator.alloc({bit_array::alloc_size(2 * new_this.cap), alignof(unsigned char)}));
 
             CZ_ASSERT(new_this.keys);
             CZ_ASSERT(new_this.values);

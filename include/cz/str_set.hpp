@@ -26,10 +26,9 @@ struct Str_Set {
             new_this.count = 0;
 
             new_this.keys = static_cast<cz::Str*>(
-                allocator.alloc({sizeof(cz::Str) * new_this.cap, alignof(cz::Str)}).buffer);
+                allocator.alloc({sizeof(cz::Str) * new_this.cap, alignof(cz::Str)}));
             new_this._masks = static_cast<unsigned char*>(
-                allocator.alloc({sizeof(unsigned char) * new_this.cap, alignof(unsigned char)})
-                    .buffer);
+                allocator.alloc({sizeof(unsigned char) * new_this.cap, alignof(unsigned char)}));
 
             CZ_ASSERT(new_this.keys);
             CZ_ASSERT(new_this._masks);

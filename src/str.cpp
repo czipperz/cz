@@ -7,14 +7,14 @@
 namespace cz {
 
 String Str::duplicate(Allocator allocator) const {
-    auto ptr = static_cast<char*>(allocator.alloc({len, 1}).buffer);
+    auto ptr = static_cast<char*>(allocator.alloc({len, 1}));
     CZ_ASSERT(ptr != nullptr);
     memcpy(ptr, buffer, len);
     return String{ptr, len, len};
 }
 
 String Str::duplicate_null_terminate(Allocator allocator) const {
-    auto ptr = static_cast<char*>(allocator.alloc({len + 1, 1}).buffer);
+    auto ptr = static_cast<char*>(allocator.alloc({len + 1, 1}));
     CZ_ASSERT(ptr != nullptr);
     memcpy(ptr, buffer, len);
     ptr[len] = '\0';

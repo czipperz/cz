@@ -9,16 +9,16 @@ namespace test {
 MockAllocate::MockAllocate(void* buffer, MemSlice expected_old_mem, AllocInfo expected_new_info)
     : buffer(buffer), expected_old_mem(expected_old_mem), expected_new_info(expected_new_info) {}
 
-static MemSlice test_realloc(void* _data, MemSlice old_mem, AllocInfo new_info) {
+static void* test_realloc(void* _data, MemSlice old_mem, AllocInfo new_info) {
     auto data = static_cast<MockAllocate*>(_data);
     CHECK(data->expected_old_mem.buffer == old_mem.buffer);
     CHECK(data->expected_old_mem.size == old_mem.size);
     REQUIRE(data->expected_new_info == new_info);
     data->called = true;
-    return {data->buffer, new_info.size};
+    return data->buffer;
 }
 
-static MemSlice test_alloc(void* _data, AllocInfo info) {
+static void* test_alloc(void* _data, AllocInfo info) {
     return test_realloc(_data, {nullptr, 0}, info);
 }
 
@@ -41,14 +41,14 @@ MockAllocate mock_realloc(void* buffer, MemSlice expected_old_mem, AllocInfo exp
     return {buffer, expected_old_mem, expected_new_info};
 }
 
-static MemSlice panic_alloc(void*, AllocInfo) {
+static void* panic_alloc(void*, AllocInfo) {
     FAIL("alloc cannot be called in this context");
-    return {nullptr, 0};
+    return nullptr;
 }
 
-static MemSlice panic_realloc(void*, MemSlice, AllocInfo) {
+static void* panic_realloc(void*, MemSlice, AllocInfo) {
     FAIL("realloc cannot be called in this context");
-    return {nullptr, 0};
+    return nullptr;
 }
 
 static void panic_dealloc(void*, MemSlice) {
@@ -62,15 +62,15 @@ Allocator panic_allocator() {
 
 MockAllocateMultiple::MockAllocateMultiple(Slice<MockAllocate> mocks) : mocks(mocks) {}
 
-static MemSlice test_multiple_realloc(void* _mocks, MemSlice old_mem, AllocInfo new_info) {
+static void* test_multiple_realloc(void* _mocks, MemSlice old_mem, AllocInfo new_info) {
     auto mocks = static_cast<MockAllocateMultiple*>(_mocks);
     REQUIRE(mocks->index < mocks->mocks.len);
-    auto mem = mocks->mocks[mocks->index].allocator().realloc(old_mem, new_info);
+    void* mem = mocks->mocks[mocks->index].allocator().realloc(old_mem, new_info);
     ++mocks->index;
     return mem;
 }
 
-static MemSlice test_multiple_alloc(void* _mocks, AllocInfo new_info) {
+static void* test_multiple_alloc(void* _mocks, AllocInfo new_info) {
     return test_multiple_realloc(_mocks, {nullptr, 0}, new_info);
 }
 
@@ -84,15 +84,15 @@ Allocator MockAllocateMultiple::allocator() {
     return {&vtable, this};
 }
 
-static MemSlice capturing_heap_realloc(void* _mems, MemSlice old_mem, AllocInfo new_info) {
+static void* capturing_heap_realloc(void* _mems, MemSlice old_mem, AllocInfo new_info) {
     auto mems = static_cast<Vector<MemSlice>*>(_mems);
-    auto mem = heap_allocator().realloc(old_mem, new_info);
-    REQUIRE(mem.buffer != nullptr);
-    mems->push(mem);
+    void* mem = heap_allocator().realloc(old_mem, new_info);
+    REQUIRE(mem != nullptr);
+    mems->push({mem, new_info.size});
     return mem;
 }
 
-static MemSlice capturing_heap_alloc(void* _mocks, AllocInfo new_info) {
+static void* capturing_heap_alloc(void* _mocks, AllocInfo new_info) {
     return capturing_heap_realloc(_mocks, {nullptr, 0}, new_info);
 }
 

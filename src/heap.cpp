@@ -11,28 +11,22 @@
 
 namespace cz {
 
-static MemSlice heap_alloc(void*, AllocInfo info) {
+static void* heap_alloc(void*, AllocInfo info) {
 #ifdef _WIN32
-    void* buf = _aligned_malloc(info.size, info.alignment);
+    return _aligned_malloc(info.size, info.alignment);
 #elif _ISOC11_SOURCE || __cplusplus >= 201703L
-    void* buf = aligned_alloc(info.alignment, info.size);
+    return aligned_alloc(info.alignment, info.size);
 #elif _POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600
     void* buf;
     if (posix_memalign(&buf, max(info.alignment, alignof(void*)), info.size) == 0) {
-        return {buf, info.size};
+        return buf;
     } else {
-        return {nullptr, 0};
+        return nullptr;
     }
 #else
     CZ_DEBUG_ASSERT(info.alignment <= alignof(max_align_t));
-    void* buf = malloc(info.size);
+    return buf = malloc(info.size);
 #endif
-
-    if (buf) {
-        return {buf, info.size};
-    } else {
-        return {nullptr, 0};
-    }
 }
 
 static void heap_dealloc(void*, MemSlice mem) {
@@ -43,17 +37,12 @@ static void heap_dealloc(void*, MemSlice mem) {
 #endif
 }
 
-static MemSlice heap_realloc(void*, MemSlice old_mem, AllocInfo new_info) {
+static void* heap_realloc(void*, MemSlice old_mem, AllocInfo new_info) {
 #ifdef _WIN32
-    void* buf = _aligned_realloc(old_mem.buffer, new_info.size, new_info.alignment);
+    return _aligned_realloc(old_mem.buffer, new_info.size, new_info.alignment);
 #else
-    void* buf = realloc(old_mem.buffer, new_info.size);
+    return realloc(old_mem.buffer, new_info.size);
 #endif
-    if (buf) {
-        return {buf, new_info.size};
-    } else {
-        return {nullptr, 0};
-    }
 }
 
 Allocator heap_allocator() {

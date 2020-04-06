@@ -77,7 +77,7 @@ static void* buffer_array_alloc_new_buffer(Buffer_Array* buffer_array, AllocInfo
     return buffer;
 }
 
-static MemSlice buffer_array_alloc(void* data, AllocInfo new_info) {
+static void* buffer_array_alloc(void* data, AllocInfo new_info) {
     Buffer_Array* buffer_array = static_cast<Buffer_Array*>(data);
 
     void* ptr = buffer_array_alloc_inplace(buffer_array, new_info, buffer_array->inner);
@@ -87,7 +87,7 @@ static MemSlice buffer_array_alloc(void* data, AllocInfo new_info) {
 
     buffer_array->inner = static_cast<char*>(ptr) + new_info.size;
 
-    return {ptr, new_info.size};
+    return ptr;
 }
 
 static void buffer_array_dealloc(void* data, MemSlice old_mem) {
@@ -97,7 +97,7 @@ static void buffer_array_dealloc(void* data, MemSlice old_mem) {
     buffer_array->inner = static_cast<char*>(old_mem.buffer);
 }
 
-static MemSlice buffer_array_realloc(void* data, MemSlice old_mem, AllocInfo new_info) {
+static void* buffer_array_realloc(void* data, MemSlice old_mem, AllocInfo new_info) {
     Buffer_Array* buffer_array = static_cast<Buffer_Array*>(data);
     // we only realloc the last entry
     CZ_DEBUG_ASSERT(buffer_array->inner == static_cast<char*>(old_mem.buffer) + old_mem.size);
@@ -111,7 +111,7 @@ static MemSlice buffer_array_realloc(void* data, MemSlice old_mem, AllocInfo new
 
     buffer_array->inner = static_cast<char*>(ptr) + new_info.size;
 
-    return {ptr, new_info.size};
+    return ptr;
 }
 
 Allocator Buffer_Array::allocator() {
