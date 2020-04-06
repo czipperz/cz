@@ -27,4 +27,4 @@ Suggested: clone the repository and include it in your cmake build via
 `add_subdirectory()`.
 
 Alternative: Build locally using `cmake` and then link the resulting library
-into your program.
+into your program.  The script `./build-release.sh` will do this automatically.
