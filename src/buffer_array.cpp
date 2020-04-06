@@ -14,13 +14,18 @@ void BufferArray::create() {
     num_buffers = 4;
     outer = 0;
 
-    buffers = static_cast<char**>(malloc(sizeof(*buffers) * num_buffers));
+    buffers = static_cast<char**>(calloc(sizeof(char*), num_buffers));
     CZ_ASSERT(buffers);
 
     char* buffer = static_cast<char*>(malloc(BufferArray::buffer_size));
     CZ_ASSERT(buffer);
     buffers[outer] = buffer;
     inner = buffer;
+}
+
+void BufferArray::clear() {
+    outer = 0;
+    inner = buffers[outer];
 }
 
 static void* buffer_array_alloc_inplace(BufferArray* buffer_array,
@@ -38,14 +43,31 @@ static void* buffer_array_alloc_new_buffer(BufferArray* buffer_array, AllocInfo 
     // we need more space to store buffers
     if (buffer_array->outer + 1 >= buffer_array->num_buffers) {
         size_t new_size = buffer_array->num_buffers * 2;
-        char** buffers = static_cast<char**>(
-            realloc(buffer_array->buffers, sizeof(*buffer_array->buffers) * new_size));
+        char** buffers =
+            static_cast<char**>(realloc(buffer_array->buffers, sizeof(char*) * new_size));
         CZ_ASSERT(buffers);
+        memset(buffers + buffer_array->num_buffers, 0,
+               (new_size - buffer_array->num_buffers) * sizeof(char*));
         buffer_array->buffers = buffers;
         buffer_array->num_buffers = new_size;
+        // Allocate new buffer.
+    } else if (buffer_array->buffers[buffer_array->outer + 1] == nullptr) {
+        // Allocate new buffer.
+    } else if (new_info.size > BufferArray::buffer_size) {
+        // Reallocate the buffer to ensure it's big enough.
+        ++buffer_array->outer;
+        char* buffer =
+            static_cast<char*>(realloc(buffer_array->buffers[buffer_array->outer], new_info.size));
+        CZ_ASSERT(buffer);
+        buffer_array->buffers[buffer_array->outer] = buffer;
+        return buffer;
+    } else {
+        // We've already allocated a buffer.
+        ++buffer_array->outer;
+        return buffer_array->buffers[buffer_array->outer];
     }
 
-    // make another buffer
+    // Make another buffer.
     size_t buffer_size = cz::max<size_t>(BufferArray::buffer_size, new_info.size);
     char* buffer = static_cast<char*>(malloc(buffer_size));
     CZ_ASSERT(buffer);
@@ -102,7 +124,7 @@ Allocator BufferArray::allocator() {
 }
 
 void BufferArray::drop() {
-    for (size_t i = 0; i <= outer; ++i) {
+    for (size_t i = 0; i < num_buffers; ++i) {
         free(buffers[i]);
     }
     free(buffers);

@@ -14,6 +14,7 @@ struct BufferArray {
     char* inner;
 
     void create();
+    void clear();
     void drop();
     Allocator allocator();
 };
