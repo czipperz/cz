@@ -92,8 +92,19 @@ static void* buffer_array_alloc(void* data, AllocInfo new_info) {
 
 static void buffer_array_dealloc(void* data, MemSlice old_mem) {
     Buffer_Array* buffer_array = static_cast<Buffer_Array*>(data);
-    // we only dealloc the last entry
-    CZ_DEBUG_ASSERT(buffer_array->inner == static_cast<char*>(old_mem.buffer) + old_mem.size);
+    // We only dealloc the last entry.
+    if (buffer_array->inner == static_cast<char*>(old_mem.buffer) + old_mem.size) {
+        // Likely case
+    } else {
+        CZ_DEBUG_ASSERT(buffer_array->outer > 0);
+        CZ_DEBUG_ASSERT(old_mem.buffer <
+                        buffer_array->buffers[buffer_array->outer - 1] + Buffer_Array::buffer_size);
+        CZ_DEBUG_ASSERT((char*)old_mem.buffer + old_mem.size <=
+                        buffer_array->buffers[buffer_array->outer - 1] + Buffer_Array::buffer_size);
+
+        --buffer_array->outer;
+    }
+
     buffer_array->inner = static_cast<char*>(old_mem.buffer);
 }
 
