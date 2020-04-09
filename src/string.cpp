@@ -85,7 +85,7 @@ void String::realloc_null_terminate(Allocator allocator) {
     CZ_ASSERT(res);
     _buffer = res;
     _buffer[_len] = '\0';
-    _cap = _len;
+    _cap = _len + 1;
 }
 
 void String::set_len(size_t new_len) {
