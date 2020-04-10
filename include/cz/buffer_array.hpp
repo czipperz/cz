@@ -17,6 +17,21 @@ struct Buffer_Array {
     void clear();
     void drop();
     Allocator allocator();
+
+    struct Save_Point {
+        size_t outer;
+        size_t inner;
+    };
+    Save_Point save() const {
+        return {
+            outer,
+            (size_t)(inner - buffers[outer]),
+        };
+    }
+    void restore(Save_Point sp) {
+        outer = sp.outer;
+        inner = buffers[outer] + sp.inner;
+    }
 };
 
 }
