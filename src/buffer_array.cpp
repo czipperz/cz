@@ -96,6 +96,7 @@ static void buffer_array_dealloc(void* data, MemSlice old_mem) {
     if (buffer_array->inner == static_cast<char*>(old_mem.buffer) + old_mem.size) {
         // Likely case
     } else {
+        CZ_DEBUG_ASSERT(buffer_array->inner == buffer_array->buffers[buffer_array->outer]);
         CZ_DEBUG_ASSERT(buffer_array->outer > 0);
         CZ_DEBUG_ASSERT(old_mem.buffer <
                         buffer_array->buffers[buffer_array->outer - 1] + Buffer_Array::buffer_size);
