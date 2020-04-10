@@ -14,9 +14,10 @@ struct Buffer_Array {
     char* inner;
 
     void create();
-    void clear();
     void drop();
     Allocator allocator();
+
+    void clear() { restore({0, 0}); }
 
     struct Save_Point {
         size_t outer;

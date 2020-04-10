@@ -23,11 +23,6 @@ void Buffer_Array::create() {
     inner = buffer;
 }
 
-void Buffer_Array::clear() {
-    outer = 0;
-    inner = buffers[outer];
-}
-
 static void* buffer_array_alloc_inplace(Buffer_Array* buffer_array,
                                         AllocInfo new_info,
                                         char* start) {
