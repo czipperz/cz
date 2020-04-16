@@ -73,6 +73,10 @@ char String::pop() {
 }
 
 void String::realloc(Allocator allocator) {
+    if (!_buffer) {
+        return;
+    }
+
     char* res = static_cast<char*>(allocator.realloc({_buffer, _cap}, {_len, 1}));
     if (res) {
         _buffer = res;
