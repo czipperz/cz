@@ -170,5 +170,29 @@ Result make_absolute(Str file, Allocator allocator, String* path) {
     return Result::ok();
 }
 
+void convert_to_forward_slashes(char* path, size_t len) {
+    size_t index = 0;
+    while (1) {
+        char* bs = (char*)memchr(path + index, '\\', len - index);
+        if (!bs) {
+            return;
+        }
+        *bs = '/';
+        index = bs - path + 1;
+    }
+}
+
+void convert_to_back_slashes(char* path, size_t len) {
+    size_t index = 0;
+    while (1) {
+        char* bs = (char*)memchr(path + index, '/', len - index);
+        if (!bs) {
+            return;
+        }
+        *bs = '\\';
+        index = bs - path + 1;
+    }
+}
+
 }
 }

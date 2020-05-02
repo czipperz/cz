@@ -52,12 +52,7 @@ Result get_working_directory(Allocator allocator, String* path) {
     path->set_len(strlen(path->buffer()));
 
 #ifdef _WIN32
-    // replace '\' with '/' on windows
-    for (size_t i = 0; i < path->len(); ++i) {
-        if ((*path)[i] == '\\') {
-            (*path)[i] = '/';
-        }
-    }
+    cz::path::convert_to_forward_slashes(path->buffer(), path->len());
 #endif
 
     return Result::ok();

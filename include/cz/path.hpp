@@ -60,5 +60,17 @@ bool is_absolute(Str path);
 /// Then in either case we flatten the path.
 Result make_absolute(Str relative_path, Allocator allocator, String* absolute_path_out);
 
+/// Convert the path to use forward slashes (`/`) instead of backward slashes (`\\`).
+///
+/// All the functions in this module rely on forward slashes being used as directory separators.
+///
+/// Note that this is only relevant to call on Windows (ie `_WIN32` is defined).
+void convert_to_forward_slashes(char* path, size_t len);
+
+/// Convert the path to use back slashes (`\\`) instead of forward slashes (`/`).
+///
+/// Note that this is only relevant to call on Windows (ie `_WIN32` is defined).
+void convert_to_back_slashes(char* path, size_t len);
+
 }
 }
