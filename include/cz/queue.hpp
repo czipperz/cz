@@ -34,8 +34,7 @@ struct Queue {
             new_cap = next_power_of_two(new_cap - 1);
 
             T* new_elems = static_cast<T*>(
-                allocator.realloc({elems, cap * sizeof(T)}, {new_cap * sizeof(T), alignof(T)})
-                    .buffer);
+                allocator.realloc({elems, cap * sizeof(T)}, {new_cap * sizeof(T), alignof(T)}));
             CZ_ASSERT(new_elems);
 
             if (offset + len > cap) {
