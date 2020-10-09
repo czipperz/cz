@@ -34,4 +34,18 @@ const char* Str::rfind(char pattern) const {
 #endif
 }
 
+const char* Str::find(cz::Str infix) const {
+#ifdef _GNU_SOURCE
+    return static_cast<const char*>(::memmem(buffer, len, infix.buffer, infix.len));
+#else
+    // todo: optimize this
+    for (size_t i = 0; i + infix.len <= len; ++i) {
+        if (memcmp(buffer + i, infix.buffer, infix.len) == 0) {
+            return buffer + i;
+        }
+    }
+    return nullptr;
+#endif
+}
+
 }

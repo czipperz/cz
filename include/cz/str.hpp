@@ -50,6 +50,11 @@ struct Str {
         }
     }
 
+    bool contains(Str infix) const { return find(infix); }
+    bool contains(char infix) const { return find(infix); }
+
+    const char* find(Str infix) const;
+
     const char* find(char pattern) const {
         return static_cast<const char*>(memchr(buffer, pattern, len));
     }
