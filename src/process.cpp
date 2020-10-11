@@ -100,7 +100,7 @@ bool Output_File::open(const char* file) {
     handle = h;
     return true;
 #else
-    fd = ::open(file, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    fd = ::open(file, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     return fd != -1;
 #endif
 }
