@@ -52,6 +52,10 @@ struct Output_File : File_Descriptor {
     int64_t write(const char* buffer, size_t size);
 };
 
+Input_File std_in_file();
+Output_File std_out_file();
+Output_File std_err_file();
+
 void read_to_string(Input_File, cz::Allocator allocator, cz::String* string);
 
 struct Process_Options {

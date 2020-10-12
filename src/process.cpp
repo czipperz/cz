@@ -125,6 +125,36 @@ int64_t Output_File::write(const char* buffer, size_t size) {
 #endif
 }
 
+Input_File std_in_file() {
+    Input_File file;
+#ifdef _WIN32
+    file.handle = GetStdHandle(STD_INPUT_HANDLE);
+#else
+    file.fd = 0;
+#endif
+    return file;
+}
+
+Output_File std_out_file() {
+    Output_File file;
+#ifdef _WIN32
+    file.handle = GetStdHandle(STD_OUTPUT_HANDLE);
+#else
+    file.fd = 1;
+#endif
+    return file;
+}
+
+Output_File std_err_file() {
+    Output_File file;
+#ifdef _WIN32
+    file.handle = GetStdHandle(STD_ERROR_HANDLE);
+#else
+    file.fd = 2;
+#endif
+    return file;
+}
+
 void read_to_string(Input_File file, cz::Allocator allocator, cz::String* out) {
     char buffer[1024];
     while (1) {
