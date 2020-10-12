@@ -34,13 +34,42 @@ struct File_Descriptor {
     bool set_non_inheritable();
 };
 
+struct Carriage_Return_Carry {
+    bool carrying = false;
+};
+
+void strip_carriage_returns(char* buffer, size_t* size);
+
 struct Input_File : File_Descriptor {
     bool open(const char* file);
 
     /// Read up to `size` bytes from the file into `buffer`.
     ///
     /// Returns the number of bytes actually read, or `-1` on failure.
-    int64_t read(char* buffer, size_t size);
+    int64_t read_binary(char* buffer, size_t size);
+
+    /// Read up to `size` bytes from the file into `buffer`.
+    ///
+    /// Returns the number of bytes actually read, or `-1` on failure.  Does not count the number
+    /// of carriage returns.
+    ///
+    /// This is the same as `read_binary` but it will strip carriage returns before newline
+    /// characters.
+    int64_t read_strip_carriage_returns(char* buffer, size_t size, Carriage_Return_Carry*);
+
+    /// Read up to `size` bytes from the file into `buffer`.
+    ///
+    /// Returns the number of bytes actually read, or `-1` on failure.  If carriage returns are
+    /// stripped, they are not counted for the return value.
+    ///
+    /// This is the same as `read_binary` but on Windows it will strip carriage returns.
+    int64_t read_text(char* buffer, size_t size, Carriage_Return_Carry* carry) {
+#ifdef _WIN32
+        return read_strip_carriage_returns(buffer, size, carry);
+#else
+        return read_binary(buffer, size);
+#endif
+    }
 };
 
 struct Output_File : File_Descriptor {
@@ -49,7 +78,29 @@ struct Output_File : File_Descriptor {
     /// Write `size` bytes from `buffer` to the file.
     ///
     /// Returns the number of bytes actually written, or `-1` on failure.
-    int64_t write(const char* buffer, size_t size);
+    int64_t write_binary(const char* buffer, size_t size);
+
+    /// Write `size` bytes from `buffer` to the file.
+    ///
+    /// Returns the number of bytes actually written, or `-1` on failure.  Doesn't count carriage
+    /// returns.
+    ///
+    /// This is the same as `write_binary` but adds carriage returns before each newline.
+    int64_t write_add_carriage_returns(const char* buffer, size_t size);
+
+    /// Write `size` bytes from `buffer` to the file.
+    ///
+    /// Returns the number of bytes actually written, or `-1` on failure.  If on Windows, doesn't
+    /// count the extra carriage returns.
+    ///
+    /// This is the same as `write_binary` but on Windows it will add carriage returns.
+    int64_t write_text(const char* buffer, size_t size) {
+#ifdef _WIN32
+        return write_add_carriage_returns(buffer, size);
+#else
+        return write_binary(buffer, size);
+#endif
+    }
 };
 
 Input_File std_in_file();

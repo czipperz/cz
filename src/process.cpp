@@ -80,7 +80,7 @@ bool File_Descriptor::set_non_inheritable() {
 #endif
 }
 
-int64_t Input_File::read(char* buffer, size_t size) {
+int64_t Input_File::read_binary(char* buffer, size_t size) {
 #ifdef _WIN32
     DWORD bytes;
     if (ReadFile(handle, buffer, size, &bytes, NULL)) {
@@ -91,6 +91,53 @@ int64_t Input_File::read(char* buffer, size_t size) {
 #else
     return ::read(fd, buffer, size);
 #endif
+}
+
+void strip_carriage_returns(char* buffer, size_t* size) {
+    char* start = buffer + 1;
+    while (start - buffer < *size) {
+        char* spot = (char*)memchr(start, '\n', buffer + *size - start);
+        if (spot) {
+            if (spot[-1] == '\r') {
+                memmove(spot - 1, spot, buffer + *size - spot);
+                --*size;
+                start = spot + 1;
+            } else {
+                start = spot + 2;
+            }
+        } else {
+            break;
+        }
+    }
+}
+
+int64_t Input_File::read_strip_carriage_returns(char* buffer,
+                                                size_t size,
+                                                Carriage_Return_Carry* carry) {
+    char* start = buffer;
+    char* end = buffer + size;
+    if (carry->carrying && size > 0) {
+        *start = '\r';
+        ++start;
+    }
+
+    int64_t res = read_binary(start, end - start);
+    if (res < 0) {
+        return -1;
+    } else {
+        size = res + start - buffer;
+        end = buffer + size;
+    }
+
+    strip_carriage_returns(buffer, &size);
+
+    if (size > 0 && buffer[size - 1] == '\r') {
+        carry->carrying = true;
+        return size - 1;
+    } else {
+        carry->carrying = false;
+        return size;
+    }
 }
 
 bool Output_File::open(const char* file) {
@@ -112,7 +159,7 @@ bool Output_File::open(const char* file) {
 #endif
 }
 
-int64_t Output_File::write(const char* buffer, size_t size) {
+int64_t Output_File::write_binary(const char* buffer, size_t size) {
 #ifdef _WIN32
     DWORD bytes;
     if (WriteFile(handle, buffer, size, &bytes, NULL)) {
@@ -123,6 +170,37 @@ int64_t Output_File::write(const char* buffer, size_t size) {
 #else
     return ::write(fd, buffer, size);
 #endif
+}
+
+int64_t Output_File::write_add_carriage_returns(const char* buffer, size_t size) {
+    const char* start = buffer;
+    const char* end = buffer + size;
+    while (1) {
+        const char* spot = (const char*)memchr(start, '\n', end - start);
+        if (spot) {
+            int64_t res = write_binary(start, spot - start);
+            if (res < 0) {
+                return -1;
+            } else if (res < spot - start) {
+                return spot + res - buffer;
+            }
+
+            int64_t tres2 = write_binary("\r\n", 2);
+            if (tres2 < 0) {
+                return -1;
+            } else if (tres2 < 2) {
+                return spot + res - buffer;
+            }
+
+            start = spot + 1;
+        } else {
+            int64_t res = write_binary(start, end - start);
+            if (res < 0) {
+                return -1;
+            }
+            return start + res - buffer;
+        }
+    }
 }
 
 Input_File std_in_file() {
@@ -157,8 +235,9 @@ Output_File std_err_file() {
 
 void read_to_string(Input_File file, cz::Allocator allocator, cz::String* out) {
     char buffer[1024];
+    Carriage_Return_Carry carry;
     while (1) {
-        int64_t read_result = file.read(buffer, sizeof(buffer));
+        int64_t read_result = file.read_text(buffer, sizeof(buffer), &carry);
         if (read_result < 0) {
             // Todo: what do we do here?  I'm just ignoring the error for now
         } else if (read_result == 0) {
