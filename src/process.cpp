@@ -31,8 +31,12 @@ void File_Descriptor::close() {
 
 bool Input_File::open(const char* file) {
 #ifdef _WIN32
-    void* h = CreateFile(file, GENERIC_READ, FILE_SHARE_READ,
-                         /* TODO: maybe the file should be inheritable? */ NULL, OPEN_EXISTING,
+    SECURITY_ATTRIBUTES sa;
+    sa.nLength = sizeof(sa);
+    sa.bInheritHandle = TRUE;
+    sa.lpSecurityDescriptor = NULL;
+
+    void* h = CreateFile(file, GENERIC_READ, FILE_SHARE_READ, &sa, OPEN_EXISTING,
                          FILE_ATTRIBUTE_NORMAL, NULL);
     if (h == INVALID_HANDLE_VALUE) {
         return false;
@@ -91,9 +95,12 @@ int64_t Input_File::read(char* buffer, size_t size) {
 
 bool Output_File::open(const char* file) {
 #ifdef _WIN32
-    void* h = CreateFile(file, GENERIC_WRITE, 0,
-                         /* TODO: maybe the file should be inheritable? */ NULL, CREATE_ALWAYS,
-                         FILE_ATTRIBUTE_NORMAL, NULL);
+    SECURITY_ATTRIBUTES sa;
+    sa.nLength = sizeof(sa);
+    sa.bInheritHandle = TRUE;
+    sa.lpSecurityDescriptor = NULL;
+
+    void* h = CreateFile(file, GENERIC_WRITE, 0, &sa, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (h == INVALID_HANDLE_VALUE) {
         return false;
     }
