@@ -340,6 +340,8 @@ bool Process::launch_program(const char* const* args, Process_Options* options) 
     for (const char* const* arg = args; *arg; ++arg) {
         add_argument(&script, *arg);
     }
+    script.reserve(cz::heap_allocator(), 1);
+    script.null_terminate();
 
     return launch_script_(script.buffer(), options, &hProcess);
 }
