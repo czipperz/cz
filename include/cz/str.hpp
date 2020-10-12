@@ -50,6 +50,21 @@ struct Str {
         }
     }
 
+    size_t count(char c) const {
+        cz::Str cpy = *this;
+        size_t cnt = 0;
+        while (1) {
+            const char* spot = cpy.find(c);
+            if (spot) {
+                ++cnt;
+                cpy.buffer = spot + 1;
+                cpy.len = len + buffer - cpy.buffer;
+            } else {
+                return cnt;
+            }
+        }
+    }
+
     bool contains(Str infix) const { return find(infix); }
     bool contains(char infix) const { return find(infix); }
 

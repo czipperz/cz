@@ -83,6 +83,14 @@ struct String {
     bool starts_with(Str prefix) const { return as_str().starts_with(prefix); }
     bool ends_with(Str postfix) const { return as_str().ends_with(postfix); }
 
+    size_t count(char c) const { return as_str().count(c); }
+
+    bool contains(Str infix) const { return as_str().contains(infix); }
+    bool contains(char infix) const { return as_str().contains(infix); }
+
+    char* find(Str pattern) { return const_cast<char*>(as_str().find(pattern)); }
+    const char* find(Str pattern) const { return as_str().find(pattern); }
+
     char* find(char pattern) { return const_cast<char*>(as_str().find(pattern)); }
     const char* find(char pattern) const { return as_str().find(pattern); }
 
