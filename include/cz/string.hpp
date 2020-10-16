@@ -80,6 +80,15 @@ struct String {
     char* end() { return buffer() + len(); }
     const char* end() const { return buffer() + len(); }
 
+    char first() const {
+        CZ_DEBUG_ASSERT(_len > 0);
+        return _buffer[0];
+    }
+    char last() const {
+        CZ_DEBUG_ASSERT(_len > 0);
+        return _buffer[_len - 1];
+    }
+
     bool starts_with(Str prefix) const { return as_str().starts_with(prefix); }
     bool ends_with(Str postfix) const { return as_str().ends_with(postfix); }
 

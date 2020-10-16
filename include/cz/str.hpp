@@ -34,6 +34,15 @@ struct Str {
     constexpr const char* start() const { return buffer; }
     constexpr const char* end() const { return buffer + len; }
 
+    char first() const {
+        CZ_DEBUG_ASSERT(len > 0);
+        return buffer[0];
+    }
+    char last() const {
+        CZ_DEBUG_ASSERT(len > 0);
+        return buffer[len - 1];
+    }
+
     bool starts_with(Str prefix) const {
         if (len < prefix.len) {
             return false;
