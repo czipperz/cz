@@ -83,7 +83,7 @@ bool File_Descriptor::set_non_inheritable() {
 int64_t Input_File::read_binary(char* buffer, size_t size) {
 #ifdef _WIN32
     DWORD bytes;
-    if (ReadFile(handle, buffer, size, &bytes, NULL)) {
+    if (ReadFile(handle, buffer, size, &bytes, NULL) || bytes == 0 /* eof */) {
         return bytes;
     } else {
         return -1;

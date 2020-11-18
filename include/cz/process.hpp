@@ -45,13 +45,13 @@ struct Input_File : File_Descriptor {
 
     /// Read up to `size` bytes from the file into `buffer`.
     ///
-    /// Returns the number of bytes actually read, or `-1` on failure.
+    /// Returns the number of bytes actually read, or `-1` on failure.  Returns `0` on end of file.
     int64_t read_binary(char* buffer, size_t size);
 
     /// Read up to `size` bytes from the file into `buffer`.
     ///
     /// Returns the number of bytes actually read, or `-1` on failure.  Does not count the number
-    /// of carriage returns.
+    /// of carriage returns.  Returns `0` on end of file.
     ///
     /// This is the same as `read_binary` but it will strip carriage returns before newline
     /// characters.
@@ -60,7 +60,7 @@ struct Input_File : File_Descriptor {
     /// Read up to `size` bytes from the file into `buffer`.
     ///
     /// Returns the number of bytes actually read, or `-1` on failure.  If carriage returns are
-    /// stripped, they are not counted for the return value.
+    /// stripped, they are not counted for the return value.  Returns `0` on end of file.
     ///
     /// This is the same as `read_binary` but on Windows it will strip carriage returns.
     int64_t read_text(char* buffer, size_t size, Carriage_Return_Carry* carry) {
@@ -77,13 +77,14 @@ struct Output_File : File_Descriptor {
 
     /// Write `size` bytes from `buffer` to the file.
     ///
-    /// Returns the number of bytes actually written, or `-1` on failure.
+    /// Returns the number of bytes actually written, or `-1` on failure.  Returns `0` on end of
+    /// file.
     int64_t write_binary(const char* buffer, size_t size);
 
     /// Write `size` bytes from `buffer` to the file.
     ///
     /// Returns the number of bytes actually written, or `-1` on failure.  Doesn't count carriage
-    /// returns.
+    /// returns.  Returns `0` on end of file.
     ///
     /// This is the same as `write_binary` but adds carriage returns before each newline.
     int64_t write_add_carriage_returns(const char* buffer, size_t size);
@@ -91,7 +92,7 @@ struct Output_File : File_Descriptor {
     /// Write `size` bytes from `buffer` to the file.
     ///
     /// Returns the number of bytes actually written, or `-1` on failure.  If on Windows, doesn't
-    /// count the extra carriage returns.
+    /// count the extra carriage returns.  Returns `0` on end of file.
     ///
     /// This is the same as `write_binary` but on Windows it will add carriage returns.
     int64_t write_text(const char* buffer, size_t size) {
