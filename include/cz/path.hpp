@@ -27,6 +27,8 @@ Result get_max_len(size_t* size);
 /// Get the directory component of the path, including the trailing slash.
 ///
 /// Returns none if there is no directory (no forward slash).
+///
+/// The path must use forward slashes.
 Option<Str> directory_component(Str path);
 
 /// Get the name component of the path.
@@ -35,29 +37,37 @@ Option<Str> directory_component(Str path);
 /// If the input is empty, none is returned.
 /// If there is both a directory and a name, the part after the trailing slash
 /// is returned.
+///
+/// The path must use forward slashes.
 Option<Str> name_component(Str path);
 
-/// Flatten the path, removing \c .. and \c . inplace.
-/// Prefers leaving trailing \c / rather than removing them.
+/// Flatten the path, removing `..` and `.` inplace.
+/// Prefers leaving trailing `/` rather than removing them.
 ///
-/// This will leave \c .. s at the start since they cannot be flattened.
+/// This will leave `..`s at the start since they cannot be flattened.
 ///
 /// Does not put in a null terminator.
+///
+/// The path must use forward slashes.
 void flatten(char* path, size_t* len);
 
-/// See \c flatten_path(char*, size_t*) .
+/// See `flatten_path(char*, size_t*)`.
 void flatten(String* path);
 
 /// Test if the path is absolute.
 ///
-/// On *nix, this means that it starts with \c / .  On Windows, this means that it
-/// starts with \c X:/ where \c X is a drive.
+/// On *nix, this means that it starts with `/`.  On Windows, this means that it
+/// starts with `X:/` where `X` is a drive.
+///
+/// The path must use forward slashes.
 bool is_absolute(Str path);
 
 /// Make an absolute path out of the relative path.
 ///
 /// If the input path is not absolute, we append it to the current working directory.
 /// Then in either case we flatten the path.
+///
+/// The path must use forward slashes.
 Result make_absolute(Str relative_path, Allocator allocator, String* absolute_path_out);
 
 /// Convert the path to use forward slashes (`/`) instead of backward slashes (`\\`).
