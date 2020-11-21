@@ -379,10 +379,11 @@ static bool launch_script_(char* script, Process_Options* options, HANDLE* hProc
     STARTUPINFO si;
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
-    si.dwFlags = STARTF_USESTDHANDLES;
+    si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
     si.hStdError = options->std_err.handle;
     si.hStdOutput = options->std_out.handle;
     si.hStdInput = options->std_in.handle;
+    si.wShowWindow = SW_HIDE;
 
     PROCESS_INFORMATION pi;
     ZeroMemory(&pi, sizeof(pi));
