@@ -161,7 +161,9 @@ public:
     /// Form a `script` from the list of `args` (arguments).
     ///
     /// Null terminates the script.
-    static void escape_args(const char* const* args, cz::String* script, cz::Allocator allocator);
+    static void escape_args(cz::Slice<const cz::Str> args,
+                            cz::String* script,
+                            cz::Allocator allocator);
 
     /// Launch a program.  The first argument must be the same the path to invoke.
     ///
@@ -170,14 +172,14 @@ public:
     /// default) are closed instead of being bound (in the new process).
     ///
     /// The return value is `true` if the program was successfully launched.
-    bool launch_program(const char* const* args, Process_Options* options);
+    bool launch_program(cz::Slice<const cz::Str> args, Process_Options* options);
 
     /// Launch a script as if it was ran on the command line.
     ///
     /// This runs the script through `cmd` on Windows and `/bin/sh` otherwise.
     ///
     /// See also `launch_program` for information on how `options` are handled.
-    bool launch_script(const char* script, Process_Options* options);
+    bool launch_script(cz::Str script, Process_Options* options);
 
     void kill();
     int join();

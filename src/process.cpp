@@ -459,24 +459,23 @@ void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocato
     }
 }
 
-bool Process::launch_script(const char* script, Process_Options* options) {
+bool Process::launch_script(cz::Str script, Process_Options* options) {
     cz::Str prefix = "cmd /C ";
-    size_t len = strlen(script);
 
-    char* copy = (char*)malloc(prefix.len + len + 1);
+    char* copy = (char*)malloc(prefix.len + script.len + 1);
     if (!copy) {
         return false;
     }
     CZ_DEFER(free(copy));
 
     memcpy(copy, prefix.buffer, prefix.len);
-    memcpy(copy + prefix.len, script, len);
-    copy[prefix.len + len] = 0;
+    memcpy(copy + prefix.len, script.buffer, script.len);
+    copy[prefix.len + script.len] = '\0';
 
     return launch_script_(copy, options, &hProcess);
 }
 
-bool Process::launch_program(const char* const* args, Process_Options* options) {
+bool Process::launch_program(cz::Slice<const cz::Str> args, Process_Options* options) {
     cz::String script = {};
     CZ_DEFER(script.drop(cz::heap_allocator()));
 
@@ -577,9 +576,9 @@ void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocato
     }
 }
 
-bool Process::launch_script(const char* script, Process_Options* options) {
-    const char* args[] = {"/bin/sh", "-c", script, nullptr};
-    return launch_program(args, options);
+bool Process::launch_script(cz::Str script, Process_Options* options) {
+    cz::Str args[] = {"/bin/sh", "-c", script, nullptr};
+    return launch_program(cz::slice(args), options);
 }
 
 static void bind_pipe(int input, int output) {
@@ -590,28 +589,22 @@ static void bind_pipe(int input, int output) {
     }
 }
 
-bool Process::launch_program(const char* const* args, Process_Options* options) {
-    size_t num_args = 0;
-    while (args[num_args]) {
-        ++num_args;
-    }
-
-    char** new_args = (char**)malloc(sizeof(char*) * (num_args + 1));
+bool Process::launch_program(cz::Slice<const cz::Str> args, Process_Options* options) {
+    char** new_args = (char**)malloc(sizeof(char*) * (args.len + 1));
     CZ_ASSERT(new_args);
     CZ_DEFER(free(new_args));
-    for (size_t i = 0; i < num_args; ++i) {
-        const char* arg = args[i];
-        size_t len = strlen(arg);
+    for (size_t i = 0; i < args.len; ++i) {
+        cz::Str arg = args[i];
 
-        char* new_arg = (char*)malloc(len + 1);
+        char* new_arg = (char*)malloc(arg.len + 1);
         CZ_ASSERT(new_arg);
-        memcpy(new_arg, arg, len);
-        new_arg[len] = 0;
+        memcpy(new_arg, arg.buffer, arg.len);
+        new_arg[arg.len] = '\0';
 
         new_args[i] = new_arg;
     }
-    new_args[num_args] = nullptr;
-    CZ_DEFER(for (size_t i = 0; i < num_args; ++i) { free(new_args[i]); });
+    new_args[args.len] = nullptr;
+    CZ_DEFER(for (size_t i = 0; i < args.len; ++i) { free(new_args[i]); });
 
     pid = fork();
     if (pid < 0) {
@@ -648,13 +641,13 @@ bool Process::launch_program(const char* const* args, Process_Options* options) 
 }
 #endif
 
-void Process::escape_args(const char* const* args, cz::String* script, cz::Allocator allocator) {
-    CZ_DEBUG_ASSERT(args[0] != nullptr);
+void Process::escape_args(cz::Slice<const cz::Str> args, cz::String* script, cz::Allocator allocator) {
+    CZ_DEBUG_ASSERT(args.len >= 1);
 
     script->reserve(cz::heap_allocator(), 32);
 
-    for (const char* const* arg = args; *arg; ++arg) {
-        escape_arg(*arg, script, allocator);
+    for (size_t i = 0; i < args.len; ++i) {
+        escape_arg(args[i], script, allocator);
         script->push(' ');
     }
 
