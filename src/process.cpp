@@ -449,7 +449,7 @@ void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocato
 
         escape_backslashes(script, arg, arg.len);
 
-        if (arg[arg.len - 1] == '%' && (*script)[script->len() - 1] == '"') {
+        if (arg.last() == '%' && script->last() == '"') {
             script->reserve(allocator, 1);
         } else {
             script->reserve(allocator, 2);
