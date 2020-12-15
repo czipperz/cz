@@ -429,9 +429,7 @@ void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocato
                 script->reserve(allocator, 2);
                 script->push('\\');
             } else if (arg[i] == '%' && i + 1 < arg.len) {
-                if (i == 0) {
-                    script->reserve(allocator, 2);
-                } else if (arg[i - 1] == '%') {
+                if (i == 0 || arg[i - 1] == '%') {
                     script->reserve(allocator, 1);
                     script->pop();
                 } else {
