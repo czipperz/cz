@@ -410,25 +410,55 @@ static void escape_backslashes(cz::String* script, cz::Str arg, size_t i) {
 }
 
 void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocator) {
-    script->reserve(allocator, 3 + arg.len);
-    script->push('"');
-
+    bool any_special = false;
     for (size_t i = 0; i < arg.len; ++i) {
-        if (arg[i] == '"') {
-            escape_backslashes(script, arg, i);
-
-            script->reserve(allocator, 2);
-            script->push('\\');
+        if (!isalnum(arg[i]) && arg[i] != '/' && arg[i] != ':' && arg[i] != '-') {
+            any_special = true;
+            break;
         }
-
-        script->reserve(allocator, 1);
-        script->push(arg[i]);
     }
 
-    escape_backslashes(script, arg, arg.len);
+    if (any_special) {
+        script->reserve(allocator, 3 + arg.len);
+        script->push('"');
 
-    script->reserve(allocator, 2);
-    script->push('"');
+        for (size_t i = 0; i < arg.len; ++i) {
+            if (arg[i] == '"') {
+                escape_backslashes(script, arg, i);
+
+                script->reserve(allocator, 2);
+                script->push('\\');
+            } else if (arg[i] == '%' && i + 1 < arg.len) {
+                if (i == 0) {
+                    script->reserve(allocator, 2);
+                } else if (arg[i - 1] == '%') {
+                    script->reserve(allocator, 1);
+                    script->pop();
+                } else {
+                    script->reserve(allocator, 3);
+                    script->push('"');
+                }
+                script->push('%');
+                script->push('"');
+                continue;
+            }
+
+            script->reserve(allocator, 1);
+            script->push(arg[i]);
+        }
+
+        escape_backslashes(script, arg, arg.len);
+
+        if (arg[arg.len - 1] == '%' && (*script)[script->len() - 1] == '"') {
+            script->reserve(allocator, 1);
+        } else {
+            script->reserve(allocator, 2);
+            script->push('"');
+        }
+    } else {
+        script->reserve(allocator, arg.len + 1);
+        script->append(arg);
+    }
 }
 
 bool Process::launch_script(const char* script, Process_Options* options) {
