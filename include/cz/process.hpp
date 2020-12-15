@@ -153,8 +153,14 @@ class Process {
 
 public:
     /// Escape one `arg` (argument) and append it to the `string`.
+    ///
+    /// Leaves an unallocated spot at the end of the `string` to either append a space (to split
+    /// arguments) or a null terminator (to complete the script).
     static void escape_arg(cz::Str arg, cz::String* string, cz::Allocator allocator);
+
     /// Form a `script` from the list of `args` (arguments).
+    ///
+    /// Null terminates the script.
     static void escape_args(const char* const* args, cz::String* script, cz::Allocator allocator);
 
     /// Launch a program.  The first argument must be the same the path to invoke.
