@@ -409,27 +409,26 @@ static void escape_backslashes(cz::String* script, cz::Str arg, size_t i) {
     }
 }
 
-static void add_argument(cz::String* script, cz::Str arg) {
-    script->reserve(cz::heap_allocator(), 3 + arg.len);
+void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocator) {
+    script->reserve(allocator, 3 + arg.len);
     script->push('"');
 
     for (size_t i = 0; i < arg.len; ++i) {
         if (arg[i] == '"') {
             escape_backslashes(script, arg, i);
 
-            script->reserve(cz::heap_allocator(), 2);
+            script->reserve(allocator, 2);
             script->push('\\');
         }
 
-        script->reserve(cz::heap_allocator(), 1);
+        script->reserve(allocator, 1);
         script->push(arg[i]);
     }
 
     escape_backslashes(script, arg, arg.len);
 
-    script->reserve(cz::heap_allocator(), 2);
+    script->reserve(allocator, 2);
     script->push('"');
-    script->push(' ');
 }
 
 bool Process::launch_script(const char* script, Process_Options* options) {
@@ -451,19 +450,104 @@ bool Process::launch_script(const char* script, Process_Options* options) {
 
 bool Process::launch_program(const char* const* args, Process_Options* options) {
     cz::String script = {};
-    script.reserve(cz::heap_allocator(), 32);
     CZ_DEFER(script.drop(cz::heap_allocator()));
 
-    for (const char* const* arg = args; *arg; ++arg) {
-        add_argument(&script, *arg);
-    }
-    script.reserve(cz::heap_allocator(), 1);
-    script.null_terminate();
+    escape_args(args, &script, cz::heap_allocator());
 
     return launch_script_(script.buffer(), options, &hProcess);
 }
 
 #else
+
+static bool shell_escape_inside(char c) {
+    switch (c) {
+        case '!':
+        case '"':
+        case '$':
+        case '\\':
+        case '`':
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+static bool shell_escape_outside(char c) {
+    switch (c) {
+        case ' ':
+        case '!':
+        case '"':
+        case '#':
+        case '$':
+        case '&':
+        case '\'':
+        case '(':
+        case ')':
+        case '*':
+        case ',':
+        case ';':
+        case '<':
+        case '>':
+        case '?':
+        case '[':
+        case '\\':
+        case ']':
+        case '^':
+        case '`':
+        case '{':
+        case '|':
+        case '}':
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocator) {
+    size_t escaped_outside = 0;
+    size_t escaped_inside = 0;
+    bool use_string = false;
+    for (size_t i = 0; i < arg.len; ++i) {
+        bool out = shell_escape_outside(arg[i]);
+        bool in = shell_escape_inside(arg[i]);
+        if (out) {
+            escaped_outside++;
+        }
+        if (in) {
+            escaped_inside++;
+        }
+        if (out && !in) {
+            use_string = true;
+        }
+    }
+
+    if (use_string) {
+        script->reserve(allocator, 3 + arg.len + escaped_inside);
+        script->push('"');
+
+        for (size_t i = 0; i < arg.len; ++i) {
+            if (shell_escape_inside(arg[i])) {
+                script->push('\\');
+            }
+
+            script->push(arg[i]);
+        }
+
+        script->push('"');
+    } else {
+        script->reserve(allocator, 1 + arg.len + escaped_outside);
+
+        for (size_t i = 0; i < arg.len; ++i) {
+            if (shell_escape_outside(arg[i])) {
+                script->push('\\');
+            }
+
+            script->push(arg[i]);
+        }
+    }
+}
 
 bool Process::launch_script(const char* script, Process_Options* options) {
     const char* args[] = {"/bin/sh", "-c", script, nullptr};
@@ -535,5 +619,19 @@ bool Process::launch_program(const char* const* args, Process_Options* options) 
     }
 }
 #endif
+
+void Process::escape_args(const char* const* args, cz::String* script, cz::Allocator allocator) {
+    CZ_DEBUG_ASSERT(args[0] != nullptr);
+
+    script->reserve(cz::heap_allocator(), 32);
+
+    for (const char* const* arg = args; *arg; ++arg) {
+        escape_arg(*arg, script, allocator);
+        script->push(' ');
+    }
+
+    script->pop();
+    script->null_terminate();
+}
 
 }

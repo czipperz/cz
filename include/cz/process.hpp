@@ -152,6 +152,11 @@ class Process {
 #endif
 
 public:
+    /// Escape one `arg` (argument) and append it to the `string`.
+    static void escape_arg(cz::Str arg, cz::String* string, cz::Allocator allocator);
+    /// Form a `script` from the list of `args` (arguments).
+    static void escape_args(const char* const* args, cz::String* script, cz::Allocator allocator);
+
     /// Launch a program.  The first argument must be the same the path to invoke.
     ///
     /// The processes `stdin`, `stdout`, and `stderr` streams are bound to the `options`' streams.
