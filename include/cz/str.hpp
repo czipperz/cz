@@ -94,8 +94,8 @@ struct Str {
     cz::Str slice_start(size_t start) const { return slice(start, len); }
     cz::Str slice_start(const char* start) const { return slice(start, len); }
 
-    cz::Str slice_end(size_t end) const { return slice(0, end); }
-    cz::Str slice_end(const char* end) const { return slice(0, end); }
+    cz::Str slice_end(size_t end) const { return slice((size_t)0, end); }
+    cz::Str slice_end(const char* end) const { return slice((size_t)0, end); }
 
     char operator[](size_t index) const {
         CZ_DEBUG_ASSERT(index < len);
