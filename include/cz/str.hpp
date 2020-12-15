@@ -84,6 +84,19 @@ struct Str {
     }
     const char* rfind(char pattern) const;
 
+    cz::Str slice(size_t start, size_t end) const { return {buffer + start, end - start}; }
+    cz::Str slice(const char* start, size_t end) const { return slice(start - buffer, end); }
+    cz::Str slice(size_t start, const char* end) const { return slice(start, end - buffer); }
+    cz::Str slice(const char* start, const char* end) const {
+        return slice(start - buffer, end - buffer);
+    }
+
+    cz::Str slice_start(size_t start) const { return slice(start, len); }
+    cz::Str slice_start(const char* start) const { return slice(start, len); }
+
+    cz::Str slice_end(size_t end) const { return slice(0, end); }
+    cz::Str slice_end(const char* end) const { return slice(0, end); }
+
     char operator[](size_t index) const {
         CZ_DEBUG_ASSERT(index < len);
         return buffer[index];

@@ -106,9 +106,20 @@ struct String {
     char* rfind(char pattern) { return const_cast<char*>(as_str().rfind(pattern)); }
     const char* rfind(char pattern) const { return as_str().rfind(pattern); }
 
-    /// Get a \c Str representing this \c String in its current state.
+    cz::Str slice(size_t start, size_t end) const { return as_str().slice(start, end); }
+    cz::Str slice(const char* start, size_t end) const { return as_str().slice(start, end); }
+    cz::Str slice(size_t start, const char* end) const { return as_str().slice(start, end); }
+    cz::Str slice(const char* start, const char* end) const { return as_str().slice(start, end); }
+
+    cz::Str slice_start(size_t start) const { return as_str().slice_start(start); }
+    cz::Str slice_start(const char* start) const { return as_str().slice_start(start); }
+
+    cz::Str slice_end(size_t end) const { return as_str().slice_end(end); }
+    cz::Str slice_end(const char* end) const { return as_str().slice_end(end); }
+
+    /// Get a `Str` representing this `String` in its current state.
     Str as_str() const;
-    /// See \c String::as_str().
+    /// See `String::as_str()`.
     operator Str() const { return as_str(); }
 
     bool operator==(const Str& other) const { return this->as_str() == other; }
