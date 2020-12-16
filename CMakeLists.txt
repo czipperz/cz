@@ -1,5 +1,6 @@
+cmake_minimum_required(VERSION 3.3)
+
 project(cz)
-cmake_minimum_required(VERSION 2.6)
 
 file(GLOB_RECURSE SRCS src/*.cpp)
 add_library(${PROJECT_NAME} ${SRCS})
