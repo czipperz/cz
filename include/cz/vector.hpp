@@ -107,7 +107,7 @@ struct Vector {
         CZ_DEBUG_ASSERT(len() > 0);
         return (*this)[len() - 1];
     }
-    constexpr const T& last() const {
+    const T& last() const {
         CZ_DEBUG_ASSERT(len() > 0);
         return (*this)[len() - 1];
     }
@@ -116,7 +116,7 @@ struct Vector {
         CZ_DEBUG_ASSERT(i < len());
         return elems()[i];
     }
-    constexpr const T& operator[](size_t i) const {
+    const T& operator[](size_t i) const {
         CZ_DEBUG_ASSERT(i < len());
         return elems()[i];
     }
