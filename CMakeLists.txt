@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.3)
 
 project(cz)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 file(GLOB_RECURSE SRCS src/*.cpp)
 add_library(${PROJECT_NAME} ${SRCS})
 target_include_directories(${PROJECT_NAME} PUBLIC include)
@@ -25,7 +28,7 @@ if (CZ_BUILD_TESTS)
 endif()
 
 if(MSVC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /std:c++11 /utf-8")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /utf-8")
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -std=c++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Werror=switch")
 endif()
