@@ -41,6 +41,9 @@ struct Carriage_Return_Carry {
 void strip_carriage_returns(char* buffer, size_t* size);
 
 struct Input_File : File_Descriptor {
+    /// Try to open a file for reading.
+    ///
+    /// Returns `true` if it succeeds, `false` otherwise.
     bool open(const char* file);
 
     /// Read up to `size` bytes from the file into `buffer`.
@@ -73,6 +76,12 @@ struct Input_File : File_Descriptor {
 };
 
 struct Output_File : File_Descriptor {
+    /// Try to open a file for writing.
+    ///
+    /// Returns `true` if it succeeds, `false` otherwise.
+    ///
+    /// If the file exists, it removes the existing contents.
+    /// If the file doesn't exist, it creates the file.
     bool open(const char* file);
 
     /// Write `size` bytes from `buffer` to the file.
