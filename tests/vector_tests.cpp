@@ -70,6 +70,7 @@ TEST_CASE("Vector push in limits") {
     CHECK(vector[3] == 6);
 }
 
+#ifndef NDEBUG
 TEST_CASE("Vector first push outside bounds panics as no reserve") {
     Vector<int> vector = {};
     auto allocator = heap_allocator();
@@ -83,6 +84,7 @@ TEST_CASE("Vector first push outside bounds panics as no reserve") {
 
     REQUIRE_THROWS_AS(vector.push(7), PanicReachedException);
 }
+#endif
 
 TEST_CASE("Vector reserve calls realloc") {
     Vector<int> vector = {};
