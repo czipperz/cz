@@ -3,10 +3,11 @@
 set -e
 
 cd "$(dirname "$0")"
-mkdir -p build/debug
 
-(cd build/debug
- cmake -DCMAKE_BUILD_TYPE=Debug -DCZ_BUILD_TESTS=1 ../.. >/dev/null
- cmake --build .)
+./build-wrapper.sh build/debug Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCZ_BUILD_TESTS=1
+
+if [ ! -e compile_commands.json ]; then
+    ln -s "$(pwd)/build/debug/compile_commands.json" .
+fi
 
 ./run-tests.sh
