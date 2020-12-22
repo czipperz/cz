@@ -2,10 +2,24 @@
 
 #include <cz/slice.hpp>
 
-TEST_CASE("slice()") {
-    auto slice = cz::slice<int>();
+TEST_CASE("Slice()") {
+    cz::Slice<int> slice = {};
     REQUIRE(slice.elems == nullptr);
     REQUIRE(slice.len == 0);
+}
+
+TEST_CASE("Slice(T[])") {
+    int buffer[3];
+    cz::Slice<int> slice = buffer;
+    REQUIRE(slice.elems == buffer);
+    REQUIRE(slice.len == 3);
+}
+
+TEST_CASE("Slice(T*, size_t)") {
+    int buffer[3];
+    cz::Slice<int> slice = {buffer, 2};
+    REQUIRE(slice.elems == buffer);
+    REQUIRE(slice.len == 2);
 }
 
 TEST_CASE("slice(T[])") {
