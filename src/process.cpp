@@ -578,7 +578,7 @@ void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocato
 
 bool Process::launch_script(cz::Str script, Process_Options* options) {
     cz::Str args[] = {"/bin/sh", "-c", script, nullptr};
-    return launch_program(cz::slice(args), options);
+    return launch_program(args, options);
 }
 
 static void bind_pipe(int input, int output) {

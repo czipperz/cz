@@ -164,7 +164,7 @@ TEST_CASE("Vector append") {
 
     vector.push(1);
     int elems[] = {2, 3};
-    vector.append(cz::slice(elems));
+    vector.append(elems);
 
     REQUIRE(vector.len() == 3);
     CHECK(vector[0] == 1);
