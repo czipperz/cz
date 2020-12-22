@@ -176,7 +176,7 @@ public:
 
     /// Launch a program.  The first argument must be the same the path to invoke.
     ///
-    /// The processes `stdin`, `stdout`, and `stderr` streams are bound to the `options`' streams.
+    /// The process's `stdin`, `stdout`, and `stderr` streams are bound to the `options`' streams.
     /// The streams in `options` are not closed by this function.  Any files that are null (the
     /// default) are closed instead of being bound (in the new process).
     ///
