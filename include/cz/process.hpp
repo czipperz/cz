@@ -70,6 +70,7 @@ struct Input_File : File_Descriptor {
 #ifdef _WIN32
         return read_strip_carriage_returns(buffer, size, carry);
 #else
+        (void)carry; // remove unused parameter warnings
         return read_binary(buffer, size);
 #endif
     }
