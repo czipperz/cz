@@ -153,7 +153,8 @@ struct Process_IO {
 bool create_process_pipes(Process_IO*, Process_Options*);
 bool create_process_pipes(Process_IOE*, Process_Options*);
 
-class Process {
+struct Process {
+private:
 #ifdef _WIN32
     void* hProcess;
 #else
