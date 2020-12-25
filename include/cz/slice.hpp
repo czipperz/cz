@@ -21,6 +21,7 @@ struct Slice {
 
     constexpr operator Slice<const T>() const { return {elems, len}; }
 
+    constexpr T* begin() const { return elems; }
     constexpr T* start() const { return elems; }
     constexpr T* end() const { return elems + len; }
 };
