@@ -106,11 +106,11 @@ void sort(cz::Slice<T> slice) {
 }
 
 template <class T, class Is_Less, class Swap>
-void sort(cz::Vector<T> slice, Is_Less&& is_less, Swap&& swap) {
-    sort(vector.slice(), is_less, swap);
+void sort(cz::Vector<T> vector, Is_Less&& is_less, Swap&& swap) {
+    sort(vector.as_slice(), is_less, swap);
 }
 template <class T, class Is_Less>
-void sort(cz::Vector<T> slice, Is_Less&& is_less) {
+void sort(cz::Vector<T> vector, Is_Less&& is_less) {
     sort(vector.as_slice(), is_less);
 }
 template <class T>
