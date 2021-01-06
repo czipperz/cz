@@ -27,6 +27,16 @@ if (CZ_BUILD_TESTS)
   target_include_directories(${TEST_EXECUTABLE} PUBLIC test_base)
 endif()
 
+if (CZ_BENCHMARK)
+  file(GLOB_RECURSE BENCH_SRCS bench/*.cpp)
+  set(BENCH_EXECUTABLE bench)
+  add_executable(${BENCH_EXECUTABLE} ${BENCH_SRCS})
+
+  add_subdirectory(benchmark)
+  target_link_libraries(${BENCH_EXECUTABLE} benchmark::benchmark)
+  target_include_directories(${BENCH_EXECUTABLE} PUBLIC include)
+endif()
+
 if(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /utf-8")
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
