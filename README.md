@@ -28,3 +28,7 @@ Suggested: clone the repository and include it in your cmake build via
 
 Alternative: Build locally using `cmake` and then link the resulting library
 into your program.  The script `./build-release.sh` will do this automatically.
+
+## Benchmarking
+
+Clone Google Benchmark into `./benchmark` and then run `./build-release-bench.sh`.
