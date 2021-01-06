@@ -19,14 +19,18 @@ void generic_swap_ptr(T* left, T* right) {
 
 template <class Iterator, class Is_Less, class Swap>
 void generic_insertion_sort(Iterator start, Iterator end, Is_Less&& is_less, Swap&& swap) {
-    for (Iterator middle = start + 1; middle < end; ++middle) {
-        for (Iterator point = start; point < middle; ++point) {
-            if (is_less(middle, point)) {
-                // Shift element at middle over to the point and displace elements in the way.
-                for (Iterator it = middle; it > point;) {
-                    --it;
-                    swap(it, it + 1);
-                }
+    Iterator middle = start;
+    for (++middle; middle < end; ++middle) {
+        Iterator point = middle;
+        while (point != start) {
+            Iterator prev = point;
+            --point;
+
+            if (is_less(prev, point)) {
+                // Shift element at middle left until we reach an element that is not less than it.
+                swap(point, prev);
+            } else {
+                break;
             }
         }
     }
