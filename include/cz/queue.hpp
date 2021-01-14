@@ -59,6 +59,15 @@ struct Queue {
     }
 
     void drop(cz::Allocator allocator) { allocator.dealloc({elems, cap * sizeof(T)}); }
+
+    T& operator[](size_t index) {
+        CZ_DEBUG_ASSERT(index < len);
+        return elems[(offset + index) & (cap - 1)];
+    }
+    const T& operator[](size_t index) const {
+        CZ_DEBUG_ASSERT(index < len);
+        return elems[(offset + index) & (cap - 1)];
+    }
 };
 
 }
