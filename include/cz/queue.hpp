@@ -24,7 +24,9 @@ struct Queue {
     T pop() {
         CZ_DEBUG_ASSERT(len >= 1);
         --len;
-        return elems[offset++];
+        size_t old_offset = offset;
+        offset = (offset + 1) & (cap - 1);
+        return elems[old_offset];
     }
 
     void reserve(cz::Allocator allocator, size_t extra) {
