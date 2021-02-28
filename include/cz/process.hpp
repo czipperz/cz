@@ -128,6 +128,9 @@ struct Process_Options {
     /// The directory to run the process from.
     const char* working_directory = nullptr;
 
+    /// Detach from the parent process instead of becoming a child process.
+    bool detach = false;
+
     void close_all();
 };
 
@@ -192,8 +195,14 @@ public:
     /// See also `launch_program` for information on how `options` are handled.
     bool launch_script(cz::Str script, Process_Options* options);
 
+    /// Kill the child process and destroy the `Process`.
     void kill();
+
+    /// Wait for the child process to end if it hasn't ended already and destroy the `Process`.
     int join();
+
+    /// Destroy the `Process` but don't terminate the child process.
+    void detach();
 };
 
 }

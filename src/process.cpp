@@ -349,29 +349,39 @@ bool create_process_pipes(Process_IOE* io, Process_Options* options) {
     return true;
 }
 
+void Process::detach() {
+#ifdef _WIN32
+    CloseHandle(hProcess);
+#endif
+}
+
 void Process::kill() {
 #ifdef _WIN32
     TerminateProcess(hProcess, -1);
 #else
     ::kill(pid, SIGTERM);
 #endif
+    detach();
 }
 
 int Process::join() {
 #ifdef _WIN32
     WaitForSingleObject(hProcess, INFINITE);
-    DWORD exitCode = -1;
-    GetExitCodeProcess(hProcess, &exitCode);
-    return exitCode;
+    DWORD exit_code = -1;
+    GetExitCodeProcess(hProcess, &exit_code);
 #else
     int status;
     waitpid(pid, &status, 0);
+    int exit_code;
     if (WIFEXITED(status)) {
-        return WEXITSTATUS(status);
+        exit_code = WEXITSTATUS(status);
     } else {
-        return 127;
+        exit_code = 127;
     }
 #endif
+
+    detach();
+    return exit_code;
 }
 
 #ifdef _WIN32
@@ -388,7 +398,12 @@ static bool launch_script_(char* script, Process_Options* options, HANDLE* hProc
     PROCESS_INFORMATION pi;
     ZeroMemory(&pi, sizeof(pi));
 
-    if (!CreateProcessA(nullptr, script, nullptr, nullptr, TRUE, 0, nullptr,
+    DWORD creation_flags = 0;
+    if (options->detach) {
+        creation_flags |= DETACHED_PROCESS;
+    }
+
+    if (!CreateProcessA(nullptr, script, nullptr, nullptr, TRUE, creation_flags, nullptr,
                         options->working_directory, &si, &pi)) {
         return false;
     }
@@ -624,6 +639,10 @@ bool Process::launch_program(cz::Slice<const cz::Str> args, Process_Options* opt
             chdir(options->working_directory);
         }
 
+        if (options->detach) {
+            setsid();
+        }
+
         // Launch the script by running it through the shell.
         execvp(new_args[0], new_args);
 
@@ -641,7 +660,9 @@ bool Process::launch_program(cz::Slice<const cz::Str> args, Process_Options* opt
 }
 #endif
 
-void Process::escape_args(cz::Slice<const cz::Str> args, cz::String* script, cz::Allocator allocator) {
+void Process::escape_args(cz::Slice<const cz::Str> args,
+                          cz::String* script,
+                          cz::Allocator allocator) {
     CZ_DEBUG_ASSERT(args.len >= 1);
 
     script->reserve(cz::heap_allocator(), 32);
