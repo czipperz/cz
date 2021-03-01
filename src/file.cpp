@@ -11,7 +11,7 @@ namespace file {
 
 bool does_file_exist(const char* path) {
 #ifdef _WIN32
-    return GetFileAttributes(path) == INVALID_FILE_ATTRIBUTES;
+    return GetFileAttributes(path) != 0xFFFFFFFF;
 #else
     return access(path, F_OK) == 0;
 #endif
