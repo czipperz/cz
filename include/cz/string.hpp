@@ -18,37 +18,37 @@ struct String {
     /// Reserve `total` total spaces in the buffer.  Ensures `cap() >= total`.
     void reserve_total(Allocator, size_t total);
 
-    /// Push the \c char onto the end of the string.
+    /// Push character `ch` onto the end of the string.
     ///
     /// Panics if there isn't enough space.
     void push(char ch) { append({&ch, 1}); }
-    /// Append the \c Str to the buffer.
+    /// Append the string `str` to the buffer.
     ///
     /// Panics if there isn't enough space.
     void append(Str str);
 
-    /// Push \c '\0' onto the end of the string without changing the length.
+    /// Push `'\0'` onto the end of the string without changing the length.
     ///
     /// Panics if there isn't enough space.
     void null_terminate();
 
-    /// Insert the \c char into the middle of the buffer.
+    /// Insert the character `ch` into the middle of the buffer.
     ///
-    /// Panics if there isn't enough space or if \c index is greater than \c len.
+    /// Panics if there isn't enough space or if `index > len()`.
     void insert(size_t index, char ch) { insert(index, {&ch, 1}); }
-    /// Insert the \c Str into the middle of the buffer.
+    /// Insert the string `str` into the middle of the buffer.
     ///
-    /// Panics if there isn't enough space or if \c index is greater than \c len.
+    /// Panics if there isn't enough space or if `index > len()`.
     void insert(size_t index, Str str);
 
-    /// Removes \c count characters start at \c index.
+    /// Removes `count` characters start at `index`.
     ///
-    /// Panics if there isn't enough space or if \c index+count is greater than \c len.
+    /// Panics if there isn't enough space or if `index + count > len()`.
     void remove(size_t index, size_t count);
 
-    /// Pop the last \c char off the string.
+    /// Pop the last character off the string.
     ///
-    /// Panics if there is no character.
+    /// Panics if `len() == 0`.
     char pop();
 
     /// Reallocate the buffer so that the length is the same as the capacity.
@@ -61,13 +61,13 @@ struct String {
     /// Panics if the reallocation fails.
     void realloc_null_terminate(Allocator);
 
-    /// Set the \c len to \c new_len.  Panics if \c new_len is greater than \c cap.
+    /// Set `len()` to `new_len`.  Panics if `new_len > cap()`.
     void set_len(size_t new_len);
 
-    /// Create a new \c String with the same contents in a unique memory buffer.
+    /// Create a new `String` with the same contents in a unique memory buffer.
     String clone(Allocator allocator) const { return as_str().duplicate(allocator); }
 
-    /// Dealloc the \c buffer.
+    /// Dealloc the `String`.
     void drop(Allocator);
 
     /// Get the byte buffer backing the string.
