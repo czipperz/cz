@@ -11,8 +11,12 @@ struct String {
     size_t _len;
     size_t _cap;
 
-    /// Ensure there are \c extra bytes available in the buffer.
-    void reserve(Allocator, size_t extra);
+    /// Reserve `extra` extra spaces in the buffer.  Ensures `cap() >= len() + extra`.
+    void reserve(Allocator allocator, size_t extra) {
+        return reserve_total(allocator, _len + extra);
+    }
+    /// Reserve `total` total spaces in the buffer.  Ensures `cap() >= total`.
+    void reserve_total(Allocator, size_t total);
 
     /// Push the \c char onto the end of the string.
     ///
