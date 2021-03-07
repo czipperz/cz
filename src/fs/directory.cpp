@@ -56,9 +56,10 @@ Result DirectoryIterator::create(const char* cstr_path) {
     // must append \c "\*" to get all files in the directory \c cstr_path.
     char buffer[_MAX_PATH];
     Str str_path = cstr_path;
-    str_path.len = min(sizeof(buffer) - sizeof("\\*"), str_path.len);
+    str_path.len = min(sizeof(buffer) - strlen("\\*") - 1, str_path.len);
     memcpy(buffer, str_path.buffer, str_path.len);
-    strcpy(buffer + str_path.len, "\\*");
+    memcpy(buffer + str_path.len, "\\*", strlen("\\*"));
+    buffer[str_path.len + strlen("\\*")] = '\0';
 
     WIN32_FIND_DATA data;
     HANDLE handle = FindFirstFileA(buffer, &data);
