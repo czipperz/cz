@@ -14,19 +14,83 @@ struct Queue {
     size_t len;
     size_t cap;
 
-    void push(const T& t) {
+    void push_end(const T& t) {
         CZ_DEBUG_ASSERT(len + 1 <= cap);
-        size_t index = (offset + len) & (cap - 1);
-        elems[index] = t;
+        size_t end = (offset + len) & (cap - 1);
+        elems[end] = t;
         ++len;
     }
 
-    T pop() {
+    void push_start(const T& t) {
+        CZ_DEBUG_ASSERT(len + 1 <= cap);
+        offset = (offset + cap - 1) & (cap - 1);
+        elems[offset] = t;
+        ++len;
+    }
+
+    void append_end(const T* ts, size_t tl) {
+        CZ_DEBUG_ASSERT(len + tl <= cap);
+        size_t end = (offset + len) & (cap - 1);
+
+        // Copy items until the end of the array.
+        if (end < cap) {
+            size_t underhanging = cap - end;
+
+            // Fast case for when we don't need to copy to the start of the array as well.
+            if (tl <= underhanging) {
+                memcpy(elems + end, ts, tl * sizeof(T));
+                len += tl;
+                return;
+            }
+
+            memcpy(elems + end, ts, underhanging * sizeof(T));
+            ts += underhanging;
+            tl -= underhanging;
+            len += underhanging;
+        }
+
+        // Copy items to the start of the array.
+        CZ_DEBUG_ASSERT(tl <= offset);
+        memcpy(elems, ts, tl * sizeof(T));
+        len += tl;
+    }
+
+    void append_start(const T* ts, size_t tl) {
+        CZ_DEBUG_ASSERT(len + tl <= cap);
+
+        // Copy items to the start of the array.
+        if (offset > 0) {
+            // Fast case for when we don't need to copy to the end of the array as well.
+            if (tl <= offset) {
+                memcpy(elems + offset - tl, ts, tl * sizeof(T));
+                offset -= tl;
+                len += tl;
+                return;
+            }
+
+            memcpy(elems, ts + tl - offset, offset * sizeof(T));
+            tl -= offset;
+            len += offset;
+        }
+
+        // Copy items to the end of the array.
+        offset = cap - tl;
+        memcpy(elems + offset, ts, tl * sizeof(T));
+        len += tl;
+    }
+
+    T pop_start() {
         CZ_DEBUG_ASSERT(len >= 1);
         --len;
         size_t old_offset = offset;
         offset = (offset + 1) & (cap - 1);
         return elems[old_offset];
+    }
+
+    T pop_end() {
+        CZ_DEBUG_ASSERT(len >= 1);
+        --len;
+        return elems[(offset + len) & (cap - 1)];
     }
 
     void reserve(cz::Allocator allocator, size_t extra) {
