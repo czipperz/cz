@@ -16,6 +16,7 @@ inline void heap_allocator_dealloc(void*, MemSlice mem) {
 }
 
 inline void* heap_allocator_realloc(void*, MemSlice old_mem, AllocInfo new_info) {
+    CZ_DEBUG_ASSERT(new_info.alignment <= alignof(max_align_t));
     return realloc(old_mem.buffer, new_info.size);
 }
 
