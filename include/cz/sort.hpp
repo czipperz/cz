@@ -122,4 +122,39 @@ void sort(cz::Vector<T> vector) {
     sort(vector.as_slice());
 }
 
+template <class Iterator, class Is_Less>
+bool generic_is_sorted(Iterator start, Iterator end, Is_Less&& is_less) {
+    Iterator next = start;
+    ++next;
+
+    while (next < end) {
+        // start can be <= next so we test if start > next == next < start.
+        if (is_less(next, start)) {
+            return false;
+        }
+
+        start = next;
+        ++next;
+    }
+
+    return true;
+}
+
+template <class T, class Is_Less>
+bool is_sorted(cz::Slice<T> slice, Is_Less&& is_less) {
+    return generic_is_sorted(slice.start(), slice.end(), is_less);
+}
+template <class T>
+bool is_sorted(cz::Slice<T> slice) {
+    return is_sorted(slice, generic_is_less_ptr<T>);
+}
+template <class T, class Is_Less>
+bool is_sorted(cz::Vector<T> vector, Is_Less&& is_less) {
+    return is_sorted(vector.as_slice(), is_less);
+}
+template <class T>
+bool is_sorted(cz::Vector<T> vector) {
+    return is_sorted(vector.as_slice());
+}
+
 }
