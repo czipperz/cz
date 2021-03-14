@@ -1,6 +1,6 @@
 #include <cz/fs/directory.hpp>
 
-#include <ctype.h>
+#include <cz/char_type.hpp>
 #include <errno.h>
 #include <cz/defer.hpp>
 #include <cz/try.hpp>

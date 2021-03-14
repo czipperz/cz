@@ -1,6 +1,6 @@
 #include <cz/path.hpp>
 
-#include <ctype.h>
+#include <cz/char_type.hpp>
 #include <cz/try.hpp>
 #include <cz/working_directory.hpp>
 
@@ -67,7 +67,7 @@ void flatten(char* buffer, size_t* len) {
 #ifdef _WIN32
     // Handle \c X:abc by removing the drive here to standardize to the *nix
     // standard (\c /x/y or \c x/y ).
-    if (*len >= 2 && isalpha(buffer[0]) && buffer[1] == ':') {
+    if (*len >= 2 && cz::is_alpha(buffer[0]) && buffer[1] == ':') {
         index += 2;
     }
 #endif
@@ -130,7 +130,7 @@ void flatten(String* string) {
 
 bool is_absolute(Str file) {
 #ifdef _WIN32
-    return file.len >= 3 && isalpha(file[0]) && file[1] == ':' && file[2] == '/';
+    return file.len >= 3 && cz::is_alpha(file[0]) && file[1] == ':' && file[2] == '/';
 #else
     return file.len >= 1 && file[0] == '/';
 #endif
@@ -144,11 +144,11 @@ Result make_absolute(Str file, Allocator allocator, String* path) {
 
 #ifdef _WIN32
         // Handle X:relpath
-        if (file.len >= 2 && isalpha(file[0]) && file[1] == ':') {
-            CZ_DEBUG_ASSERT(path->len() >= 2 && isalpha((*path)[0]) && (*path)[1] == ':');
+        if (file.len >= 2 && cz::is_alpha(file[0]) && file[1] == ':') {
+            CZ_DEBUG_ASSERT(path->len() >= 2 && cz::is_alpha((*path)[0]) && (*path)[1] == ':');
 
             // Don't currently support get_working_directory on different drives
-            if (tolower((*path)[0]) != tolower(file[0])) {
+            if (cz::to_lower((*path)[0]) != cz::to_lower(file[0])) {
                 CZ_PANIC(
                     "cz::fs::make_absolute(): Unimplemented get_working_directory() for other "
                     "drives");

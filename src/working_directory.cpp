@@ -6,7 +6,7 @@
 #include <cz/string.hpp>
 #include <cz/try.hpp>
 
-#include <ctype.h>
+#include <cz/char_type.hpp>
 #include <errno.h>
 
 // Although the headers are different, we can use the Windows "Posix"
