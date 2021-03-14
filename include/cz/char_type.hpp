@@ -33,8 +33,8 @@ inline bool is_graph(char ch) {
 }
 
 inline bool is_punct(char ch) {
-    return ch >= 33 && ch <= 47 || ch >= 58 && ch <= 64 || ch >= 91 && ch <= 96 ||
-           ch >= 123 && ch <= 126;
+    return (ch >= 33 && ch <= 47) || (ch >= 58 && ch <= 64) || (ch >= 91 && ch <= 96) ||
+           (ch >= 123 && ch <= 126);
 }
 
 inline bool is_upper(char ch) {
@@ -68,7 +68,7 @@ inline bool is_digit(char ch) {
 }
 
 inline bool is_hex_digit(char ch) {
-    return is_digit(ch) || ch >= 'A' && ch <= 'f' || ch >= 'a' && ch <= 'f';
+    return is_digit(ch) || (ch >= 'A' && ch <= 'F') || (ch >= 'a' && ch <= 'f');
 }
 
 inline bool is_alnum(char ch) {
