@@ -15,7 +15,7 @@ namespace cz {
 
 // Convert a void* to the primitive type.
 #ifdef _WIN32
-HANDLE h(void*& handle) {
+static HANDLE h(void*& handle) {
     if (sizeof(HANDLE) <= sizeof(void*)) {
         return *(HANDLE*)&handle;
     } else {
@@ -23,7 +23,7 @@ HANDLE h(void*& handle) {
     }
 }
 #else
-pthread_mutex_t* h(void*& handle) {
+static pthread_mutex_t* h(void*& handle) {
     if (sizeof(pthread_mutex_t) <= sizeof(void*)) {
         return *(pthread_mutex_t**)&handle;
     } else {
