@@ -15,11 +15,11 @@ namespace cz {
 
 // Convert a void* to the primitive type.
 #ifdef _WIN32
-static HANDLE h(void*& handle) {
-    if (sizeof(HANDLE) <= sizeof(void*)) {
-        return *(HANDLE*)&handle;
+static CRITICAL_SECTION* h(void*& handle) {
+    if (sizeof(CRITICAL_SECTION) <= sizeof(void*)) {
+        return (CRITICAL_SECTION*)&handle;
     } else {
-        return *(HANDLE*)handle;
+        return (CRITICAL_SECTION*)handle;
     }
 }
 #else
@@ -34,19 +34,12 @@ static pthread_mutex_t* h(void*& handle) {
 
 void Mutex::init() {
 #ifdef _WIN32
-    if (sizeof(HANDLE) > sizeof(void*)) {
-        handle = malloc(sizeof(HANDLE));
+    if (sizeof(CRITICAL_SECTION) > sizeof(void*)) {
+        handle = malloc(sizeof(CRITICAL_SECTION));
         CZ_ASSERT(handle);
     }
 
-    HANDLE hh = CreateMutexA(/*security_attributes=*/nullptr, /*start_locked=*/false,
-                             /*name=*/nullptr);
-
-    if (sizeof(HANDLE) <= sizeof(void*)) {
-        *(HANDLE*)&handle = hh;
-    } else {
-        *(HANDLE*)handle = hh;
-    }
+    InitializeCriticalSection(h(handle));
 #else
     if (sizeof(pthread_mutex_t) > sizeof(void*)) {
         handle = malloc(sizeof(pthread_mutex_t));
@@ -59,8 +52,8 @@ void Mutex::init() {
 
 void Mutex::drop() {
 #ifdef _WIN32
-    CloseHandle(h(handle));
-    if (sizeof(HANDLE) > sizeof(void*)) {
+    DeleteCriticalSection(h(handle));
+    if (sizeof(CRITICAL_SECTION) > sizeof(void*)) {
         free(handle);
     }
 #else
@@ -73,8 +66,7 @@ void Mutex::drop() {
 
 void Mutex::unlock() {
 #ifdef _WIN32
-    DWORD ret = ReleaseMutex(h(handle));
-    CZ_ASSERT(ret != 0);
+    LeaveCriticalSection(h(handle));
 #else
     int ret = pthread_mutex_unlock(h(handle));
     CZ_ASSERT(ret == 0);
@@ -83,8 +75,7 @@ void Mutex::unlock() {
 
 void Mutex::lock() {
 #ifdef _WIN32
-    DWORD ret = WaitForSingleObject(h(handle), /*milli_seconds=*/INFINITE);
-    CZ_ASSERT(ret == WAIT_OBJECT_0);
+    EnterCriticalSection(h(handle));
 #else
     int ret = pthread_mutex_lock(h(handle));
     CZ_ASSERT(ret == 0);
@@ -94,7 +85,7 @@ void Mutex::lock() {
 bool Mutex::try_lock() {
 #ifdef _WIN32
     // Note that this ignores errors.
-    return WaitForSingleObject(h(handle), /*milli_seconds=*/0) == WAIT_OBJECT_0;
+    return TryEnterCriticalSection(h(handle));
 #else
     // Note that this ignores errors.
     return pthread_mutex_trylock(h(handle)) == 0;
