@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <cz/assert.hpp>
 #include <new>
 #include <utility>
 
@@ -103,8 +104,8 @@ template <class T>
 void Arc<T>::init_general() {
     pointer = (Arc_Value<T>*)malloc(sizeof(Arc_Value<T>));
     CZ_ASSERT(pointer);
-    std::atomic_init(pointer->strong, 0);
-    std::atomic_init(pointer->total, 0);
+    std::atomic_init(&pointer->strong, 1);
+    std::atomic_init(&pointer->total, 1);
 }
 
 template <class T>
