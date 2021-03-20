@@ -2,6 +2,8 @@
 
 namespace cz {
 
+struct Condition_Variable;
+
 /// The mutex synchronization primitive.  Can be locked to control exclusive access to a resource.
 ///
 /// A mutex is similar to a semaphore but has the following constraints:
@@ -14,6 +16,8 @@ namespace cz {
 struct Mutex {
 private:
     void* handle;
+
+    friend struct Condition_Variable;
 
 public:
     /// Create the mutex.

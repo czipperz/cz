@@ -14,6 +14,7 @@
 namespace cz {
 
 // Convert a void* to the primitive type.
+// @Condition_Variable_Mutex relies on this code.
 #ifdef _WIN32
 static CRITICAL_SECTION* h(void*& handle) {
     if (sizeof(CRITICAL_SECTION) <= sizeof(void*)) {
