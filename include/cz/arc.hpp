@@ -201,6 +201,7 @@ bool Arc_Weak<T>::upgrade(Arc<T>* arc) const noexcept {
         }
 
         // We secured a strong reference.
+        pointer->total.fetch_add(1);
         arc->pointer = pointer;
         return true;
     }
