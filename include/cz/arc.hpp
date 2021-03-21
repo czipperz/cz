@@ -32,6 +32,8 @@ private:
     Arc_Value<T>* pointer;
     void init_general();
 
+    friend struct Arc_Weak<T>;
+
 public:
     /// Initialize the pointer by copying the `value`.
     void init_copy(const T& value);
@@ -186,15 +188,10 @@ template <class T>
 bool Arc_Weak<T>::upgrade(Arc<T>* arc) const noexcept {
     CZ_DEBUG_ASSERT(pointer);
 
-    // Ensure the pointer doesn't get destructed while we're running.
-    pointer->total.fetch_add(1);
-
     uint32_t strong = pointer->strong.load();
     while (1) {
         // There are no strong references so the resource has been destroyed.
         if (strong == 0) {
-            // Decrement the total since we incremented it above.
-            decrement_total(pointer);
             return false;
         }
 
