@@ -10,6 +10,7 @@
 #define NOMINMAX
 #include <windows.h>
 #else
+#include <errno.h>
 #include <pthread.h>
 #endif
 

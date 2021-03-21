@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdlib.h>
 #include <atomic>
 #include <cz/assert.hpp>
 #include <new>
