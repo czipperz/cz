@@ -37,6 +37,11 @@ if (CZ_BENCHMARK)
   target_include_directories(${BENCH_EXECUTABLE} PUBLIC include)
 endif()
 
+if (TRACY_ENABLE)
+  add_definitions(-DTRACY_ENABLE)
+  include_directories(${TRACY_INCLUDE_DIRS})
+endif()
+
 if(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
