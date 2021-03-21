@@ -66,6 +66,9 @@ struct String {
 
     /// Create a new `String` with the same contents in a unique memory buffer.
     String clone(Allocator allocator) const { return as_str().duplicate(allocator); }
+    String clone_null_terminate(Allocator allocator) const {
+        return as_str().duplicate_null_terminate(allocator);
+    }
 
     /// Dealloc the `String`.
     void drop(Allocator);
