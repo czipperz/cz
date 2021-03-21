@@ -83,10 +83,19 @@ bool File_Descriptor::set_non_inheritable() {
 int64_t Input_File::read_binary(char* buffer, size_t size) {
 #ifdef _WIN32
     DWORD bytes;
-    if (ReadFile(handle, buffer, size, &bytes, NULL) || bytes == 0 /* eof */) {
+    if (ReadFile(handle, buffer, size, &bytes, NULL)) {
         return bytes;
     } else {
-        return -1;
+        // If we're reading non-blocking then no data also has
+        // bytes == 0 but needs to be considered an error.
+        DWORD error = GetLastError();
+        if (error == ERROR_NO_DATA) {
+            return -1;
+        } else if (bytes == 0 /* eof */) {
+            return bytes;
+        } else {
+            return -1;
+        }
     }
 #else
     return ::read(fd, buffer, size);
