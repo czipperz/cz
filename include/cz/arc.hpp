@@ -107,8 +107,8 @@ template <class T>
 void Arc<T>::init_general() {
     pointer = (Arc_Value<T>*)malloc(sizeof(Arc_Value<T>));
     CZ_ASSERT(pointer);
-    std::atomic_init(&pointer->strong, 1);
-    std::atomic_init(&pointer->total, 1);
+    std::atomic_init(&pointer->strong, (uint32_t)1);
+    std::atomic_init(&pointer->total, (uint32_t)1);
 }
 
 template <class T>
