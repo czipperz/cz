@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <cz/assert.hpp>
+#include <cz/heap.hpp>
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -16,6 +17,7 @@ namespace cz {
 // Convert a void* to the primitive type.
 #ifdef _WIN32
 static HANDLE h(void*& handle) {
+    // Windows has pointer semantics for HANDLEs so try to store it inline.
     if (sizeof(HANDLE) <= sizeof(void*)) {
         return *(HANDLE*)&handle;
     } else {
@@ -24,18 +26,14 @@ static HANDLE h(void*& handle) {
 }
 #else
 static sem_t* h(void*& handle) {
-    if (sizeof(sem_t) <= sizeof(void*)) {
-        return *(sem_t**)&handle;
-    } else {
-        return (sem_t*)handle;
-    }
+    return (sem_t*)handle;
 }
 #endif
 
 void Semaphore::init(uint32_t initial_value) {
 #ifdef _WIN32
     if (sizeof(HANDLE) > sizeof(void*)) {
-        handle = malloc(sizeof(HANDLE));
+        handle = cz::heap_allocator().alloc<HANDLE>();
         CZ_ASSERT(handle);
     }
 
@@ -48,10 +46,8 @@ void Semaphore::init(uint32_t initial_value) {
         *(HANDLE*)handle = hh;
     }
 #else
-    if (sizeof(sem_t) > sizeof(void*)) {
-        handle = malloc(sizeof(sem_t));
-        CZ_ASSERT(handle);
-    }
+    handle = cz::heap_allocator().alloc<sem_t>();
+    CZ_ASSERT(handle);
 
     sem_init(h(handle), /*is_shared_between_processes=*/0, initial_value);
 #endif
@@ -61,13 +57,11 @@ void Semaphore::drop() {
 #ifdef _WIN32
     CloseHandle(h(handle));
     if (sizeof(HANDLE) > sizeof(void*)) {
-        free(handle);
+        cz::heap_allocator().dealloc((HANDLE*)handle);
     }
 #else
     sem_destroy(h(handle));
-    if (sizeof(sem_t) > sizeof(void*)) {
-        free(handle);
-    }
+    cz::heap_allocator().dealloc(h(handle));
 #endif
 }
 

@@ -11,6 +11,9 @@ namespace cz {
 /// A semaphore can emulate a mutex by using `starting_value = 1`, and then using
 /// `acquire` and `release` instead of `lock` and `unlock`.  Unlike a mutex, a
 /// semaphore can be `release`d by a different thread that `acquired` the semaphore.
+///
+/// A semaphore has pointer semantics.  So you are free to copy
+/// or move the struct as long as you only `drop` it once.
 struct Semaphore {
 private:
     void* handle;

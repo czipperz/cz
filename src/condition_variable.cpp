@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <cz/assert.hpp>
+#include <cz/heap.hpp>
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -19,35 +20,23 @@ namespace cz {
 // Convert a void* to the primitive type.
 #ifdef _WIN32
 static CONDITION_VARIABLE* h(void*& handle) {
-    if (sizeof(CONDITION_VARIABLE) <= sizeof(void*)) {
-        return (CONDITION_VARIABLE*)&handle;
-    } else {
-        return (CONDITION_VARIABLE*)handle;
-    }
+    return (CONDITION_VARIABLE*)handle;
 }
 #else
 static pthread_cond_t* h(void*& handle) {
-    if (sizeof(pthread_cond_t) <= sizeof(void*)) {
-        return *(pthread_cond_t**)&handle;
-    } else {
-        return (pthread_cond_t*)handle;
-    }
+    return (pthread_cond_t*)handle;
 }
 #endif
 
 void Condition_Variable::init() {
 #ifdef _WIN32
-    if (sizeof(CONDITION_VARIABLE) > sizeof(void*)) {
-        handle = malloc(sizeof(CONDITION_VARIABLE));
-        CZ_ASSERT(handle);
-    }
+    handle = cz::heap_allocator().alloc<CONDITION_VARIABLE>();
+    CZ_ASSERT(handle);
 
     InitializeConditionVariable(h(handle));
 #else
-    if (sizeof(pthread_cond_t) > sizeof(void*)) {
-        handle = malloc(sizeof(pthread_cond_t));
-        CZ_ASSERT(handle);
-    }
+    handle = cz::heap_allocator().alloc<pthread_cond_t>();
+    CZ_ASSERT(handle);
 
     pthread_cond_init(h(handle), /*attr=*/nullptr);
 #endif
@@ -56,15 +45,11 @@ void Condition_Variable::init() {
 void Condition_Variable::drop() {
 #ifdef _WIN32
     // No destroy function on Windows.
-    if (sizeof(CONDITION_VARIABLE) > sizeof(void*)) {
-        free(handle);
-    }
 #else
     pthread_cond_destroy(h(handle));
-    if (sizeof(pthread_cond_t) > sizeof(void*)) {
-        free(handle);
-    }
 #endif
+
+    cz::heap_allocator().dealloc(h(handle));
 }
 
 // Convert a void* to the primitive type.

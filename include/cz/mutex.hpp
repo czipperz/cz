@@ -11,8 +11,11 @@ struct Condition_Variable;
 /// 2. A mutex only reprents the semaphore's values of `0` or `1`.
 /// Because of these restrictions, a mutex is faster than a semaphore.
 ///
-/// A semaphore can emulate a mutex by using `starting_value = 1`, and then using
-/// `acquire` and `release` instead of `lock` and `unlock`.
+/// A semaphore can emulate a mutex by using `starting_value = 1`, and
+/// then using `acquire` and `release` instead of `lock` and `unlock`.
+///
+/// A mutex has pointer semantics.  So you are free to copy
+/// or move the struct as long as you only `drop` it once.
 struct Mutex {
 private:
     void* handle;

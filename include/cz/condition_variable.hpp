@@ -6,6 +6,9 @@ struct Mutex;
 
 /// The condition variable synchronization primitive.  Used in
 /// combination with a `Mutex` to represent when a condition is hit.
+///
+/// A condition variable has pointer semantics.  So you are free
+/// to copy or move the struct as long as you only `drop` it once.
 struct Condition_Variable {
 private:
     void* handle;

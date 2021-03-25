@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <cz/assert.hpp>
+#include <cz/heap.hpp>
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -17,35 +18,23 @@ namespace cz {
 // @Condition_Variable_Mutex relies on this code.
 #ifdef _WIN32
 static CRITICAL_SECTION* h(void*& handle) {
-    if (sizeof(CRITICAL_SECTION) <= sizeof(void*)) {
-        return (CRITICAL_SECTION*)&handle;
-    } else {
-        return (CRITICAL_SECTION*)handle;
-    }
+    return (CRITICAL_SECTION*)handle;
 }
 #else
 static pthread_mutex_t* h(void*& handle) {
-    if (sizeof(pthread_mutex_t) <= sizeof(void*)) {
-        return *(pthread_mutex_t**)&handle;
-    } else {
-        return (pthread_mutex_t*)handle;
-    }
+    return (pthread_mutex_t*)handle;
 }
 #endif
 
 void Mutex::init() {
 #ifdef _WIN32
-    if (sizeof(CRITICAL_SECTION) > sizeof(void*)) {
-        handle = malloc(sizeof(CRITICAL_SECTION));
-        CZ_ASSERT(handle);
-    }
+    handle = cz::heap_allocator().alloc<CRITICAL_SECTION>();
+    CZ_ASSERT(handle);
 
     InitializeCriticalSection(h(handle));
 #else
-    if (sizeof(pthread_mutex_t) > sizeof(void*)) {
-        handle = malloc(sizeof(pthread_mutex_t));
-        CZ_ASSERT(handle);
-    }
+    handle = cz::heap_allocator().alloc<pthread_mutex_t>();
+    CZ_ASSERT(handle);
 
     pthread_mutex_init(h(handle), /*attr=*/nullptr);
 #endif
@@ -54,15 +43,11 @@ void Mutex::init() {
 void Mutex::drop() {
 #ifdef _WIN32
     DeleteCriticalSection(h(handle));
-    if (sizeof(CRITICAL_SECTION) > sizeof(void*)) {
-        free(handle);
-    }
 #else
     pthread_mutex_destroy(h(handle));
-    if (sizeof(pthread_mutex_t) > sizeof(void*)) {
-        free(handle);
-    }
 #endif
+
+    cz::heap_allocator().dealloc(h(handle));
 }
 
 void Mutex::unlock() {
