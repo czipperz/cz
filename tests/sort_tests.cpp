@@ -16,16 +16,6 @@ static void insertion_sort(cz::Slice<T> slice) {
     generic_insertion_sort(slice.start(), slice.end(), generic_is_less_ptr<T>, generic_swap_ptr<T>);
 }
 
-template <class T>
-static bool is_sorted(cz::Slice<T> slice) {
-    for (size_t i = 0; i + 1 < slice.len; ++i) {
-        if (slice[i] > slice[i + 1]) {
-            return false;
-        }
-    }
-    return true;
-}
-
 template <class Data, class Rand>
 static Data** make_datas(int iterations, size_t length, int order, Rand&& rand) {
     Data** datas = (Data**)calloc(sizeof(Data*), iterations);
