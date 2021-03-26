@@ -63,17 +63,31 @@ Option<Str> name_component(Str str) {
 
 void flatten(char* buffer, size_t* len) {
     size_t index = 0;
+    size_t protected_start = 0;
 
 #ifdef _WIN32
     // Handle \c X:abc by removing the drive here to standardize to the *nix
     // standard (\c /x/y or \c x/y ).
     if (*len >= 2 && cz::is_alpha(buffer[0]) && buffer[1] == ':') {
         index += 2;
+        protected_start = 2;
     }
 #endif
 
+    bool is_absolute = false;
     if (*len >= 1 && buffer[index] == '/') {
+        is_absolute = true;
         index += 1;
+
+        // Remove multiple / in a row.
+        size_t end = index;
+        while (end < *len && buffer[end] == '/') {
+            ++end;
+        }
+        if (end > index) {
+            memmove(buffer + index, buffer + end, *len - end);
+            *len -= end - index;
+        }
     }
 
     size_t directories = 0;
@@ -88,7 +102,7 @@ void flatten(char* buffer, size_t* len) {
                 if (point) {
                     start = point - buffer + 1;
                 } else {
-                    start = 0;
+                    start = protected_start;
                 }
 
                 // abc/def/..
@@ -100,6 +114,11 @@ void flatten(char* buffer, size_t* len) {
                 *len -= end - start;
                 index = start;
                 --directories;
+            } else if (is_absolute) {
+                // Delete ../ at start if we are absolute.
+                size_t end = index + 2 + (index + 2 != *len);
+                memmove(buffer + index, buffer + end, *len - end);
+                *len -= end - index;
             } else {
                 index += 2 + (index + 2 != *len);
             }
@@ -116,6 +135,16 @@ void flatten(char* buffer, size_t* len) {
 
             // get the point after the /
             index = point - buffer + 1;
+
+            // Remove multiple / in a row.
+            size_t end = index;
+            while (end < *len && buffer[end] == '/') {
+                ++end;
+            }
+            if (end > index) {
+                memmove(buffer + index, buffer + end, *len - end);
+                *len -= end - index;
+            }
 
             ++directories;
         }

@@ -229,7 +229,7 @@ TEST_CASE("path::flatten() absolute path with drive windows") {
 
     flatten(buffer, &size);
 
-    REQUIRE(Str{buffer, size} == "c:/../abc");
+    REQUIRE(Str{buffer, size} == "c:/abc");
 }
 
 TEST_CASE("path::flatten() relative path with drive windows") {
@@ -248,5 +248,52 @@ TEST_CASE("path::flatten() absolute path") {
 
     flatten(buffer, &size);
 
-    REQUIRE(Str{buffer, size} == "/../abc");
+    REQUIRE(Str{buffer, size} == "/abc");
+}
+
+TEST_CASE("path::flatten() absolute path 2") {
+    char buffer[] = "/..";
+    size_t size = sizeof(buffer) - 1;
+
+    flatten(buffer, &size);
+
+    REQUIRE(Str{buffer, size} == "/");
+}
+
+#ifdef _WIN32
+TEST_CASE("path::flatten() relative path with drive .. test") {
+    char buffer[] = "x:abc/../def";
+    size_t size = sizeof(buffer) - 1;
+
+    flatten(buffer, &size);
+
+    REQUIRE(Str{buffer, size} == "x:def");
+}
+#endif
+
+TEST_CASE("path::flatten() /// at start are collapsed") {
+    char buffer[] = "///abc";
+    size_t size = sizeof(buffer) - 1;
+
+    flatten(buffer, &size);
+
+    REQUIRE(Str{buffer, size} == "/abc");
+}
+
+TEST_CASE("path::flatten() /// in middle are collapsed") {
+    char buffer[] = "def///abc";
+    size_t size = sizeof(buffer) - 1;
+
+    flatten(buffer, &size);
+
+    REQUIRE(Str{buffer, size} == "def/abc");
+}
+
+TEST_CASE("path::flatten() /// at end are collapsed") {
+    char buffer[] = "def///";
+    size_t size = sizeof(buffer) - 1;
+
+    flatten(buffer, &size);
+
+    REQUIRE(Str{buffer, size} == "def/");
 }
