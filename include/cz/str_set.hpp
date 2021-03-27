@@ -10,13 +10,13 @@ namespace cz {
 
 struct Str_Set {
     cz::Str* keys;
-    unsigned char* _masks;
+    Bit_Array _masks;
     size_t cap;
     size_t count;
 
     void drop(cz::Allocator allocator) {
         allocator.dealloc({keys, sizeof(cz::Str) * cap});
-        allocator.dealloc({_masks, bit_array::alloc_size(cap)});
+        _masks.drop(allocator, cap);
     }
 
     void reserve(cz::Allocator allocator, size_t extra) {
@@ -27,12 +27,10 @@ struct Str_Set {
 
             new_this.keys = static_cast<cz::Str*>(
                 allocator.alloc({sizeof(cz::Str) * new_this.cap, alignof(cz::Str)}));
-            new_this._masks = static_cast<unsigned char*>(
-                allocator.alloc({sizeof(unsigned char) * new_this.cap, alignof(unsigned char)}));
+            new_this._masks.init(allocator, new_this.cap);
 
             CZ_ASSERT(new_this.keys);
             CZ_ASSERT(new_this._masks);
-            memset(new_this._masks, 0, sizeof(unsigned char) * new_this.cap);
 
             if (count != 0) {
                 for (size_t i = 0; i < cap; ++i) {
@@ -44,18 +42,18 @@ struct Str_Set {
 
             if (cap != 0) {
                 allocator.dealloc({keys, sizeof(cz::Str) * cap});
-                allocator.dealloc({_masks, sizeof(unsigned char) * cap});
+                _masks.drop(allocator, cap);
             }
 
             *this = new_this;
         }
     }
 
-    bool is_present(size_t index) { return bit_array::get(_masks, index); }
-    void set_present(size_t index) { return bit_array::set(_masks, index); }
-    void set_removed(size_t index) { return bit_array::unset(_masks, index); }
+    bool is_present(size_t index) { return _masks.get(index); }
+    void set_present(size_t index) { return _masks.set(index); }
+    void set_removed(size_t index) { return _masks.unset(index); }
 
-    void clear() { memset(_masks, 0, sizeof(unsigned char) * cap); }
+    void clear() { _masks.clear(cap); }
 
     static Hash hash(cz::Str key) { return ::cz::hash(key, 0x7521AB297521AB29); }
 

@@ -12,14 +12,14 @@ template <class Value>
 struct Str_Map_Removable {
     cz::Str* keys;
     Value* values;
-    unsigned char* _masks;
+    Bit_Array _masks;
     size_t cap;
     size_t count;
 
     void drop(cz::Allocator allocator) {
         allocator.dealloc({keys, sizeof(cz::Str) * cap});
         allocator.dealloc({values, sizeof(Value) * cap});
-        allocator.dealloc({_masks, bit_array::alloc_size(2 * cap)});
+        _masks.drop(allocator, 2 * cap);
     }
 
     void reserve(cz::Allocator allocator, size_t extra) {
@@ -32,13 +32,10 @@ struct Str_Map_Removable {
                 allocator.alloc({sizeof(cz::Str) * new_this.cap, alignof(cz::Str)}));
             new_this.values = static_cast<Value*>(
                 allocator.alloc({sizeof(Value) * new_this.cap, alignof(Value)}));
-            new_this._masks = static_cast<unsigned char*>(
-                allocator.alloc({bit_array::alloc_size(2 * new_this.cap), alignof(unsigned char)}));
+            new_this._masks.init(allocator, 2 * new_this.cap);
 
             CZ_ASSERT(new_this.keys);
             CZ_ASSERT(new_this.values);
-            CZ_ASSERT(new_this._masks);
-            memset(new_this._masks, 0, bit_array::alloc_size(2 * new_this.cap));
 
             if (count != 0) {
                 for (size_t i = 0; i < cap; ++i) {
@@ -51,23 +48,23 @@ struct Str_Map_Removable {
             if (cap != 0) {
                 allocator.dealloc({keys, sizeof(cz::Str) * cap});
                 allocator.dealloc({values, sizeof(Value) * cap});
-                allocator.dealloc({_masks, bit_array::alloc_size(2 * cap)});
+                _masks.dealloc(allocator, 2 * cap);
             }
 
             *this = new_this;
         }
     }
 
-    bool is_present(size_t index) const { return bit_array::get(_masks, 2 * index); }
-    bool is_tombstone(size_t index) const { return bit_array::get(_masks, 2 * index + 1); }
+    bool is_present(size_t index) const { return _masks.get(2 * index); }
+    bool is_tombstone(size_t index) const { return _masks.get(2 * index + 1); }
 
     void set_present(size_t index) {
-        bit_array::set(_masks, 2 * index);
-        bit_array::unset(_masks, 2 * index + 1);
+        _masks.set(2 * index);
+        _masks.unset(2 * index + 1);
     }
     void set_tombstone(size_t index) {
-        bit_array::unset(_masks, 2 * index);
-        bit_array::set(_masks, 2 * index + 1);
+        _masks.unset(2 * index);
+        _masks.set(2 * index + 1);
     }
 
     static Hash hash(cz::Str key) { return ::cz::hash(key, 0x7521AB297521AB29); }
