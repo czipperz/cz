@@ -48,7 +48,7 @@ struct Str_Map_Removable {
             if (cap != 0) {
                 allocator.dealloc({keys, sizeof(cz::Str) * cap});
                 allocator.dealloc({values, sizeof(Value) * cap});
-                _masks.dealloc(allocator, 2 * cap);
+                _masks.drop(allocator, 2 * cap);
             }
 
             *this = new_this;
