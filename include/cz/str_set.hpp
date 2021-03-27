@@ -30,7 +30,6 @@ struct Str_Set {
             new_this._masks.init(allocator, new_this.cap);
 
             CZ_ASSERT(new_this.keys);
-            CZ_ASSERT(new_this._masks);
 
             if (count != 0) {
                 for (size_t i = 0; i < cap; ++i) {

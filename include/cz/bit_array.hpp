@@ -40,9 +40,7 @@ struct Bit_Array {
     }
 
     /// Turn off all bits.  `len` must match the `len` passed into `init`.
-    void clear(size_t len) {
-        memset(buffer, 0, alloc_size(len));
-    }
+    void clear(size_t len) { memset(buffer, 0, alloc_size(len)); }
 
     /// Get the bit at `index`.
     bool get(size_t index) const {
@@ -68,9 +66,7 @@ struct Sized_Bit_Array : Bit_Array {
     void drop(cz::Allocator allocator) { Bit_Array::drop(allocator, len); }
 
     /// Turn off all bits.
-    void clear() {
-        clear(len);
-    }
+    void clear() { Bit_Array::clear(len); }
 };
 
 }
