@@ -38,6 +38,18 @@ struct Allocator {
         return (T*)alloc(info);
     }
 
+    /// Allocate zeroed memory to store an array of values of the given type using this allocator.
+    template <class T>
+    T* alloc_zeroed(size_t count) const {
+        AllocInfo info = alloc_info<T>();
+        info.size *= count;
+        T* ptr = (T*)alloc(info);
+        if (ptr) {
+            memset(ptr, 0, info.size);
+        }
+        return ptr;
+    }
+
     /// Allocate and initialize an object of the given type using this allocator.
     template <class T>
     T* create() const {
