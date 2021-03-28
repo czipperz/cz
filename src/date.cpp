@@ -98,7 +98,7 @@ bool file_time_to_date_utc(File_Time file_time, Date* date) {
     date->second = system_time.wSecond;
     return true;
 #else
-    *date = tm_to_date(time_t_to_tm_utc(file_time.data));
+    *date = time_t_to_date_utc(file_time.data);
     return true;
 #endif
 }
@@ -111,9 +111,17 @@ bool file_time_to_date_local(File_Time file_time, Date* date) {
     }
     return file_time_to_date_utc(local_time, date);
 #else
-    *date = tm_to_date(time_t_to_tm_local(file_time.data));
+    *date = time_t_to_date_local(file_time.data);
     return true;
 #endif
+}
+
+Date time_t_to_date_utc(time_t t) {
+    return tm_to_date(time_t_to_tm_utc(t));
+}
+
+Date time_t_to_date_local(time_t t) {
+    return tm_to_date(time_t_to_tm_local(t));
 }
 
 }

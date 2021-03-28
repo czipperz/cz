@@ -45,6 +45,9 @@ bool file_time_to_date_local(File_Time file_time, Date* date);
 
 struct tm time_t_to_tm_utc(time_t);
 struct tm time_t_to_tm_local(time_t);
+
+Date time_t_to_date_utc(time_t);
+Date time_t_to_date_local(time_t);
 Date tm_to_date(struct tm);
 
 }
