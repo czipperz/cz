@@ -2,6 +2,7 @@
 
 #include <limits.h>
 #include <cz/assert.hpp>
+#include <cz/char_type.hpp>
 #include <cz/string.hpp>
 
 namespace cz {
@@ -21,24 +22,35 @@ String Str::duplicate_null_terminate(Allocator allocator) const {
     return String{ptr, len, len + 1};
 }
 
-const char* Str::rfind(char pattern) const {
-#ifdef _GNU_SOURCE
-    return static_cast<const char*>(::memrchr(buffer, pattern, len));
-#else
-    for (size_t i = len; i > 0; --i) {
-        if (buffer[i - 1] == pattern) {
-            return &buffer[i - 1];
+static inline bool matches_case_insensitive_unbounded(const char* str, cz::Str piece) {
+    for (size_t i = 0; i < piece.len; ++i) {
+        if (cz::to_lower(str[i]) != cz::to_lower(piece[i])) {
+            return false;
         }
     }
-    return nullptr;
-#endif
+    return true;
+}
+
+bool Str::starts_with_case_insensitive(cz::Str prefix) const {
+    if (prefix.len > len) {
+        return false;
+    } else {
+        return matches_case_insensitive_unbounded(buffer, prefix);
+    }
+}
+
+bool Str::ends_with_case_insensitive(cz::Str postfix) const {
+    if (postfix.len > len) {
+        return false;
+    } else {
+        return matches_case_insensitive_unbounded(buffer + len - postfix.len, postfix);
+    }
 }
 
 const char* Str::find(cz::Str infix) const {
 #ifdef _GNU_SOURCE
     return static_cast<const char*>(::memmem(buffer, len, infix.buffer, infix.len));
 #else
-    // todo: optimize this
     for (size_t i = 0; i + infix.len <= len; ++i) {
         if (memcmp(buffer + i, infix.buffer, infix.len) == 0) {
             return buffer + i;
@@ -46,6 +58,47 @@ const char* Str::find(cz::Str infix) const {
     }
     return nullptr;
 #endif
+}
+
+const char* Str::rfind(cz::Str infix) const {
+    if (infix.len > len) {
+        return false;
+    }
+    for (size_t i = len - infix.len; i > 0; --i) {
+        if (memcmp(buffer + i, infix.buffer, infix.len) == 0) {
+            return buffer + i;
+        }
+    }
+    return nullptr;
+}
+
+const char* Str::rfind(char pattern) const {
+#ifdef _GNU_SOURCE
+    return static_cast<const char*>(::memrchr(buffer, pattern, len));
+#else
+    return rfind({&pattern, 1});
+#endif
+}
+
+const char* Str::find_case_insensitive(cz::Str infix) const {
+    for (size_t i = 0; i + infix.len <= len; ++i) {
+        if (matches_case_insensitive_unbounded(buffer + i, infix)) {
+            return buffer + i;
+        }
+    }
+    return nullptr;
+}
+
+const char* Str::rfind_case_insensitive(cz::Str infix) const {
+    if (infix.len > len) {
+        return false;
+    }
+    for (size_t i = len - infix.len; i > 0; --i) {
+        if (matches_case_insensitive_unbounded(buffer + i, infix)) {
+            return buffer + i;
+        }
+    }
+    return nullptr;
 }
 
 }

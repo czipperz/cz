@@ -59,6 +59,9 @@ struct Str {
         }
     }
 
+    bool starts_with_case_insensitive(Str prefix) const;
+    bool ends_with_case_insensitive(Str postfix) const;
+
     size_t count(char c) const {
         cz::Str cpy = *this;
         size_t cnt = 0;
@@ -78,11 +81,20 @@ struct Str {
     bool contains(char infix) const { return find(infix); }
 
     const char* find(Str infix) const;
+    const char* rfind(Str infix) const;
 
-    const char* find(char pattern) const {
-        return static_cast<const char*>(memchr(buffer, pattern, len));
-    }
+    const char* find(char pattern) const { return (const char*)memchr(buffer, pattern, len); }
     const char* rfind(char pattern) const;
+
+    const char* find_case_insensitive(Str infix) const;
+    const char* rfind_case_insensitive(Str infix) const;
+
+    const char* find_case_insensitive(char pattern) const {
+        return find_case_insensitive({&pattern, 1});
+    }
+    const char* rfind_case_insensitive(char pattern) const {
+        return rfind_case_insensitive({&pattern, 1});
+    }
 
     cz::Str slice(size_t start, size_t end) const { return {buffer + start, end - start}; }
     cz::Str slice(const char* start, size_t end) const { return slice(start - buffer, end); }

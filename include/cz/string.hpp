@@ -99,6 +99,13 @@ struct String {
     bool starts_with(Str prefix) const { return as_str().starts_with(prefix); }
     bool ends_with(Str postfix) const { return as_str().ends_with(postfix); }
 
+    bool starts_with_case_insensitive(Str prefix) const {
+        return as_str().starts_with_case_insensitive(prefix);
+    }
+    bool ends_with_case_insensitive(Str postfix) const {
+        return as_str().ends_with_case_insensitive(postfix);
+    }
+
     size_t count(char c) const { return as_str().count(c); }
 
     bool contains(Str infix) const { return as_str().contains(infix); }
@@ -110,8 +117,39 @@ struct String {
     char* find(char pattern) { return const_cast<char*>(as_str().find(pattern)); }
     const char* find(char pattern) const { return as_str().find(pattern); }
 
+    char* rfind(Str pattern) { return const_cast<char*>(as_str().rfind(pattern)); }
+    const char* rfind(Str pattern) const { return as_str().rfind(pattern); }
+
     char* rfind(char pattern) { return const_cast<char*>(as_str().rfind(pattern)); }
     const char* rfind(char pattern) const { return as_str().rfind(pattern); }
+
+    char* find_case_insensitive(Str pattern) {
+        return const_cast<char*>(as_str().find_case_insensitive(pattern));
+    }
+    const char* find_case_insensitive(Str pattern) const {
+        return as_str().find_case_insensitive(pattern);
+    }
+
+    char* find_case_insensitive(char pattern) {
+        return const_cast<char*>(as_str().find_case_insensitive(pattern));
+    }
+    const char* find_case_insensitive(char pattern) const {
+        return as_str().find_case_insensitive(pattern);
+    }
+
+    char* rfind_case_insensitive(Str pattern) {
+        return const_cast<char*>(as_str().rfind_case_insensitive(pattern));
+    }
+    const char* rfind_case_insensitive(Str pattern) const {
+        return as_str().rfind_case_insensitive(pattern);
+    }
+
+    char* rfind_case_insensitive(char pattern) {
+        return const_cast<char*>(as_str().rfind_case_insensitive(pattern));
+    }
+    const char* rfind_case_insensitive(char pattern) const {
+        return as_str().rfind_case_insensitive(pattern);
+    }
 
     cz::Str slice(size_t start, size_t end) const { return as_str().slice(start, end); }
     cz::Str slice(const char* start, size_t end) const { return as_str().slice(start, end); }
