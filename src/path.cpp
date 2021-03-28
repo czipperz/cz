@@ -61,6 +61,22 @@ Option<Str> name_component(Str str) {
     }
 }
 
+bool has_component(Str path, Str component) {
+    while (1) {
+        const char* ptr = path.find(component);
+        if (!ptr) {
+            return false;
+        }
+
+        if ((ptr == path.start() || ptr[-1] == '/') &&
+            (ptr + component.len == path.end() || ptr[component.len] == '/')) {
+            return true;
+        }
+
+        path = path.slice_start(ptr + 1);
+    }
+}
+
 void flatten(char* buffer, size_t* len) {
     size_t index = 0;
     size_t protected_start = 0;

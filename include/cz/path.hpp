@@ -41,6 +41,9 @@ Option<Str> directory_component(Str path);
 /// The path must use forward slashes.
 Option<Str> name_component(Str path);
 
+/// Test if the path has the component.
+bool has_component(Str path, Str component);
+
 /// Flatten the path, removing `..` and `.` inplace.
 /// Prefers leaving trailing `/` rather than removing them.
 ///
