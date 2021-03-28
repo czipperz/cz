@@ -4,6 +4,7 @@
 #include <string.h>
 #include <cz/alloc_utils.hpp>
 #include <cz/assert.hpp>
+#include <cz/heap.hpp>
 #include <cz/util.hpp>
 
 namespace cz {
@@ -14,10 +15,10 @@ void Buffer_Array::create() {
     num_buffers = 4;
     outer = 0;
 
-    buffers = static_cast<char**>(calloc(sizeof(char*), num_buffers));
+    buffers = cz::heap_allocator().alloc_zeroed<char*>(num_buffers);
     CZ_ASSERT(buffers);
 
-    char* buffer = static_cast<char*>(malloc(Buffer_Array::buffer_size));
+    char* buffer = cz::heap_allocator().alloc<char>(Buffer_Array::buffer_size);
     CZ_ASSERT(buffer);
     buffers[outer] = buffer;
     inner = buffer;
@@ -38,8 +39,9 @@ static void* buffer_array_alloc_new_buffer(Buffer_Array* buffer_array, AllocInfo
     // we need more space to store buffers
     if (buffer_array->outer + 1 >= buffer_array->num_buffers) {
         size_t new_size = buffer_array->num_buffers * 2;
-        char** buffers =
-            static_cast<char**>(realloc(buffer_array->buffers, sizeof(char*) * new_size));
+        char** buffers = (char**)cz::heap_allocator().realloc(
+            {buffer_array->buffers, sizeof(char*) * buffer_array->num_buffers},
+            {sizeof(char*) * new_size, alignof(char*)});
         CZ_ASSERT(buffers);
         memset(buffers + buffer_array->num_buffers, 0,
                (new_size - buffer_array->num_buffers) * sizeof(char*));
@@ -51,8 +53,9 @@ static void* buffer_array_alloc_new_buffer(Buffer_Array* buffer_array, AllocInfo
     } else if (new_info.size > Buffer_Array::buffer_size) {
         // Reallocate the buffer to ensure it's big enough.
         ++buffer_array->outer;
-        char* buffer =
-            static_cast<char*>(realloc(buffer_array->buffers[buffer_array->outer], new_info.size));
+        char* buffer = (char*)cz::heap_allocator().realloc(
+            {buffer_array->buffers[buffer_array->outer], Buffer_Array::buffer_size},
+            {new_info.size, 1});
         CZ_ASSERT(buffer);
         buffer_array->buffers[buffer_array->outer] = buffer;
         return buffer;
@@ -64,7 +67,7 @@ static void* buffer_array_alloc_new_buffer(Buffer_Array* buffer_array, AllocInfo
 
     // Make another buffer.
     size_t buffer_size = cz::max<size_t>(Buffer_Array::buffer_size, new_info.size);
-    char* buffer = static_cast<char*>(malloc(buffer_size));
+    char* buffer = cz::heap_allocator().alloc<char>(buffer_size);
     CZ_ASSERT(buffer);
     ++buffer_array->outer;
     buffer_array->buffers[buffer_array->outer] = buffer;
@@ -131,9 +134,9 @@ Allocator Buffer_Array::allocator() {
 
 void Buffer_Array::drop() {
     for (size_t i = 0; i < num_buffers; ++i) {
-        free(buffers[i]);
+        cz::heap_allocator().dealloc({buffers[i], Buffer_Array::buffer_size});
     }
-    free(buffers);
+    cz::heap_allocator().dealloc(buffers, num_buffers);
 }
 
 }

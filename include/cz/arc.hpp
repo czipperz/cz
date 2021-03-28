@@ -1,8 +1,8 @@
 #pragma once
 
-#include <stdlib.h>
 #include <atomic>
 #include <cz/assert.hpp>
+#include <cz/heap.hpp>
 #include <new>
 #include <utility>
 
@@ -98,14 +98,14 @@ void decrement_total(Arc_Value<T>*& pointer) {
     CZ_DEBUG_ASSERT(total > 0);
 
     if (total == 1) {
-        free(pointer);
+        cz::heap_allocator().dealloc(pointer);
         pointer = nullptr;
     }
 }
 
 template <class T>
 void Arc<T>::init_general() {
-    pointer = (Arc_Value<T>*)malloc(sizeof(Arc_Value<T>));
+    pointer = cz::heap_allocator().alloc<Arc_Value<T> >();
     CZ_ASSERT(pointer);
     std::atomic_init(&pointer->strong, (uint32_t)1);
     std::atomic_init(&pointer->total, (uint32_t)1);
