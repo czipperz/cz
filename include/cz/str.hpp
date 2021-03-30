@@ -43,6 +43,8 @@ struct Str {
         return buffer[len - 1];
     }
 
+    bool equals_case_insensitive(Str other) const;
+
     bool starts_with(Str prefix) const {
         if (len < prefix.len) {
             return false;

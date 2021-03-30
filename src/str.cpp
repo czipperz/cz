@@ -31,6 +31,14 @@ static inline bool matches_case_insensitive_unbounded(const char* str, cz::Str p
     return true;
 }
 
+bool Str::equals_case_insensitive(cz::Str other) const {
+    if (other.len != len) {
+        return false;
+    } else {
+        return matches_case_insensitive_unbounded(buffer, other);
+    }
+}
+
 bool Str::starts_with_case_insensitive(cz::Str prefix) const {
     if (prefix.len > len) {
         return false;

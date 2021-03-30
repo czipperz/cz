@@ -96,6 +96,10 @@ struct String {
         return _buffer[_len - 1];
     }
 
+    bool equals_case_insensitive(Str prefix) const {
+        return as_str().equals_case_insensitive(prefix);
+    }
+
     bool starts_with(Str prefix) const { return as_str().starts_with(prefix); }
     bool ends_with(Str postfix) const { return as_str().ends_with(postfix); }
 
