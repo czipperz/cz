@@ -375,24 +375,59 @@ void Process::kill() {
     detach();
 }
 
-int Process::join() {
 #ifdef _WIN32
-    WaitForSingleObject(hProcess, INFINITE);
+static int get_exit_code(HANDLE hProcess) {
     DWORD exit_code = -1;
     GetExitCodeProcess(hProcess, &exit_code);
+    return exit_code;
+}
 #else
-    int status;
-    waitpid(pid, &status, 0);
+static int get_exit_code(int status) {
     int exit_code;
     if (WIFEXITED(status)) {
         exit_code = WEXITSTATUS(status);
     } else {
         exit_code = 127;
     }
+}
+#endif
+
+int Process::join() {
+#ifdef _WIN32
+    DWORD status = WaitForSingleObject(hProcess, INFINITE);
+    CZ_ASSERT(status == WAIT_OBJECT_0);
+
+    int exit_code = get_exit_code(hProcess);
+#else
+    int status;
+    waitpid(pid, &status, 0);
+
+    int exit_code = get_exit_code(status);
 #endif
 
     detach();
     return exit_code;
+}
+
+bool Process::try_join(int* exit_code) {
+#ifdef _WIN32
+    DWORD status = WaitForSingleObject(hProcess, 0);
+    if (status != WAIT_OBJECT_0) {
+        return false;
+    }
+
+    *exit_code = get_exit_code(hProcess);
+#else
+    int status;
+    if (waitpid(pid, &status, WNOHANG) == 0) {
+        return false;
+    }
+
+    *exit_code = get_exit_code(status);
+#endif
+
+    detach();
+    return true;
 }
 
 #ifdef _WIN32

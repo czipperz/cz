@@ -70,7 +70,7 @@ struct Input_File : File_Descriptor {
 #ifdef _WIN32
         return read_strip_carriage_returns(buffer, size, carry);
 #else
-        (void)carry; // remove unused parameter warnings
+        (void)carry;  // remove unused parameter warnings
         return read_binary(buffer, size);
 #endif
     }
@@ -199,7 +199,18 @@ public:
     void kill();
 
     /// Wait for the child process to end if it hasn't ended already and destroy the `Process`.
+    ///
+    /// Returns the exit code of the process or a special code if the process terminated
+    /// without exiting (crashed).  On Windows this is `-1`, on Linux this is `127`.
     int join();
+
+    /// Try to join the process, returning whether it was successful.
+    ///
+    /// If it hasn't completed, returns `false`.  If it has completed then stores the
+    /// exit code in `exit_code` (ie the return value of `join`) and returns `true`.
+    ///
+    /// See `join` for more information.
+    bool try_join(int* exit_code);
 
     /// Destroy the `Process` but don't terminate the child process.
     void detach();
