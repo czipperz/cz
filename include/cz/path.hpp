@@ -85,5 +85,16 @@ void convert_to_forward_slashes(char* path, size_t len);
 /// Note that this is only relevant to call on Windows (ie `_WIN32` is defined).
 void convert_to_back_slashes(char* path, size_t len);
 
+/// Test if the character is a directory separator on this platform.
+inline bool is_dir_sep(char ch) {
+#ifdef _WIN32
+    if (ch == '\\') {
+        return true;
+    }
+#endif
+
+    return ch == '/';
+}
+
 }
 }
