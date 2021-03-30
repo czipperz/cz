@@ -438,7 +438,8 @@ static void escape_backslashes(cz::String* script, cz::Str arg, size_t i) {
 void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocator) {
     bool any_special = false;
     for (size_t i = 0; i < arg.len; ++i) {
-        if (!isalnum(arg[i]) && arg[i] != '/' && arg[i] != ':' && arg[i] != '-' && arg[i] != '.') {
+        if (!isalnum(arg[i]) && arg[i] != '/' && arg[i] != '\\' && arg[i] != ':' && arg[i] != '-' &&
+            arg[i] != '.') {
             any_special = true;
             break;
         }
