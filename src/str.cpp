@@ -70,7 +70,7 @@ const char* Str::find(cz::Str infix) const {
 
 const char* Str::rfind(cz::Str infix) const {
     if (infix.len > len) {
-        return false;
+        return nullptr;
     }
     for (size_t i = len - infix.len; i > 0; --i) {
         if (memcmp(buffer + i, infix.buffer, infix.len) == 0) {
@@ -99,7 +99,7 @@ const char* Str::find_case_insensitive(cz::Str infix) const {
 
 const char* Str::rfind_case_insensitive(cz::Str infix) const {
     if (infix.len > len) {
-        return false;
+        return nullptr;
     }
     for (size_t i = len - infix.len; i > 0; --i) {
         if (matches_case_insensitive_unbounded(buffer + i, infix)) {
