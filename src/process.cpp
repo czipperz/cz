@@ -389,6 +389,7 @@ static int get_exit_code(int status) {
     } else {
         exit_code = 127;
     }
+    return exit_code;
 }
 #endif
 
