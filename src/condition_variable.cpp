@@ -55,20 +55,12 @@ void Condition_Variable::drop() {
 // Convert a void* to the primitive type.
 // @Condition_Variable_Mutex relies on this code.
 #ifdef _WIN32
-static CRITICAL_SECTION* hmutex(void*& handle) {
-    if (sizeof(CRITICAL_SECTION) <= sizeof(void*)) {
-        return (CRITICAL_SECTION*)&handle;
-    } else {
-        return (CRITICAL_SECTION*)handle;
-    }
+static CRITICAL_SECTION* hmutex(void* handle) {
+    return (CRITICAL_SECTION*)handle;
 }
 #else
-static pthread_mutex_t* hmutex(void*& handle) {
-    if (sizeof(pthread_mutex_t) <= sizeof(void*)) {
-        return *(pthread_mutex_t**)&handle;
-    } else {
-        return (pthread_mutex_t*)handle;
-    }
+static pthread_mutex_t* hmutex(void* handle) {
+    return (pthread_mutex_t*)handle;
 }
 #endif
 
