@@ -86,7 +86,7 @@ struct Vector {
         CZ_DEBUG_ASSERT(index <= _len);
         CZ_DEBUG_ASSERT(_cap - _len >= slice.len);
         memmove(_elems + index + slice.len, _elems + index, (_len - index) * sizeof(T));
-        memcpy(_elems + index, slice.buffer, slice.len * sizeof(T));
+        memcpy(_elems + index, slice.elems, slice.len * sizeof(T));
         _len += slice.len;
     }
 
