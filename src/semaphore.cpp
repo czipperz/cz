@@ -25,7 +25,7 @@ static HANDLE h(void*& handle) {
     }
 }
 #else
-static sem_t* h(void*& handle) {
+static sem_t* h(void* handle) {
     return (sem_t*)handle;
 }
 #endif

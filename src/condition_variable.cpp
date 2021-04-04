@@ -19,11 +19,11 @@ namespace cz {
 
 // Convert a void* to the primitive type.
 #ifdef _WIN32
-static CONDITION_VARIABLE* h(void*& handle) {
+static CONDITION_VARIABLE* h(void* handle) {
     return (CONDITION_VARIABLE*)handle;
 }
 #else
-static pthread_cond_t* h(void*& handle) {
+static pthread_cond_t* h(void* handle) {
     return (pthread_cond_t*)handle;
 }
 #endif

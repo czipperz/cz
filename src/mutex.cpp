@@ -17,11 +17,11 @@ namespace cz {
 // Convert a void* to the primitive type.
 // @Condition_Variable_Mutex relies on this code.
 #ifdef _WIN32
-static CRITICAL_SECTION* h(void*& handle) {
+static CRITICAL_SECTION* h(void* handle) {
     return (CRITICAL_SECTION*)handle;
 }
 #else
-static pthread_mutex_t* h(void*& handle) {
+static pthread_mutex_t* h(void* handle) {
     return (pthread_mutex_t*)handle;
 }
 #endif
