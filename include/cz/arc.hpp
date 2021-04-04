@@ -79,6 +79,7 @@ private:
 
 public:
     /// Try to upgrade this weak reference to a strong reference (`Arc`).
+    /// If successful, the `Arc` must be destroyed via `drop`.
     bool upgrade(Arc<T>*) const noexcept;
 
     /// Test if the resource is still alive.  If this is `false` then `upgrade` will always fail.
@@ -114,14 +115,14 @@ void Arc<T>::init_general() {
 template <class T>
 void Arc<T>::init_copy(const T& value) {
     init_general();
-    new (pointer) T(value);
+    new (&pointer->value) T(value);
 }
 
 template <class T>
 template <class... Args>
 void Arc<T>::init_emplace(Args&&... args) {
     init_general();
-    new (pointer) T(std::forward<Args>(args)...);
+    new (&pointer->value) T(std::forward<Args>(args)...);
 }
 
 template <class T>
