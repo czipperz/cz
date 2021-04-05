@@ -26,6 +26,11 @@ struct Slice {
     constexpr T* end() const { return elems + len; }
 };
 
+template <class T, size_t len_>
+constexpr size_t len(T (&arr)[len_]) {
+    return len_;
+}
+
 template <class T, size_t len>
 constexpr Slice<T> slice(T (&arr)[len]) {
     return {arr, len};
