@@ -91,7 +91,7 @@ void flatten(char* buffer, size_t* len) {
 #endif
 
     bool is_absolute = false;
-    if (*len >= 1 && buffer[index] == '/') {
+    if (index < *len && buffer[index] == '/') {
         is_absolute = true;
         index += 1;
 
