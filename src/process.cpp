@@ -98,9 +98,10 @@ bool File_Descriptor::set_non_inheritable() {
 
 int64_t Input_File::read_binary(char* buffer, size_t size) {
     ZoneScoped;
+
 #ifdef _WIN32
     DWORD bytes;
-    if (ReadFile(handle, buffer, size, &bytes, NULL)) {
+    if (ReadFile(handle, buffer, (DWORD)size, &bytes, NULL)) {
         return bytes;
     } else {
         // If we're reading non-blocking then no data also has
@@ -123,7 +124,7 @@ void strip_carriage_returns(char* buffer, size_t* size) {
     ZoneScoped;
 
     char* start = buffer + 1;
-    while (start - buffer < *size) {
+    while (start < buffer + *size) {
         char* spot = (char*)memchr(start, '\n', buffer + *size - start);
         if (spot) {
             if (spot[-1] == '\r') {
@@ -196,7 +197,7 @@ int64_t Output_File::write_binary(const char* buffer, size_t size) {
 
 #ifdef _WIN32
     DWORD bytes;
-    if (WriteFile(handle, buffer, size, &bytes, NULL)) {
+    if (WriteFile(handle, buffer, (DWORD)size, &bytes, NULL)) {
         return bytes;
     } else {
         return -1;
@@ -412,10 +413,10 @@ void Process::kill() {
 
 #ifdef _WIN32
     TerminateProcess(hProcess, -1);
+    CloseHandle(hProcess);
 #else
     ::kill(pid, SIGTERM);
 #endif
-    detach();
 }
 
 #ifdef _WIN32
@@ -444,6 +445,7 @@ int Process::join() {
     CZ_ASSERT(status == WAIT_OBJECT_0);
 
     int exit_code = get_exit_code(hProcess);
+    CloseHandle(hProcess);
 #else
     int status;
     waitpid(pid, &status, 0);
@@ -451,7 +453,6 @@ int Process::join() {
     int exit_code = get_exit_code(status);
 #endif
 
-    detach();
     return exit_code;
 }
 
@@ -465,6 +466,7 @@ bool Process::try_join(int* exit_code) {
     }
 
     *exit_code = get_exit_code(hProcess);
+    CloseHandle(hProcess);
 #else
     int status;
     if (waitpid(pid, &status, WNOHANG) == 0) {
@@ -474,7 +476,6 @@ bool Process::try_join(int* exit_code) {
     *exit_code = get_exit_code(status);
 #endif
 
-    detach();
     return true;
 }
 
@@ -752,11 +753,11 @@ bool Process::launch_program(cz::Slice<const cz::Str> args, Process_Options* opt
 
         // If exec returns there is an error launching.
         const char* message = "Error executing ";
-        write(2, message, strlen(message));
-        write(2, new_args[0], strlen(new_args[0]));
-        write(2, ": ", 2);
+        (void)write(2, message, strlen(message));
+        (void)write(2, new_args[0], strlen(new_args[0]));
+        (void)write(2, ": ", 2);
         const char* err = strerror(errno);
-        write(2, err, strlen(err));
+        (void)write(2, err, strlen(err));
         exit(errno);
     } else {  // parent process
         return true;
