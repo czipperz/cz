@@ -17,6 +17,12 @@
 #include <cz/defer.hpp>
 #include <cz/heap.hpp>
 
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#else
+#define ZoneScoped
+#endif
+
 namespace cz {
 
 void File_Descriptor::close() {
@@ -83,6 +89,7 @@ bool File_Descriptor::set_non_inheritable() {
 }
 
 int64_t Input_File::read_binary(char* buffer, size_t size) {
+    ZoneScoped;
 #ifdef _WIN32
     DWORD bytes;
     if (ReadFile(handle, buffer, size, &bytes, NULL)) {
@@ -171,6 +178,7 @@ bool Output_File::open(const char* file) {
 }
 
 int64_t Output_File::write_binary(const char* buffer, size_t size) {
+    ZoneScoped;
 #ifdef _WIN32
     DWORD bytes;
     if (WriteFile(handle, buffer, size, &bytes, NULL)) {

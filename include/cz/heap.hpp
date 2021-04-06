@@ -9,11 +9,13 @@
 #else
 #define TracyAlloc(x, y)
 #define TracyFree(x)
+#define ZoneScoped
 #endif
 
 namespace cz {
 
 inline void* heap_allocator_alloc(void*, AllocInfo info) {
+    ZoneScoped;
     CZ_DEBUG_ASSERT(info.alignment <= alignof(max_align_t));
     void* ptr = malloc(info.size);
     TracyAlloc(ptr, info.size);
@@ -21,11 +23,13 @@ inline void* heap_allocator_alloc(void*, AllocInfo info) {
 }
 
 inline void heap_allocator_dealloc(void*, MemSlice mem) {
+    ZoneScoped;
     TracyFree(mem.buffer);
     free(mem.buffer);
 }
 
 inline void* heap_allocator_realloc(void*, MemSlice old_mem, AllocInfo new_info) {
+    ZoneScoped;
     CZ_DEBUG_ASSERT(new_info.alignment <= alignof(max_align_t));
     void* ptr = realloc(old_mem.buffer, new_info.size);
     if (ptr) {
