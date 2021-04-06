@@ -26,6 +26,8 @@
 namespace cz {
 
 void File_Descriptor::close() {
+    ZoneScoped;
+
 #ifdef _WIN32
     if (handle != Null_) {
         CloseHandle(handle);
@@ -38,6 +40,8 @@ void File_Descriptor::close() {
 }
 
 bool Input_File::open(const char* file) {
+    ZoneScoped;
+
 #ifdef _WIN32
     SECURITY_ATTRIBUTES sa;
     sa.nLength = sizeof(sa);
@@ -58,6 +62,8 @@ bool Input_File::open(const char* file) {
 }
 
 bool File_Descriptor::set_non_blocking() {
+    ZoneScoped;
+
 #ifdef _WIN32
     DWORD mode = PIPE_NOWAIT;
     return SetNamedPipeHandleState(handle, &mode, NULL, NULL);
@@ -74,6 +80,8 @@ bool File_Descriptor::set_non_blocking() {
 }
 
 bool File_Descriptor::set_non_inheritable() {
+    ZoneScoped;
+
 #ifdef _WIN32
     return SetHandleInformation(handle, HANDLE_FLAG_INHERIT, FALSE);
 #else
@@ -112,6 +120,8 @@ int64_t Input_File::read_binary(char* buffer, size_t size) {
 }
 
 void strip_carriage_returns(char* buffer, size_t* size) {
+    ZoneScoped;
+
     char* start = buffer + 1;
     while (start - buffer < *size) {
         char* spot = (char*)memchr(start, '\n', buffer + *size - start);
@@ -132,6 +142,8 @@ void strip_carriage_returns(char* buffer, size_t* size) {
 int64_t Input_File::read_strip_carriage_returns(char* buffer,
                                                 size_t size,
                                                 Carriage_Return_Carry* carry) {
+    ZoneScoped;
+
     char* start = buffer;
     char* end = buffer + size;
     if (carry->carrying && size > 0) {
@@ -159,6 +171,8 @@ int64_t Input_File::read_strip_carriage_returns(char* buffer,
 }
 
 bool Output_File::open(const char* file) {
+    ZoneScoped;
+
 #ifdef _WIN32
     SECURITY_ATTRIBUTES sa;
     sa.nLength = sizeof(sa);
@@ -179,6 +193,7 @@ bool Output_File::open(const char* file) {
 
 int64_t Output_File::write_binary(const char* buffer, size_t size) {
     ZoneScoped;
+
 #ifdef _WIN32
     DWORD bytes;
     if (WriteFile(handle, buffer, size, &bytes, NULL)) {
@@ -192,6 +207,8 @@ int64_t Output_File::write_binary(const char* buffer, size_t size) {
 }
 
 int64_t Output_File::write_add_carriage_returns(const char* buffer, size_t size) {
+    ZoneScoped;
+
     const char* start = buffer;
     const char* end = buffer + size;
     while (1) {
@@ -253,6 +270,8 @@ Output_File std_err_file() {
 }
 
 void read_to_string(Input_File file, cz::Allocator allocator, cz::String* out) {
+    ZoneScoped;
+
     char buffer[1024];
     Carriage_Return_Carry carry;
     while (1) {
@@ -270,6 +289,8 @@ void read_to_string(Input_File file, cz::Allocator allocator, cz::String* out) {
 }
 
 void Process_Options::close_all() {
+    ZoneScoped;
+
     std_in.close();
     std_out.close();
 #ifdef _WIN32
@@ -283,6 +304,8 @@ void Process_Options::close_all() {
 }
 
 bool create_pipe(Input_File* input, Output_File* output) {
+    ZoneScoped;
+
 #ifdef _WIN32
     SECURITY_ATTRIBUTES sa;
     sa.nLength = sizeof(sa);
@@ -303,6 +326,8 @@ bool create_pipe(Input_File* input, Output_File* output) {
 }
 
 bool create_process_input_pipe(Input_File* input, Output_File* output) {
+    ZoneScoped;
+
     if (!create_pipe(input, output)) {
         return false;
     }
@@ -317,6 +342,8 @@ bool create_process_input_pipe(Input_File* input, Output_File* output) {
 }
 
 bool create_process_output_pipe(Output_File* output, Input_File* input) {
+    ZoneScoped;
+
     if (!create_pipe(input, output)) {
         return false;
     }
@@ -331,6 +358,8 @@ bool create_process_output_pipe(Output_File* output, Input_File* input) {
 }
 
 bool create_process_pipes(Process_IO* io, Process_Options* options) {
+    ZoneScoped;
+
     if (!create_process_input_pipe(&options->std_in, &io->std_in)) {
         return false;
     }
@@ -347,6 +376,8 @@ bool create_process_pipes(Process_IO* io, Process_Options* options) {
 }
 
 bool create_process_pipes(Process_IOE* io, Process_Options* options) {
+    ZoneScoped;
+
     if (!create_process_input_pipe(&options->std_in, &io->std_in)) {
         return false;
     }
@@ -369,12 +400,16 @@ bool create_process_pipes(Process_IOE* io, Process_Options* options) {
 }
 
 void Process::detach() {
+    ZoneScoped;
+
 #ifdef _WIN32
     CloseHandle(hProcess);
 #endif
 }
 
 void Process::kill() {
+    ZoneScoped;
+
 #ifdef _WIN32
     TerminateProcess(hProcess, -1);
 #else
@@ -402,6 +437,8 @@ static int get_exit_code(int status) {
 #endif
 
 int Process::join() {
+    ZoneScoped;
+
 #ifdef _WIN32
     DWORD status = WaitForSingleObject(hProcess, INFINITE);
     CZ_ASSERT(status == WAIT_OBJECT_0);
@@ -419,6 +456,8 @@ int Process::join() {
 }
 
 bool Process::try_join(int* exit_code) {
+    ZoneScoped;
+
 #ifdef _WIN32
     DWORD status = WaitForSingleObject(hProcess, 0);
     if (status != WAIT_OBJECT_0) {
@@ -441,6 +480,8 @@ bool Process::try_join(int* exit_code) {
 
 #ifdef _WIN32
 static bool launch_script_(char* script, Process_Options* options, HANDLE* hProcess) {
+    ZoneScoped;
+
     STARTUPINFO si;
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
@@ -480,6 +521,8 @@ static void escape_backslashes(cz::String* script, cz::Str arg, size_t i) {
 }
 
 void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocator) {
+    ZoneScoped;
+
     bool any_special = false;
     for (size_t i = 0; i < arg.len; ++i) {
         if (!isalnum(arg[i]) && arg[i] != '/' && arg[i] != '\\' && arg[i] != ':' && arg[i] != '-' &&
@@ -531,6 +574,8 @@ void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocato
 }
 
 bool Process::launch_script(cz::Str script, Process_Options* options) {
+    ZoneScoped;
+
     cz::Str prefix = "cmd /C ";
 
     cz::String copy = {};
@@ -545,6 +590,8 @@ bool Process::launch_script(cz::Str script, Process_Options* options) {
 }
 
 bool Process::launch_program(cz::Slice<const cz::Str> args, Process_Options* options) {
+    ZoneScoped;
+
     cz::String script = {};
     CZ_DEFER(script.drop(cz::heap_allocator()));
 
@@ -602,6 +649,8 @@ static bool shell_escape_outside(char c) {
 }
 
 void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocator) {
+    ZoneScoped;
+
     size_t escaped_outside = 0;
     size_t escaped_inside = 0;
     bool use_string = false;
@@ -646,6 +695,8 @@ void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocato
 }
 
 bool Process::launch_script(cz::Str script, Process_Options* options) {
+    ZoneScoped;
+
     cz::Str args[] = {"/bin/sh", "-c", script, nullptr};
     return launch_program(args, options);
 }
@@ -659,6 +710,8 @@ static void bind_pipe(int input, int output) {
 }
 
 bool Process::launch_program(cz::Slice<const cz::Str> args, Process_Options* options) {
+    ZoneScoped;
+
     char** new_args = cz::heap_allocator().alloc<char*>(args.len + 1);
     CZ_ASSERT(new_args);
     CZ_DEFER(cz::heap_allocator().dealloc(new_args, args.len + 1));
@@ -714,6 +767,8 @@ bool Process::launch_program(cz::Slice<const cz::Str> args, Process_Options* opt
 void Process::escape_args(cz::Slice<const cz::Str> args,
                           cz::String* script,
                           cz::Allocator allocator) {
+    ZoneScoped;
+
     CZ_DEBUG_ASSERT(args.len >= 1);
 
     script->reserve(cz::heap_allocator(), 32);

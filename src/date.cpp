@@ -12,9 +12,17 @@
 #include <unistd.h>
 #endif
 
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#else
+#define ZoneScoped
+#endif
+
 namespace cz {
 
 bool get_file_time(const char* path, File_Time* file_time) {
+    ZoneScoped;
+
 #ifdef _WIN32
     HANDLE handle = CreateFile(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
                                FILE_FLAG_BACKUP_SEMANTICS, NULL);
