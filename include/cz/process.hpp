@@ -22,6 +22,7 @@ struct File_Descriptor {
     static constexpr const int Null_ = -1;
 #endif
 
+    /// If the `File_Descriptor` was successfully opened, then close it.
     void close();
 
     /// Set the file descriptor to return swiftly from IO operations.
