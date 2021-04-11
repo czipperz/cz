@@ -24,6 +24,9 @@ struct Slice {
     constexpr T* begin() const { return elems; }
     constexpr T* start() const { return elems; }
     constexpr T* end() const { return elems + len; }
+
+    T& first() const { return elems[0]; }
+    T& last() const { return elems[len - 1]; }
 };
 
 template <class T, size_t len_>

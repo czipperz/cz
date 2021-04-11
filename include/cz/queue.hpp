@@ -28,6 +28,7 @@ struct Queue {
         ++len;
     }
 
+    void append_end(cz::Slice<const T> slice) { return append_end(slice.elems, slice.len); }
     void append_end(const T* ts, size_t tl) {
         CZ_DEBUG_ASSERT(len + tl <= cap);
         size_t end = (offset + len) & (cap - 1);
@@ -55,6 +56,7 @@ struct Queue {
         len += tl;
     }
 
+    void append_start(cz::Slice<const T> slice) { return append_start(slice.elems, slice.len); }
     void append_start(const T* ts, size_t tl) {
         CZ_DEBUG_ASSERT(len + tl <= cap);
 
@@ -131,6 +133,24 @@ struct Queue {
     const T& operator[](size_t index) const {
         CZ_DEBUG_ASSERT(index < len);
         return elems[(offset + index) & (cap - 1)];
+    }
+
+    T& first() {
+        CZ_DEBUG_ASSERT(len > 0);
+        return elems[offset];
+    }
+    const T& first() const {
+        CZ_DEBUG_ASSERT(len > 0);
+        return elems[offset];
+    }
+
+    T& last() {
+        CZ_DEBUG_ASSERT(len > 0);
+        return elems[(offset + len - 1) & (cap - 1)];
+    }
+    const T& last() const {
+        CZ_DEBUG_ASSERT(len > 0);
+        return elems[(offset + len - 1) & (cap - 1)];
     }
 };
 
