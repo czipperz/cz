@@ -81,6 +81,12 @@ struct Allocator {
     void* realloc(MemSlice old_mem, AllocInfo new_info) const {
         return vtable->realloc(data, old_mem, new_info);
     }
+
+    template <class T>
+    T* realloc(T* old_mem, size_t old_len, size_t new_len) const {
+        return (T*)vtable->realloc(data, {old_mem, old_len * sizeof(T)},
+                                   {new_len * sizeof(T), alignof(T)});
+    }
 };
 
 }
