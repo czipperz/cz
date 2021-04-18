@@ -40,7 +40,7 @@ struct Vector {
     void realloc(Allocator allocator) {
         if (_elems) {
             T* new_elems = static_cast<T*>(
-                allocator.realloc({_elems, _cap}, {_len * sizeof(T), alignof(T)}));
+                allocator.realloc({_elems, _cap * sizeof(T)}, {_len * sizeof(T), alignof(T)}));
             if (new_elems) {
                 _elems = new_elems;
                 _cap = _len;
