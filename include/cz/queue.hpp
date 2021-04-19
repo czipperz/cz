@@ -95,6 +95,67 @@ struct Queue {
         return elems[(offset + len) & (cap - 1)];
     }
 
+    void remove(size_t index) {
+        CZ_DEBUG_ASSERT(len >= 1);
+        CZ_DEBUG_ASSERT(index < len);
+
+        if (index + offset < cap) {
+            // We are removing before the wrap around.  Shift elements forward.
+            // _ _ a b c X e f
+            // _ _ _ a b c e f
+            memmove(elems + offset + 1, elems + offset, index * sizeof(T));
+            offset = (offset + 1) & (cap - 1);
+        } else {
+            // We are removing after the wrap around.  Shift elements backwards.
+            // c X e f _ _ a b
+            // c e f _ _ _ a b
+            size_t index2 = (offset + index) & (cap - 1);
+            memmove(elems + index2, elems + index2 + 1, (len - (index + 1)) * sizeof(T));
+        }
+
+        --len;
+    }
+
+    void remove_range(size_t start, size_t end) {
+        CZ_DEBUG_ASSERT(end >= start);
+        CZ_DEBUG_ASSERT(len >= (end - start));
+        CZ_DEBUG_ASSERT(end <= len);
+
+        if (offset + end <= cap) {
+            // Removing purely before the wrap around.  Shift elements forward.
+            // f _ _ a b X X e
+            // f _ _ _ _ a b e
+            memmove(elems + offset + (end - start), elems + offset, (end - start) * sizeof(T));
+            offset = (offset + (end - start)) & (cap - 1);
+            len -= (end - start);
+            return;
+        }
+
+        if (offset + start < cap) {
+            // Removing partially before the wrap around.  Shift elements forward.
+            // Note: the X at the start is handled in the case below.
+            // X f _ _ a b X X
+            // X f _ _ _ _ a b
+            memmove(elems + (cap - start), elems + offset, start * sizeof(T));
+            end = (offset + end) & (cap - 1);
+            offset = 0;
+            len -= (cap - start - offset);
+            start = 0;
+            goto remove_after;
+        }
+
+        if (offset + end >= cap) {
+        remove_after:
+            // Removing after the wrap around.  Shift elements backwards.
+            // c X e _ _ a b c
+            // c e _ _ _ a b c
+            size_t start2 = ((offset + start) & (cap - 1));
+            size_t end2 = ((offset + end) & (cap - 1));
+            memmove(elems + start2, elems + end2, (len - end) * sizeof(T));
+            len -= (end - start);
+        }
+    }
+
     void reserve(cz::Allocator allocator, size_t extra) {
         size_t new_cap = len + extra;
         if (new_cap > cap) {
