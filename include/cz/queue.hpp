@@ -125,7 +125,7 @@ struct Queue {
             // Removing purely before the wrap around.  Shift elements forward.
             // f _ _ a b X X e
             // f _ _ _ _ a b e
-            memmove(elems + offset + (end - start), elems + offset, (end - start) * sizeof(T));
+            memmove(elems + offset + (end - start), elems + offset, start * sizeof(T));
             offset = (offset + (end - start)) & (cap - 1);
             len -= (end - start);
             return;
