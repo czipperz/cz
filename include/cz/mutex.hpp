@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#endif
+
 namespace cz {
 
 struct Condition_Variable;
@@ -19,6 +23,10 @@ struct Condition_Variable;
 struct Mutex {
 private:
     void* handle;
+
+#ifdef TRACY_ENABLE
+    tracy::SharedLockableCtx* context;
+#endif
 
     friend struct Condition_Variable;
 

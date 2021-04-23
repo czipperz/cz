@@ -38,6 +38,14 @@ void Mutex::init() {
 
     pthread_mutex_init(h(handle), /*attr=*/nullptr);
 #endif
+
+#ifdef TRACY_ENABLE
+    context = new tracy::SharedLockableCtx([]() -> const tracy::SourceLocationData* {
+        static constexpr tracy::SourceLocationData srcloc{nullptr, "cz::Mutex", __FILE__, __LINE__,
+                                                          0};
+        return &srcloc;
+    }());
+#endif
 }
 
 void Mutex::drop() {
@@ -48,6 +56,10 @@ void Mutex::drop() {
 #endif
 
     cz::heap_allocator().dealloc(h(handle));
+
+#ifdef TRACY_ENABLE
+    delete context;
+#endif
 }
 
 void Mutex::unlock() {
@@ -57,25 +69,47 @@ void Mutex::unlock() {
     int ret = pthread_mutex_unlock(h(handle));
     CZ_ASSERT(ret == 0);
 #endif
+
+#ifdef TRACY_ENABLE
+    context->AfterUnlock();
+#endif
 }
 
 void Mutex::lock() {
+#ifdef TRACY_ENABLE
+    const auto run_after = context->BeforeLock();
+#endif
+
 #ifdef _WIN32
     EnterCriticalSection(h(handle));
 #else
     int ret = pthread_mutex_lock(h(handle));
     CZ_ASSERT(ret == 0);
 #endif
+
+#ifdef TRACY_ENABLE
+    if (run_after) {
+        context->AfterLock();
+    }
+#endif
 }
 
 bool Mutex::try_lock() {
+    bool success;
+
 #ifdef _WIN32
     // Note that this ignores errors.
-    return TryEnterCriticalSection(h(handle));
+    success = TryEnterCriticalSection(h(handle));
 #else
     // Note that this ignores errors.
-    return pthread_mutex_trylock(h(handle)) == 0;
+    success = pthread_mutex_trylock(h(handle)) == 0;
 #endif
+
+#ifdef TRACY_ENABLE
+    context->AfterTryLock(success);
+#endif
+
+    return success;
 }
 
 }
