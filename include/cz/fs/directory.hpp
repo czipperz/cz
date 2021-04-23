@@ -47,5 +47,15 @@ Result files(Allocator paths_allocator,
              const char* cstr_path,
              Vector<Str>* paths);
 
+Result files_null_terminate(Allocator paths_allocator,
+                            Allocator path_allocator,
+                            const char* cstr_path,
+                            Vector<String>* paths);
+
+Result files_null_terminate(Allocator paths_allocator,
+                            Allocator path_allocator,
+                            const char* cstr_path,
+                            Vector<Str>* paths);
+
 }
 }
