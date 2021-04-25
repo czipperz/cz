@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #endif
@@ -93,6 +94,61 @@ bool File_Descriptor::set_non_inheritable() {
         return false;
     }
     return true;
+#endif
+}
+
+int64_t File_Descriptor::set_position(int64_t value, Relative_To relative_to) {
+#ifdef _WIN32
+    DWORD move_method;
+    switch (relative_to) {
+        case Relative_To::START:
+            move_method = FILE_BEGIN;
+            break;
+        case Relative_To::END:
+            move_method = FILE_END;
+            break;
+        case Relative_To::CURRENT:
+            move_method = FILE_CURRENT;
+            break;
+    }
+
+    LARGE_INTEGER large_integer;
+    large_integer.QuadPart = (LONGLONG)value;
+    if (!SetFilePointerEx(handle, large_integer, &large_integer, move_method)) {
+        return -1;
+    }
+    return (int64_t)large_integer.QuadPart;
+#else
+    int whence;
+    switch (relative_to) {
+        case Relative_To::START:
+            whence = SEEK_SET;
+            break;
+        case Relative_To::END:
+            whence = SEEK_END;
+            break;
+        case Relative_To::CURRENT:
+            whence = SEEK_CUR;
+            break;
+    }
+
+    return lseek(fd, value, whence);
+#endif
+}
+
+int64_t File_Descriptor::get_size() {
+#ifdef _WIN32
+    LARGE_INTEGER file_size;
+    if (!GetFileSizeEx(handle, &file_size)) {
+        return -1;
+    }
+    return file_size.QuadPart;
+#else
+    struct stat buf;
+    if (fstat(fd, &buf) < 0) {
+        return -1;
+    }
+    return buf.st_size;
 #endif
 }
 

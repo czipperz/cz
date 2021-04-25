@@ -11,6 +11,26 @@
 
 namespace cz {
 
+namespace Relative_To_ {
+/// An enum describing what `File_Descriptor::set_position()` will set the position relative to.
+enum Relative_To {
+    /// The start of the file.  The value must not be negative.
+    START,
+
+    /// The end of the file.  The value must not be positive.
+    END,
+
+    /// The current point in the file.  The value, once added to
+    /// the current position of the file, should not be negative.
+    ///
+    /// If the sum is greater than the size of the file and you have an `Output_File`
+    /// you can then write to it; on Windows this will leave the intermediate bytes
+    /// uninitialized whereas on Linux it will fill them with `'\0'`.
+    CURRENT,
+};
+}
+using Relative_To_::Relative_To;
+
 struct File_Descriptor {
 #ifdef _WIN32
     void* handle = Null_;
@@ -33,6 +53,21 @@ struct File_Descriptor {
 
     /// Set the file descriptor to be automatically closed when a process is created.
     bool set_non_inheritable();
+
+    /// Set the position of the file relative to a marker (the
+    /// start or end of the file or the current position).
+    ///
+    /// Returns `-1` on failure.  On success returns the position
+    /// of the file (relative to the start of the file).
+    ///
+    /// This is referred to as "seeking" on some filesystems.
+    int64_t set_position(int64_t value, Relative_To relative_to);
+
+    /// Get the position of the file or `-1` on error.
+    int64_t get_position() { return set_position(0, Relative_To::CURRENT); }
+
+    /// Get the size of the file or `-1` on error.
+    int64_t get_size();
 };
 
 struct Carriage_Return_Carry {
