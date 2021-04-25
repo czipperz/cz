@@ -98,6 +98,8 @@ bool File_Descriptor::set_non_inheritable() {
 }
 
 int64_t File_Descriptor::set_position(int64_t value, Relative_To relative_to) {
+    ZoneScoped;
+
 #ifdef _WIN32
     DWORD move_method;
     switch (relative_to) {
@@ -137,6 +139,8 @@ int64_t File_Descriptor::set_position(int64_t value, Relative_To relative_to) {
 }
 
 int64_t File_Descriptor::get_size() {
+    ZoneScoped;
+
 #ifdef _WIN32
     LARGE_INTEGER file_size;
     if (!GetFileSizeEx(handle, &file_size)) {
