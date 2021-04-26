@@ -38,7 +38,7 @@ Result get_working_directory(Allocator allocator, String* path) {
     path->set_len(0);
     path->reserve(allocator, size);
 
-    while (!getcwd(path->end(), size)) {
+    while (!getcwd(path->end(), (int)size)) {
         if (errno == ERANGE) {
             // get longer length and then retry
             size *= 2;
