@@ -13,8 +13,12 @@ struct Vector {
     size_t _cap;
 
     void reserve(Allocator allocator, size_t extra) {
-        if (this->cap() - this->len() < extra) {
-            size_t new_cap = max(this->len() + extra, this->cap() * 2);
+        return reserve_total(allocator, _len + extra);
+    }
+
+    void reserve_total(Allocator allocator, size_t total) {
+        if (this->cap() < total) {
+            size_t new_cap = max(total, this->cap() * 2);
 
             T* new_elems;
             if (this->elems()) {
