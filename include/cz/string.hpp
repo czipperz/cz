@@ -188,13 +188,4 @@ struct String {
     }
 };
 
-struct AllocatedString : String {
-    Allocator allocator;
-
-    void reserve(size_t extra) { String::reserve(allocator, extra); }
-    void realloc() { String::realloc(allocator); }
-    void realloc_null_terminate() { String::realloc_null_terminate(allocator); }
-    void drop() { String::drop(allocator); }
-};
-
 }
