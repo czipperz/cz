@@ -77,4 +77,13 @@ inline Format_Address address(void* x) {
 }
 void append(cz::Allocator allocator, cz::String* string, Format_Address);
 
+struct Format_Many {
+    char ch;
+    size_t count;
+};
+inline Format_Many many(char ch, size_t count) {
+    return Format_Many{ch, count};
+}
+void append(cz::Allocator allocator, cz::String* string, Format_Many);
+
 }

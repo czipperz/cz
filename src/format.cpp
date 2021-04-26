@@ -111,4 +111,10 @@ void append(cz::Allocator allocator, cz::String* string, Format_Address address)
     append_sprintf(allocator, string, "0x%h", address.x);
 }
 
+void append(cz::Allocator allocator, cz::String* string, Format_Many many) {
+    string->reserve(allocator, many.count);
+    memset(string->end(), many.ch, many.count);
+    string->set_len(string->len() + many.count);
+}
+
 }
