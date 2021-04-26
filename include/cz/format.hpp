@@ -1,92 +1,80 @@
 #pragma once
 
+#include <stdarg.h>
+#include "heap_string.hpp"
 #include "string.hpp"
-#include "write.hpp"
 
 namespace cz {
 
+/// Run `sprintf` and make the result into a string.
+cz::String asprintf(cz::Allocator allocator, const char* format, ...);
+cz::Heap_String asprintf(const char* format, ...);
+cz::String avsprintf(cz::Allocator allocator, const char* format, va_list args);
+cz::Heap_String avsprintf(const char* format, va_list args);
+
+/// Run `sprintf` and append the result to a string.
+void append_sprintf(cz::Allocator allocator, cz::String* string, const char* format, ...);
+void append_sprintf(cz::Heap_String* string, const char* format, ...);
+void append_vsprintf(cz::Allocator allocator, cz::String* string, const char* format, va_list args);
+void append_vsprintf(cz::Heap_String* string, const char* format, va_list args);
+
+/// Format a bunch of things to a string.
 template <class... Ts>
-String sprint(Allocator allocator, Ts... ts) {
-    AllocatedString string = {};
-    string.allocator = allocator;
-    write(string_writer(&string), ts...);
-    return /* slice */ string;
+cz::String format(cz::Allocator allocator, Ts... ts) {
+    cz::String string = {};
+    append(allocator, &string, ts...);
+    return string;
 }
 
-namespace format {
+/// Format a bunch of things to a string that is heap allocated.
+template <class... Ts>
+cz::Heap_String format(Ts... ts) {
+    cz::Heap_String string = {};
+    append(&string, ts...);
+    return string;
+}
 
-struct Address {
-    void* val;
+/// Append a bunch of things to a string.
+template <class T1, class T2, class... Ts>
+void append(cz::Allocator allocator, cz::String* string, T1 t1, T2 t2, Ts... ts) {
+    append(allocator, string, t1);
+    append(allocator, string, t2, ts...);
+}
+
+/// Append a bunch of things to a heap allocated string.
+template <class... Ts>
+inline void append(cz::Heap_String* string, Ts... ts) {
+    append(cz::heap_allocator(), string, ts...);
+}
+
+/// Default implementations for basic types.
+inline void append(cz::Allocator allocator, cz::String* string, cz::Str str) {
+    string->reserve(allocator, str.len);
+    string->append(str);
+}
+inline void append(cz::Allocator allocator, cz::String* string, char ch) {
+    string->reserve(allocator, 1);
+    string->push(ch);
+}
+
+void append(cz::Allocator allocator, cz::String* string, short);
+void append(cz::Allocator allocator, cz::String* string, unsigned short);
+void append(cz::Allocator allocator, cz::String* string, int);
+void append(cz::Allocator allocator, cz::String* string, unsigned int);
+void append(cz::Allocator allocator, cz::String* string, long);
+void append(cz::Allocator allocator, cz::String* string, unsigned long);
+void append(cz::Allocator allocator, cz::String* string, long long);
+void append(cz::Allocator allocator, cz::String* string, unsigned long long);
+
+void append(cz::Allocator allocator, cz::String* string, AllocInfo);
+void append(cz::Allocator allocator, cz::String* string, MemSlice);
+
+struct Format_Address {
+    void* x;
 };
-
-inline Address addr(void* val) {
-    return {val};
+inline Format_Address address(void* x) {
+    return Format_Address{x};
 }
-
-template <class T>
-struct WidthSpecified {
-    T val;
-    size_t width;
-};
-
-template <class T>
-inline WidthSpecified<T> width(size_t width, T val) {
-    return {val, width};
-}
-
-template <class T>
-struct Debug {
-    T val;
-};
-
-template <class T>
-inline Debug<T> debug(T val) {
-    return {val};
-}
-
-}
-
-Result write(Writer writer, format::Address addr);
-
-Result write(Writer writer, format::WidthSpecified<short>);
-Result write(Writer writer, format::WidthSpecified<unsigned short>);
-Result write(Writer writer, format::WidthSpecified<int>);
-Result write(Writer writer, format::WidthSpecified<unsigned int>);
-Result write(Writer writer, format::WidthSpecified<long>);
-Result write(Writer writer, format::WidthSpecified<unsigned long>);
-Result write(Writer writer, format::WidthSpecified<long long>);
-Result write(Writer writer, format::WidthSpecified<unsigned long long>);
-
-template <class T>
-Result write(Writer writer, format::Debug<T> debug) {
-    return write(writer, debug.val);
-}
-
-Result write(Writer writer, format::Debug<Str>);
-inline Result write(Writer writer, format::Debug<const char*> str) {
-    return write(writer, format::debug(Str(str.val)));
-}
-inline Result write(Writer writer, format::Debug<String> string) {
-    return write(writer, format::debug(Str(string.val)));
-}
-
-Result write(Writer writer, format::Debug<MemSlice>);
-Result write(Writer writer, format::Debug<AllocInfo>);
-
-template <class T>
-Result write(Writer writer, format::Debug<Slice<T>> debug_slice) {
-    auto slice = debug_slice.val;
-    CZ_TRY(write(writer, '['));
-
-    for (size_t i = 0; i < slice.len; ++i) {
-        if (i != 0) {
-            CZ_TRY(write(writer, ", "));
-        }
-
-        CZ_TRY(write(writer, format::debug(slice[i])));
-    }
-
-    return write(writer, ']');
-}
+void append(cz::Allocator allocator, cz::String* string, Format_Address);
 
 }
