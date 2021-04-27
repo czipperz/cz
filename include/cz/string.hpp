@@ -22,6 +22,8 @@ struct String {
     ///
     /// Panics if there isn't enough space.
     void push(char ch) { append({&ch, 1}); }
+    /// Calls `push` `count` times.
+    void push_many(char ch, size_t count);
     /// Append the string `str` to the buffer.
     ///
     /// Panics if there isn't enough space.

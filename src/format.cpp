@@ -113,8 +113,7 @@ void append(cz::Allocator allocator, cz::String* string, Format_Address address)
 
 void append(cz::Allocator allocator, cz::String* string, Format_Many many) {
     string->reserve(allocator, many.count);
-    memset(string->end(), many.ch, many.count);
-    string->set_len(string->len() + many.count);
+    string->push_many(many.ch, many.count);
 }
 
 }

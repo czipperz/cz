@@ -39,6 +39,13 @@ void String::reserve_total(Allocator allocator, size_t total) {
     }
 }
 
+void String::push_many(char ch, size_t count) {
+    CZ_DEBUG_ASSERT(_cap - _len >= count);
+    memset(_buffer + _len, ch, count);
+    _len += count;
+    CZ_DEBUG_ASSERT(_len <= _cap);
+}
+
 void String::append(Str str) {
     CZ_DEBUG_ASSERT(_cap - _len >= str.len);
     memcpy(_buffer + _len, str.buffer, str.len);
