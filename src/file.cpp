@@ -10,10 +10,17 @@
 #include <unistd.h>
 #endif
 
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#else
+#define ZoneScoped (void)0
+#endif
+
 namespace cz {
 namespace file {
 
 bool does_file_exist(const char* path) {
+    ZoneScoped;
 #ifdef _WIN32
     return GetFileAttributes(path) != 0xFFFFFFFF;
 #else
