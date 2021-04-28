@@ -92,7 +92,13 @@ void String::realloc(Allocator allocator) {
 }
 
 void String::realloc_null_terminate(Allocator allocator) {
-    char* res = static_cast<char*>(allocator.realloc({_buffer, _cap}, {_len + 1, 1}));
+    char* res;
+    if (_buffer) {
+        res = static_cast<char*>(allocator.realloc({_buffer, _cap}, {_len + 1, 1}));
+    } else {
+        CZ_DEBUG_ASSERT(_len == 0);
+        res = static_cast<char*>(allocator.alloc({1, 1}));
+    }
     CZ_ASSERT(res);
     _buffer = res;
     _buffer[_len] = '\0';
