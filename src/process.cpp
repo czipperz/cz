@@ -22,6 +22,7 @@
 #include <Tracy.hpp>
 #else
 #define ZoneScoped
+#define ZoneText(...)
 #endif
 
 namespace cz {
@@ -42,6 +43,7 @@ void File_Descriptor::close() {
 
 bool Input_File::open(const char* file) {
     ZoneScoped;
+    ZoneText(file, strlen(file));
 
 #ifdef _WIN32
     SECURITY_ATTRIBUTES sa;
@@ -233,6 +235,7 @@ int64_t Input_File::read_strip_carriage_returns(char* buffer,
 
 bool Output_File::open(const char* file) {
     ZoneScoped;
+    ZoneText(file, strlen(file));
 
 #ifdef _WIN32
     SECURITY_ATTRIBUTES sa;
