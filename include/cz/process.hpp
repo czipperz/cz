@@ -43,6 +43,7 @@ struct File_Descriptor {
 #endif
 
     /// If the `File_Descriptor` was successfully opened, then close it.
+    /// Note: this function does not reset the state of the `File_Descriptor`.
     void close();
 
     /// Check if the `File_Descriptor` is open.
