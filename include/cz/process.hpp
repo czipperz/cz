@@ -45,6 +45,9 @@ struct File_Descriptor {
     /// If the `File_Descriptor` was successfully opened, then close it.
     void close();
 
+    /// Check if the `File_Descriptor` is open.
+    bool is_open() const;
+
     /// Set the file descriptor to return swiftly from IO operations.
     ///
     /// This is most useful when used on an `Input_File`.  In this case read will immediately

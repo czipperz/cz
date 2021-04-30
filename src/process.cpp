@@ -30,20 +30,27 @@ namespace cz {
 void File_Descriptor::close() {
     ZoneScoped;
 
+    if (is_open()) {
 #ifdef _WIN32
-    if (handle != Null_) {
         CloseHandle(handle);
-    }
 #else
-    if (fd != Null_) {
         ::close(fd);
+#endif
     }
+}
+
+bool File_Descriptor::is_open() const {
+#ifdef _WIN32
+    return handle != Null_;
+#else
+    return fd != Null_;
 #endif
 }
 
 bool Input_File::open(const char* file) {
     ZoneScoped;
     ZoneText(file, strlen(file));
+    CZ_DEBUG_ASSERT(!is_open());
 
 #ifdef _WIN32
     SECURITY_ATTRIBUTES sa;
@@ -66,6 +73,7 @@ bool Input_File::open(const char* file) {
 
 bool File_Descriptor::set_non_blocking() {
     ZoneScoped;
+    CZ_DEBUG_ASSERT(is_open());
 
 #ifdef _WIN32
     DWORD mode = PIPE_NOWAIT;
@@ -84,6 +92,7 @@ bool File_Descriptor::set_non_blocking() {
 
 bool File_Descriptor::set_non_inheritable() {
     ZoneScoped;
+    CZ_DEBUG_ASSERT(is_open());
 
 #ifdef _WIN32
     return SetHandleInformation(handle, HANDLE_FLAG_INHERIT, FALSE);
@@ -101,6 +110,7 @@ bool File_Descriptor::set_non_inheritable() {
 
 int64_t File_Descriptor::set_position(int64_t value, Relative_To relative_to) {
     ZoneScoped;
+    CZ_DEBUG_ASSERT(is_open());
 
 #ifdef _WIN32
     DWORD move_method;
@@ -142,6 +152,7 @@ int64_t File_Descriptor::set_position(int64_t value, Relative_To relative_to) {
 
 int64_t File_Descriptor::get_size() {
     ZoneScoped;
+    CZ_DEBUG_ASSERT(is_open());
 
 #ifdef _WIN32
     LARGE_INTEGER file_size;
@@ -160,6 +171,7 @@ int64_t File_Descriptor::get_size() {
 
 int64_t Input_File::read_binary(char* buffer, size_t size) {
     ZoneScoped;
+    CZ_DEBUG_ASSERT(is_open());
 
 #ifdef _WIN32
     DWORD bytes;
@@ -206,6 +218,7 @@ int64_t Input_File::read_strip_carriage_returns(char* buffer,
                                                 size_t size,
                                                 Carriage_Return_Carry* carry) {
     ZoneScoped;
+    CZ_DEBUG_ASSERT(is_open());
 
     char* start = buffer;
     char* end = buffer + size;
@@ -236,6 +249,7 @@ int64_t Input_File::read_strip_carriage_returns(char* buffer,
 bool Output_File::open(const char* file) {
     ZoneScoped;
     ZoneText(file, strlen(file));
+    CZ_DEBUG_ASSERT(!is_open());
 
 #ifdef _WIN32
     SECURITY_ATTRIBUTES sa;
@@ -257,6 +271,7 @@ bool Output_File::open(const char* file) {
 
 int64_t Output_File::write_binary(const char* buffer, size_t size) {
     ZoneScoped;
+    CZ_DEBUG_ASSERT(is_open());
 
 #ifdef _WIN32
     DWORD bytes;
@@ -272,6 +287,7 @@ int64_t Output_File::write_binary(const char* buffer, size_t size) {
 
 int64_t Output_File::write_add_carriage_returns(const char* buffer, size_t size) {
     ZoneScoped;
+    CZ_DEBUG_ASSERT(is_open());
 
     const char* start = buffer;
     const char* end = buffer + size;
@@ -335,6 +351,7 @@ Output_File std_err_file() {
 
 void read_to_string(Input_File file, cz::Allocator allocator, cz::String* out) {
     ZoneScoped;
+    CZ_DEBUG_ASSERT(file.is_open());
 
     char buffer[1024];
     Carriage_Return_Carry carry;
