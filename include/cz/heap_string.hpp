@@ -28,6 +28,8 @@ struct Heap_String : String {
         hcopy._cap = scopy._cap;
         return hcopy;
     }
+    using String::clone;
+    using String::clone_null_terminate;
 
     void drop() { String::drop(cz::heap_allocator()); }
 };

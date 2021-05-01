@@ -15,6 +15,7 @@ struct Heap_Vector : Vector<T> {
     void realloc() { Vector<T>::realloc(cz::heap_allocator()); }
 
     Heap_Vector<T> clone() const { return clone(cz::heap_allocator()); }
+    using Vector::clone;
 };
 
 }
