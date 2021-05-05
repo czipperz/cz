@@ -2,6 +2,7 @@
 
 #include "allocator.hpp"
 #include "assert.hpp"
+#include "slice.hpp"
 #include "util.hpp"
 
 namespace cz {
@@ -131,6 +132,19 @@ struct Vector {
     Slice<T> as_slice() { return *this; }
     constexpr Slice<const T> as_slice() const { return *this; }
 
+    Slice<T> slice(size_t start, size_t end) const { return {_elems + start, end - start}; }
+    Slice<T> slice(const T* start, size_t end) const { return slice(start - _elems, end); }
+    Slice<T> slice(size_t start, const T* end) const { return slice(start, end - _elems); }
+    Slice<T> slice(const T* start, const T* end) const {
+        return slice(start - _elems, end - _elems);
+    }
+
+    Slice<T> slice_start(size_t start) const { return slice(start, _len); }
+    Slice<T> slice_start(const T* start) const { return slice(start, _len); }
+
+    Slice<T> slice_end(size_t end) const { return slice((size_t)0, end); }
+    Slice<T> slice_end(const T* end) const { return slice((size_t)0, end); }
+
     T* elems() { return _elems; }
     constexpr const T* elems() const { return _elems; }
     void set_len(size_t new_len) {
@@ -147,5 +161,12 @@ struct Vector {
     T* end() { return elems() + len(); }
     constexpr const T* end() const { return elems() + len(); }
 };
+
+template <class T>
+Vector<T> Slice<T>::duplicate(Allocator allocator) const {
+    T* ts = allocator.alloc<T>(len);
+    memcpy(ts, elems, sizeof(T) * len);
+    return {ts, len, len};
+}
 
 }

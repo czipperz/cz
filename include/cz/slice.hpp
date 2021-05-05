@@ -3,6 +3,9 @@
 #include <stddef.h>
 
 namespace cz {
+struct Allocator;
+template <class T>
+struct Vector;
 
 /// A slice of an array of the given type.
 ///
@@ -21,12 +24,26 @@ struct Slice {
 
     constexpr operator Slice<const T>() const { return {elems, len}; }
 
+    // Note the implementation for this is in vector.hpp.
+    Vector<T> duplicate(Allocator allocator) const;
+
     constexpr T* begin() const { return elems; }
     constexpr T* start() const { return elems; }
     constexpr T* end() const { return elems + len; }
 
     T& first() const { return elems[0]; }
     T& last() const { return elems[len - 1]; }
+
+    Slice slice(size_t start, size_t end) const { return {elems + start, end - start}; }
+    Slice slice(const T* start, size_t end) const { return slice(start - elems, end); }
+    Slice slice(size_t start, const T* end) const { return slice(start, end - elems); }
+    Slice slice(const T* start, const T* end) const { return slice(start - elems, end - elems); }
+
+    Slice slice_start(size_t start) const { return slice(start, len); }
+    Slice slice_start(const T* start) const { return slice(start, len); }
+
+    Slice slice_end(size_t end) const { return slice((size_t)0, end); }
+    Slice slice_end(const T* end) const { return slice((size_t)0, end); }
 };
 
 template <class T, size_t len_>
