@@ -59,6 +59,15 @@ struct Allocator {
         return obj;
     }
 
+    /// Clone an object into the allocator.
+    template <class T>
+    T* clone(const T& t) {
+        T* ptr = alloc<T>();
+        CZ_ASSERT(ptr);
+        *ptr = t;
+        return ptr;
+    }
+
     /// Duplicate a slice of memory by allocating a copy of it using this allocator.
     template <class T>
     cz::Slice<T> duplicate(cz::Slice<T> slice) {
