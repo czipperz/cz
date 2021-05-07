@@ -13,7 +13,7 @@ struct Buffer_Array {
     size_t outer;
     char* inner;
 
-    void create();
+    void init();
     void drop();
     Allocator allocator();
 

@@ -17,9 +17,9 @@ TEST_CASE("fs::files works") {
 
     const char* dir = "tests/fs";
 
-    DirectoryIterator iterator(allocator);
-    REQUIRE(iterator.create(dir).is_ok());
-    CZ_DEFER(REQUIRE(iterator.destroy().is_ok()));
+    Directory_Iterator iterator;
+    REQUIRE(iterator.init(allocator, dir).is_ok());
+    CZ_DEFER(REQUIRE(iterator.drop(allocator).is_ok()));
 
     Vector<String> paths = {};
     CZ_DEFER(paths.drop(allocator));
@@ -28,8 +28,11 @@ TEST_CASE("fs::files works") {
 
     size_t i = 0;
     while (!iterator.done()) {
-        cz::println("ls: ", iterator.file());
+        fputs("ls: ", stdout);
+        cz::Str file = iterator.file();
+        fwrite(file.buffer, 1, file.len, stdout);
+        putchar('\n');
         REQUIRE(iterator.file() == paths[i++]);
-        REQUIRE(iterator.advance().is_ok());
+        REQUIRE(iterator.advance(allocator).is_ok());
     }
 }

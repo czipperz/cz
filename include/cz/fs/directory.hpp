@@ -8,8 +8,7 @@
 namespace cz {
 namespace fs {
 
-class DirectoryIterator {
-    Allocator _allocator;
+struct Directory_Iterator {
     String _file = {};
     bool _done = false;
 
@@ -19,18 +18,16 @@ class DirectoryIterator {
     /* DIR* */ void* _dir /* uninitialized */;
 #endif
 
-public:
-    DirectoryIterator(Allocator allocator) : _allocator(allocator) {}
-
     Str file() const { return _file; }
     bool done() const { return _done; }
 
-    /// Create the iterator for the files in the directory \c cstr_path.
+    /// Create the iterator for the files in the directory `path`.
     ///
-    /// The path may be followed by a \c / .
-    Result create(const char* cstr_path);
-    Result advance();
-    Result destroy();
+    /// The path may be followed by a `/`.
+    Result init(Allocator allocator, const char* path);
+    Result drop(Allocator allocator);
+
+    Result advance(Allocator allocator);
 };
 
 /// Get the files in the directory \c cstr_path.

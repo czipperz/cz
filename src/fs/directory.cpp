@@ -24,7 +24,7 @@ static Result get_last_error() {
     return result;
 }
 
-Result DirectoryIterator::advance() {
+Result Directory_Iterator::advance(Allocator allocator) {
     WIN32_FIND_DATA data;
     if (FindNextFileA(_handle, &data)) {
         _file.set_len(0);
@@ -42,8 +42,8 @@ Result DirectoryIterator::advance() {
     }
 }
 
-Result DirectoryIterator::destroy() {
-    _file.drop(_allocator);
+Result Directory_Iterator::drop(Allocator allocator) {
+    _file.drop(allocator);
     if (FindClose(_handle)) {
         return Result::ok();
     } else {
@@ -51,7 +51,7 @@ Result DirectoryIterator::destroy() {
     }
 }
 
-Result DirectoryIterator::create(const char* cstr_path) {
+Result Directory_Iterator::init(Allocator allocator, const char* cstr_path) {
     // Windows doesn't list the files in a directory, it findes files matching criteria.  Thus we
     // must append \c "\*" to get all files in the directory \c cstr_path.
     char buffer[_MAX_PATH];
@@ -76,7 +76,7 @@ Result DirectoryIterator::create(const char* cstr_path) {
             _done = true;
             return Result::ok();
         } else {
-            destroy();
+            drop(allocator);
             return get_last_error();
         }
     }
@@ -85,7 +85,7 @@ Result DirectoryIterator::create(const char* cstr_path) {
             _done = true;
             return Result::ok();
         } else {
-            destroy();
+            drop(allocator);
             return get_last_error();
         }
     }
@@ -93,7 +93,7 @@ Result DirectoryIterator::create(const char* cstr_path) {
     CZ_DEBUG_ASSERT(_file.len() == 0);
 
     // _MAX_PATH (= 260) accounts for null terminator
-    _file.reserve(_allocator, sizeof(buffer));
+    _file.reserve(allocator, sizeof(buffer));
 
     Str file = data.cFileName;
     _file.append(file);
@@ -111,13 +111,13 @@ Result DirectoryIterator::create(const char* cstr_path) {
 namespace cz {
 namespace fs {
 
-Result DirectoryIterator::advance() {
+Result Directory_Iterator::advance(Allocator allocator) {
     errno = 0;
     dirent* dirent = readdir((DIR*)_dir);
     if (dirent) {
         Str file = dirent->d_name;
         if (file == "." || file == "..") {
-            return advance();
+            return advance(allocator);
         }
 
         _file.set_len(0);
@@ -133,26 +133,27 @@ Result DirectoryIterator::advance() {
     }
 }
 
-Result DirectoryIterator::destroy() {
-    _file.drop(_allocator);
+Result Directory_Iterator::drop(Allocator allocator) {
+    _file.drop(allocator);
     int ret = closedir((DIR*)_dir);
     (void)ret;
     CZ_DEBUG_ASSERT(ret == 0);
     return Result::ok();
 }
 
-Result DirectoryIterator::create(const char* cstr_path) {
+Result Directory_Iterator::init(Allocator allocator, const char* cstr_path) {
     DIR* dir = opendir(cstr_path);
     if (!dir) {
         return Result::last_error();
     }
 
     // NAME_MAX doesn't account for null terminator
-    _file.reserve(_allocator, NAME_MAX + 1);
+    _file.reserve(allocator, NAME_MAX + 1);
     _dir = dir;
 
-    auto result = advance();
+    auto result = advance(allocator);
     if (result.is_err()) {
+        _file.drop(allocator);
         closedir(dir);
     }
     return result;
@@ -169,88 +170,88 @@ Result files(Allocator paths_allocator,
              Allocator path_allocator,
              const char* cstr_path,
              Vector<String>* paths) {
-    DirectoryIterator iterator(paths_allocator);
-    CZ_TRY(iterator.create(cstr_path));
+    Directory_Iterator iterator;
+    CZ_TRY(iterator.init(paths_allocator, cstr_path));
 
     while (!iterator.done()) {
         paths->reserve(paths_allocator, 1);
         paths->push(iterator.file().duplicate(path_allocator));
 
-        auto result = iterator.advance();
+        auto result = iterator.advance(paths_allocator);
         if (result.is_err()) {
             // ignore errors in destruction
-            iterator.destroy();
+            iterator.drop(paths_allocator);
             return result;
         }
     }
 
-    return iterator.destroy();
+    return iterator.drop(paths_allocator);
 }
 
 Result files(Allocator paths_allocator,
              Allocator path_allocator,
              const char* cstr_path,
              Vector<Str>* paths) {
-    DirectoryIterator iterator(paths_allocator);
-    CZ_TRY(iterator.create(cstr_path));
+    Directory_Iterator iterator;
+    CZ_TRY(iterator.init(paths_allocator, cstr_path));
 
     while (!iterator.done()) {
         paths->reserve(paths_allocator, 1);
         paths->push(iterator.file().duplicate(path_allocator));
 
-        auto result = iterator.advance();
+        auto result = iterator.advance(paths_allocator);
         if (result.is_err()) {
             // ignore errors in destruction
-            iterator.destroy();
+            iterator.drop(paths_allocator);
             return result;
         }
     }
 
-    return iterator.destroy();
+    return iterator.drop(paths_allocator);
 }
 
 Result files_null_terminate(Allocator paths_allocator,
                             Allocator path_allocator,
                             const char* cstr_path,
                             Vector<String>* paths) {
-    DirectoryIterator iterator(paths_allocator);
-    CZ_TRY(iterator.create(cstr_path));
+    Directory_Iterator iterator;
+    CZ_TRY(iterator.init(paths_allocator, cstr_path));
 
     while (!iterator.done()) {
         paths->reserve(paths_allocator, 1);
         paths->push(iterator.file().duplicate_null_terminate(path_allocator));
 
-        auto result = iterator.advance();
+        auto result = iterator.advance(paths_allocator);
         if (result.is_err()) {
             // ignore errors in destruction
-            iterator.destroy();
+            iterator.drop(paths_allocator);
             return result;
         }
     }
 
-    return iterator.destroy();
+    return iterator.drop(paths_allocator);
 }
 
 Result files_null_terminate(Allocator paths_allocator,
                             Allocator path_allocator,
                             const char* cstr_path,
                             Vector<Str>* paths) {
-    DirectoryIterator iterator(paths_allocator);
-    CZ_TRY(iterator.create(cstr_path));
+    Directory_Iterator iterator;
+    CZ_TRY(iterator.init(paths_allocator, cstr_path));
 
     while (!iterator.done()) {
         paths->reserve(paths_allocator, 1);
         paths->push(iterator.file().duplicate_null_terminate(path_allocator));
 
-        auto result = iterator.advance();
+        auto result = iterator.advance(paths_allocator);
         if (result.is_err()) {
             // ignore errors in destruction
-            iterator.destroy();
+            iterator.drop(paths_allocator);
             return result;
         }
     }
 
-    return iterator.destroy();
+    return iterator.drop(paths_allocator);
 }
 
 }

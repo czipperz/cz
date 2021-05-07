@@ -11,7 +11,7 @@ namespace cz {
 
 using namespace cz;
 
-void Buffer_Array::create() {
+void Buffer_Array::init() {
     num_buffers = 4;
     outer = 0;
 
