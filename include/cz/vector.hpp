@@ -101,11 +101,15 @@ struct Vector {
         --_len;
     }
 
+    void remove_many(size_t index, size_t count) {
+        CZ_DEBUG_ASSERT(index + count <= _len);
+        memmove(_elems + index, _elems + index + count, sizeof(T) * (_len - index - count));
+        _len -= count;
+    }
+
     void remove_range(size_t start, size_t end) {
-        CZ_DEBUG_ASSERT(start <= end);
-        CZ_DEBUG_ASSERT(end <= _len);
-        memmove(_elems + start, _elems + end, sizeof(T) * (_len - end));
-        _len -= end - start;
+        CZ_DEBUG_ASSERT(end >= start);
+        return remove_many(start, end - start);
     }
 
     T& last() {

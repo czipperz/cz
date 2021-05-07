@@ -116,6 +116,8 @@ struct Queue {
         --len;
     }
 
+    void remove_many(size_t index, size_t count) { return remove_range(index, index + count); }
+
     void remove_range(size_t start, size_t end) {
         CZ_DEBUG_ASSERT(end >= start);
         CZ_DEBUG_ASSERT(len >= (end - start));

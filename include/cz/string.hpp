@@ -43,10 +43,23 @@ struct String {
     /// Panics if there isn't enough space or if `index > len()`.
     void insert(size_t index, Str str);
 
-    /// Removes `count` characters start at `index`.
+    /// Removes the character at `index`.
     ///
-    /// Panics if there isn't enough space or if `index + count > len()`.
-    void remove(size_t index, size_t count);
+    /// Panics if `index >= len()`.
+    void remove(size_t index);
+
+    /// Removes `count` characters starting at `index`.
+    ///
+    /// Panics if `index + count > len()`.
+    void remove_many(size_t index, size_t count);
+
+    /// Removes all characters starting at `start` up to but not including `end`.
+    ///
+    /// Panics if `end > start` or `end > len()`.
+    void remove_range(size_t start, size_t end) {
+        CZ_DEBUG_ASSERT(end >= start);
+        return remove_many(start, end - start);
+    }
 
     /// Pop the last character off the string.
     ///
