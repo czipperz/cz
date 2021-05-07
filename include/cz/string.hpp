@@ -112,6 +112,13 @@ struct String {
         return as_str().ends_with_case_insensitive(postfix);
     }
 
+    bool starts_with(char c) const { return as_str().starts_with(c); }
+    bool ends_with(char c) const { return as_str().ends_with(c); }
+    bool starts_with_case_insensitive(char c) const {
+        return as_str().starts_with_case_insensitive(c);
+    }
+    bool ends_with_case_insensitive(char c) const { return as_str().ends_with_case_insensitive(c); }
+
     size_t count(char c) const { return as_str().count(c); }
 
     bool contains(Str infix) const { return as_str().contains(infix); }

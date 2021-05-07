@@ -6,6 +6,7 @@
 #include "allocator.hpp"
 #include "assert.hpp"
 #include "slice.hpp"
+#include "char_type.hpp"
 
 namespace cz {
 
@@ -63,6 +64,15 @@ struct Str {
 
     bool starts_with_case_insensitive(Str prefix) const;
     bool ends_with_case_insensitive(Str postfix) const;
+
+    bool starts_with(char c) const { return len > 0 && buffer[0] == c; }
+    bool ends_with(char c) const { return len > 0 && buffer[len - 1] == c; }
+    bool starts_with_case_insensitive(char c) const {
+        return len > 0 && cz::to_lower(buffer[0]) == cz::to_lower(c);
+    }
+    bool ends_with_case_insensitive(char c) const {
+        return len > 0 && cz::to_lower(buffer[len - 1]) == cz::to_lower(c);
+    }
 
     size_t count(char c) const {
         cz::Str cpy = *this;
