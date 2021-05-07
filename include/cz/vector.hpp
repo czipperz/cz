@@ -53,6 +53,23 @@ struct Vector {
         }
     }
 
+    /// Reallocates the vector to have `new_cap` as the new capacity.  If this
+    /// causes the vector to shrink then the length will be adjusted accordingly.
+    void resize(Allocator allocator, size_t new_cap) {
+        T* new_elems;
+        if (_elems) {
+            new_elems = allocator.realloc(_elems, _cap, new_cap);
+        } else {
+            new_elems = allocator.alloc<T>(new_cap);
+        }
+
+        if (new_elems) {
+            _elems = new_elems;
+            _cap = new_cap;
+            _len = std::min(_len, _cap);
+        }
+    }
+
     Vector clone(Allocator allocator) const {
         Vector result = {};
         result.reserve(allocator, _len);
