@@ -72,7 +72,7 @@ const char* Str::rfind(cz::Str infix) const {
     if (infix.len > len) {
         return nullptr;
     }
-    for (size_t i = len - infix.len; i > 0; --i) {
+    for (size_t i = len - infix.len + 1; i-- > 0;) {
         if (memcmp(buffer + i, infix.buffer, infix.len) == 0) {
             return buffer + i;
         }

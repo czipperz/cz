@@ -21,7 +21,7 @@ void set_wd() {
 
     REQUIRE(!cz::is_err(get_working_directory(allocator, &path)));
 
-    cz::println("cwd: ", path);
+    printf("cwd: %s\n", path.buffer());
 
 #if _WIN32
     Str end = "/out/build/x64-Debug";

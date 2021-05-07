@@ -9,11 +9,11 @@
 using namespace cz;
 using namespace cz::test;
 
-TEST_CASE("sprint works") {
+TEST_CASE("format works") {
     Aligned_Buffer<32> buffer;
     Arena arena;
     arena.mem = buffer;
-    auto string = sprint(arena.allocator(), 123, " + ", 456);
+    auto string = format(arena.allocator(), 123, " + ", 456);
 
     REQUIRE(string == "123 + 456");
 }

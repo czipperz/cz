@@ -3,7 +3,6 @@
 #include <cz/defer.hpp>
 #include <cz/heap.hpp>
 #include <cz/vector.hpp>
-#include <cz/write.hpp>
 #include <czt/mock_allocate.hpp>
 
 using namespace cz;
