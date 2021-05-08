@@ -6,7 +6,7 @@
 namespace cz {
 
 struct Buffer_Array {
-    static constexpr const size_t buffer_size = 1024;
+    static constexpr const size_t buffer_size = 0x1000;
 
     char** buffers;
     size_t num_buffers;
