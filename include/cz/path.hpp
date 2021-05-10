@@ -80,10 +80,18 @@ Result make_absolute(Str relative_path, Allocator allocator, String* absolute_pa
 /// Note that this is only relevant to call on Windows (ie `_WIN32` is defined).
 void convert_to_forward_slashes(char* path, size_t len);
 
+inline void convert_to_forward_slashes(String* path) {
+    convert_to_forward_slashes(path->buffer(), path->len());
+}
+
 /// Convert the path to use back slashes (`\\`) instead of forward slashes (`/`).
 ///
 /// Note that this is only relevant to call on Windows (ie `_WIN32` is defined).
 void convert_to_back_slashes(char* path, size_t len);
+
+inline void convert_to_back_slashes(String* path) {
+    convert_to_back_slashes(path->buffer(), path->len());
+}
 
 /// Test if the character is a directory separator on this platform.
 inline bool is_dir_sep(char ch) {
