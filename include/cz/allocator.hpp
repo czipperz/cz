@@ -12,17 +12,29 @@ namespace cz {
 
 /// A memory allocator.
 struct Allocator {
-    struct VTable {
-        void* (*alloc)(void* data, AllocInfo new_info);
-        void (*dealloc)(void* data, MemSlice old_mem);
-        void* (*realloc)(void* data, MemSlice old_mem, AllocInfo new_info);
-    };
-
-    const Allocator::VTable* vtable;
+    void* (*func)(void* data, MemSlice old_mem, AllocInfo new_info);
     void* data;
 
     /// Allocate memory using this allocator.
-    void* alloc(AllocInfo info) const { return vtable->alloc(data, info); }
+    void* alloc(AllocInfo info) const {
+        CZ_DEBUG_ASSERT(info.size > 0);
+        return realloc({}, info);
+    }
+    /// Deallocate memory allocated using this allocator.
+    void dealloc(MemSlice old_mem) const { realloc(old_mem, {0, 1}); }
+
+#ifndef NDEBUG
+    // When compiled in debug mode we have out of line handlers that check preconditions
+    // and fill uninitialized memory with random values to try to find bugs.
+    /// Reallocate memory allocated using this allocator.
+    void* realloc(MemSlice old_mem, AllocInfo new_info) const;
+#else
+    // When compiled in release mode call the virtual function without any checks.
+    /// Reallocate memory allocated using this allocator.
+    void* realloc(MemSlice old_mem, AllocInfo new_info) const {
+        return func(data, old_mem, new_info);
+    }
+#endif
 
     /// Allocate memory to store a value of the given type using this allocator.
     template <class T>
@@ -77,24 +89,16 @@ struct Allocator {
         return {new_elems, slice.len};
     }
 
-    /// Deallocate memory allocated using this allocator.
-    void dealloc(MemSlice mem) const { return vtable->dealloc(data, mem); }
-
     /// Deallocate an array of a given type or a single element if the count isn't passed.
     template <class T>
     void dealloc(T* t, size_t count = 1) const {
         return dealloc({t, sizeof(T) * count});
     }
 
-    /// Reallocate a section of memory allocated using this allocator.
-    void* realloc(MemSlice old_mem, AllocInfo new_info) const {
-        return vtable->realloc(data, old_mem, new_info);
-    }
-
+    /// Reallocate an array of a given type.
     template <class T>
     T* realloc(T* old_mem, size_t old_len, size_t new_len) const {
-        return (T*)vtable->realloc(data, {old_mem, old_len * sizeof(T)},
-                                   {new_len * sizeof(T), alignof(T)});
+        return (T*)realloc({old_mem, old_len * sizeof(T)}, {new_len * sizeof(T), alignof(T)});
     }
 };
 

@@ -6,18 +6,29 @@
 namespace cz {
 
 struct Arena {
-    MemSlice mem;
-    size_t offset = 0;
+    char* start;
+    char* pointer;
+    char* end;
 
-    constexpr Arena() = default;
-    constexpr explicit Arena(MemSlice mem) : mem(mem) {}
+    void init(MemSlice mem) { init(mem.buffer, mem.size); }
+    void init(void* start, size_t size) {
+        this->start = (char*)start;
+        this->pointer = this->start;
+        this->end = this->start + size;
+    }
 
-    /// Create an \c cz::Allocator allocating memory in the \c Arena.
-    Allocator allocator();
+    void init(Allocator allocator, size_t size) {
+        void* ptr = allocator.alloc({size, /*alignment=*/16});
+        CZ_ASSERT(ptr);
+        init(ptr, size);
+    }
 
-    MemSlice remaining() const { return {point(), mem.size - offset}; }
-    void* point() const { return (char*)mem.buffer + offset; }
-    void set_point(void* p) { offset = (char*)p - (char*)mem.buffer; }
+    void drop(Allocator allocator) { allocator.dealloc(start, end - start); }
+
+    Allocator allocator() { return {Arena::realloc, this}; }
+    size_t remaining() const { return end - pointer; }
+
+    static void* realloc(void* arena, MemSlice old_mem, AllocInfo new_info);
 };
 
 }

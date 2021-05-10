@@ -26,12 +26,7 @@ Str String::as_str() const {
 void String::reserve_total(Allocator allocator, size_t total) {
     if (_cap < total) {
         size_t new_cap = max(total, _cap * 2);
-        char* new_buffer;
-        if (_buffer) {
-            new_buffer = static_cast<char*>(allocator.realloc({_buffer, _cap}, {new_cap, 1}));
-        } else {
-            new_buffer = static_cast<char*>(allocator.alloc({new_cap, 1}));
-        }
+        char* new_buffer = allocator.realloc(_buffer, _cap, new_cap);
         CZ_ASSERT(new_buffer != nullptr);
 
         _buffer = new_buffer;
@@ -90,7 +85,7 @@ void String::realloc(Allocator allocator) {
         return;
     }
 
-    char* res = static_cast<char*>(allocator.realloc({_buffer, _cap}, {_len, 1}));
+    char* res = allocator.realloc(_buffer, _cap, _len);
     if (res) {
         _buffer = res;
         _cap = _len;
@@ -98,13 +93,7 @@ void String::realloc(Allocator allocator) {
 }
 
 void String::realloc_null_terminate(Allocator allocator) {
-    char* res;
-    if (_buffer) {
-        res = static_cast<char*>(allocator.realloc({_buffer, _cap}, {_len + 1, 1}));
-    } else {
-        CZ_DEBUG_ASSERT(_len == 0);
-        res = static_cast<char*>(allocator.alloc({1, 1}));
-    }
+    char* res = allocator.realloc(_buffer, _cap, _len + 1);
     CZ_ASSERT(res);
     _buffer = res;
     _buffer[_len] = '\0';
@@ -117,7 +106,7 @@ void String::set_len(size_t new_len) {
 }
 
 void String::drop(Allocator allocator) {
-    allocator.dealloc({_buffer, _cap});
+    allocator.dealloc(_buffer, _cap);
 }
 
 }

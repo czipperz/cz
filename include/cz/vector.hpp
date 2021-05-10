@@ -21,14 +21,7 @@ struct Vector {
         if (this->cap() < total) {
             size_t new_cap = max(total, this->cap() * 2);
 
-            T* new_elems;
-            if (this->elems()) {
-                new_elems = static_cast<T*>(allocator.realloc(
-                    {this->elems(), this->cap() * sizeof(T)}, {new_cap * sizeof(T), alignof(T)}));
-            } else {
-                new_elems = static_cast<T*>(allocator.alloc({new_cap * sizeof(T), alignof(T)}));
-            }
-
+            T* new_elems = allocator.realloc(_elems, _cap, new_cap);
             CZ_ASSERT(new_elems != nullptr);
 
             this->_elems = new_elems;
@@ -36,32 +29,21 @@ struct Vector {
         }
     }
 
-    void drop(Allocator allocator) {
-        if (this->elems()) {
-            allocator.dealloc({this->elems(), this->cap() * sizeof(T)});
-        }
-    }
+    void drop(Allocator allocator) { allocator.dealloc(_elems, _cap); }
 
+    /// Reallocate such that the capacity matches the length.
     void realloc(Allocator allocator) {
-        if (_elems) {
-            T* new_elems = static_cast<T*>(
-                allocator.realloc({_elems, _cap * sizeof(T)}, {_len * sizeof(T), alignof(T)}));
-            if (new_elems) {
-                _elems = new_elems;
-                _cap = _len;
-            }
+        T* new_elems = allocator.realloc(_elems, _cap, _len);
+        if (new_elems) {
+            _elems = new_elems;
+            _cap = _len;
         }
     }
 
     /// Reallocates the vector to have `new_cap` as the new capacity.  If this
     /// causes the vector to shrink then the length will be adjusted accordingly.
     void resize(Allocator allocator, size_t new_cap) {
-        T* new_elems;
-        if (_elems) {
-            new_elems = allocator.realloc(_elems, _cap, new_cap);
-        } else {
-            new_elems = allocator.alloc<T>(new_cap);
-        }
+        T* new_elems = allocator.realloc(_elems, _cap, new_cap);
 
         if (new_elems) {
             _elems = new_elems;
@@ -186,6 +168,7 @@ struct Vector {
 template <class T>
 Vector<T> Slice<T>::duplicate(Allocator allocator) const {
     T* ts = allocator.alloc<T>(len);
+    CZ_ASSERT(ts);
     memcpy(ts, elems, sizeof(T) * len);
     return {ts, len, len};
 }

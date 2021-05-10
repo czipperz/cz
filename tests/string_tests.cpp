@@ -6,10 +6,8 @@
 #include <cz/defer.hpp>
 #include <cz/heap.hpp>
 #include <cz/string.hpp>
-#include <czt/mock_allocate.hpp>
 
 using namespace cz;
-using namespace cz::test;
 
 TEST_CASE("String::String() is empty") {
     String string = {};
@@ -25,39 +23,10 @@ TEST_CASE("String::String(char*, size_t, size_t)") {
     REQUIRE(string.cap() == 4);
 }
 
-TEST_CASE("Str::duplicate(C*) clones") {
-    Str str = "abc";
-
-    char clone_buffer[3] = {0};
-    auto mock = mock_alloc(clone_buffer, {3, 1});
-
-    String clone = str.duplicate(mock.allocator());
-
-    REQUIRE(clone.buffer() == clone_buffer);
-    REQUIRE(clone.len() == 3);
-    REQUIRE(clone.cap() == 3);
-    REQUIRE(mock.called);
-}
-
-TEST_CASE("String::clone(C*) clones") {
-    char buffer[4] = "abc";
-    String string = {buffer, 3, 4};
-
-    char clone_buffer[3] = {0};
-    auto mock = mock_alloc(clone_buffer, {3, 1});
-
-    String clone = string.clone(mock.allocator());
-
-    REQUIRE(clone.buffer() == clone_buffer);
-    REQUIRE(clone.len() == 3);
-    REQUIRE(clone.cap() == 3);
-    REQUIRE(mock.called);
-}
-
 TEST_CASE("String::append from empty string") {
     Aligned_Buffer<32> buffer;
     Arena arena;
-    arena.mem = buffer;
+    arena.init(buffer.mem());
 
     String string = {};
     string.reserve(arena.allocator(), 3);
@@ -69,7 +38,7 @@ TEST_CASE("String::append from empty string") {
 TEST_CASE("String::append from non-empty string and reallocates") {
     Aligned_Buffer<64> buffer;
     Arena arena;
-    arena.mem = buffer;
+    arena.init(buffer.mem());
 
     String string = {};
     string.reserve(arena.allocator(), 3);
@@ -80,56 +49,12 @@ TEST_CASE("String::append from non-empty string and reallocates") {
     REQUIRE(string == "abcdefghijklmnopqrstuvwxyz0123456789");
 }
 
-TEST_CASE("String::append no realloc") {
-    char buffer[64];
-    auto mock = mock_alloc(buffer, {64, 1});
-
-    String string = {};
-    string.reserve(mock.allocator(), 64);
-    mock.called = false;
-
-    string.append("abc");
-    REQUIRE(!mock.called);
-    string.append("defghijklmnopqrstuvwxyz0123456789");
-    REQUIRE(!mock.called);
-
-    REQUIRE(string == "abcdefghijklmnopqrstuvwxyz0123456789");
-}
-
-TEST_CASE("String::reserve allocates") {
-    char buffer[64];
-    auto mock = mock_alloc(buffer, {64, 1});
-    String string = {};
-
-    string.reserve(mock.allocator(), 64);
-
-    CHECK(string.buffer() == buffer);
-    CHECK(string.len() == 0);
-    CHECK(string.cap() == 64);
-    REQUIRE(mock.called);
-}
-
 TEST_CASE("String::insert empty string") {
     String string = {};
     string.insert(0, "");
 
     CHECK(string.buffer() == nullptr);
     REQUIRE(string == "");
-}
-
-TEST_CASE("String::insert into empty string") {
-    Aligned_Buffer<32> buffer;
-    Arena arena;
-    arena.mem = buffer;
-    String string = {};
-
-    string.reserve(arena.allocator(), 3);
-    string.insert(0, "abc");
-
-    CHECK(string.buffer() != nullptr);
-    CHECK(string.len() == 3);
-    CHECK(string.cap() >= 3);
-    REQUIRE(string == "abc");
 }
 
 TEST_CASE("String::insert beginning") {
@@ -166,19 +91,6 @@ TEST_CASE("String::insert end") {
     CHECK(string.len() == 6);
     CHECK(string.cap() >= 6);
     REQUIRE(string == "xyzabc");
-}
-
-TEST_CASE("String::insert with resize") {
-    char buffer[4];
-    Arena arena;
-    arena.mem = buffer;
-    String string = {};
-
-    string.reserve(arena.allocator(), 3);
-    string.insert(0, "abc");
-
-    CHECK(string.buffer() == arena.mem.buffer);
-    REQUIRE(string == "abc");
 }
 
 TEST_CASE("String::insert resize boundary") {
@@ -278,27 +190,4 @@ TEST_CASE("Str<Str substring on right") {
 
 TEST_CASE("Str<Str both empty") {
     REQUIRE_FALSE(Str("") < "");
-}
-
-TEST_CASE("String::realloc does nothing when len == cap") {
-    Vector<MemSlice> mems = {};
-    mems.reserve(heap_allocator(), 1);
-    CZ_DEFER(mems.drop(heap_allocator()));
-    CZ_DEFER(heap_dealloc_all(mems));
-
-    String string = {};
-    string.reserve(capturing_heap_allocator(&mems), 4);
-    REQUIRE(mems[0].size == 4);
-
-    string.append("abc");
-    REQUIRE(string.len() == 3);
-    REQUIRE(string.cap() > 3);
-
-    char buffer[3];
-    auto mock = mock_realloc(buffer, mems[0], {3, 1});
-    string.realloc(mock.allocator());
-    REQUIRE(mock.called);
-
-    REQUIRE(string.buffer() == buffer);
-    REQUIRE(string.cap() == 3);
 }

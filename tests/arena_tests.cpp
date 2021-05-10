@@ -2,26 +2,27 @@
 
 #include <string.h>
 #include <cz/arena.hpp>
-#include <czt/mock_allocate.hpp>
 
 using namespace cz;
-using namespace cz::test;
 
 TEST_CASE("Arena alloc returns null when no space left") {
     char buffer[1] = {0};
-    Arena arena({buffer, 0});
+    Arena arena;
+    arena.init(buffer, 0);
     REQUIRE(arena.allocator().alloc({1, 1}) == nullptr);
 }
 
 TEST_CASE("Arena alloc succeeds when exactly enough space left") {
     char buffer[8] = {0};
-    Arena arena(buffer);
+    Arena arena;
+    arena.init(buffer, 8);
     REQUIRE(arena.allocator().alloc({8, 1}) == buffer);
 }
 
 TEST_CASE("Arena allocates at an offset") {
     char buffer[8] = {0};
-    Arena arena(buffer);
+    Arena arena;
+    arena.init(buffer, 8);
     REQUIRE(arena.allocator().alloc({2, 1}) == buffer);
     REQUIRE(arena.allocator().alloc({4, 1}) == buffer + 2);
     REQUIRE(arena.allocator().alloc({2, 1}) == buffer + 6);
@@ -29,7 +30,8 @@ TEST_CASE("Arena allocates at an offset") {
 
 TEST_CASE("Arena alloc succeeds after first failure") {
     char buffer[8] = {0};
-    Arena arena(buffer);
+    Arena arena;
+    arena.init(buffer, 8);
     REQUIRE(arena.allocator().alloc({2, 1}) == buffer);
     REQUIRE(arena.allocator().alloc({4, 1}) == buffer + 2);
     REQUIRE(arena.allocator().alloc({4, 1}) == nullptr);
@@ -38,7 +40,8 @@ TEST_CASE("Arena alloc succeeds after first failure") {
 
 TEST_CASE() {
     char buffer[8] = {0};
-    Arena arena(buffer);
+    Arena arena;
+    arena.init(buffer, 8);
 
     auto start = arena.allocator().alloc({1, 2});
     REQUIRE(start);
@@ -48,7 +51,8 @@ TEST_CASE() {
 
 TEST_CASE("Arena dealloc move pointer back when most recent allocation") {
     char buffer[8] = {0};
-    Arena arena(buffer);
+    Arena arena;
+    arena.init(buffer, 8);
     arena.allocator().alloc({2, 1});
 
     auto mem = arena.allocator().alloc({2, 1});
@@ -59,7 +63,8 @@ TEST_CASE("Arena dealloc move pointer back when most recent allocation") {
 
 TEST_CASE("Arena realloc in place expanding") {
     char buffer[8] = {0};
-    Arena arena(buffer);
+    Arena arena;
+    arena.init(buffer, 8);
 
     auto mem = arena.allocator().alloc({4, 1});
     REQUIRE(mem == buffer);
@@ -75,7 +80,8 @@ TEST_CASE("Arena realloc in place expanding") {
 
 TEST_CASE("Arena realloc in place expanding failure boundary success") {
     char buffer[8] = {0};
-    Arena arena(buffer);
+    Arena arena;
+    arena.init(buffer, 8);
     arena.allocator().alloc({2, 1});
 
     auto mem = arena.allocator().alloc({4, 1});
@@ -87,7 +93,8 @@ TEST_CASE("Arena realloc in place expanding failure boundary success") {
 
 TEST_CASE("Arena realloc in place expanding failure boundary error") {
     char buffer[8] = {0};
-    Arena arena(buffer);
+    Arena arena;
+    arena.init(buffer, 8);
     arena.allocator().alloc({2, 1});
 
     auto mem = arena.allocator().alloc({4, 1});
@@ -99,21 +106,23 @@ TEST_CASE("Arena realloc in place expanding failure boundary error") {
 
 TEST_CASE("Arena realloc not enough space returns null") {
     char buffer[8] = {0};
-    Arena arena(buffer);
+    Arena arena;
+    arena.init(buffer, 8);
 
     auto mem = arena.allocator().alloc({4, 1});
     REQUIRE(arena.allocator().realloc({mem, 4}, {10, 1}) == nullptr);
 
-    REQUIRE(arena.offset == 4);
+    REQUIRE(arena.remaining() == 4);
 }
 
 TEST_CASE("Arena realloc smaller size") {
     char buffer[8] = {0};
-    Arena arena(buffer);
+    Arena arena;
+    arena.init(buffer, 8);
 
     auto mem = arena.allocator().alloc({4, 1});
     mem = arena.allocator().realloc({mem, 4}, {2, 1});
 
-    REQUIRE(mem == arena.mem.buffer);
-    REQUIRE(arena.offset == 2);
+    REQUIRE(mem == arena.start);
+    REQUIRE(arena.remaining() == 6);
 }
