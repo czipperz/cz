@@ -150,112 +150,37 @@ Result Directory_Iterator::init(const char* cstr_path, Allocator allocator, Stri
 
 namespace cz {
 
-Result files(Allocator paths_allocator,
-             Allocator path_allocator,
-             const char* cstr_path,
-             Vector<String>* files) {
-    cz::String file = {};
-
-    Directory_Iterator iterator;
-    CZ_TRY(iterator.init(cstr_path, path_allocator, &file));
-
-    while (!iterator.done()) {
-        file.realloc(path_allocator);
-
-        files->reserve(paths_allocator, 1);
-        files->push(file);
-
-        file = {};
-        Result result = iterator.advance(path_allocator, &file);
-        if (result.is_err()) {
-            // ignore errors in destruction
-            iterator.drop();
-            return result;
-        }
+#define define_files_function(STRING, NT)                                                        \
+    Result files##NT(Allocator paths_allocator, Allocator path_allocator, const char* cstr_path, \
+                     Vector<STRING>* files) {                                                    \
+        cz::String file = {};                                                                    \
+                                                                                                 \
+        Directory_Iterator iterator;                                                             \
+        CZ_TRY(iterator.init(cstr_path, path_allocator, &file));                                 \
+                                                                                                 \
+        while (!iterator.done()) {                                                               \
+            file.realloc##NT(path_allocator);                                                    \
+                                                                                                 \
+            files->reserve(paths_allocator, 1);                                                  \
+            files->push(file);                                                                   \
+                                                                                                 \
+            file = {};                                                                           \
+            Result result = iterator.advance(path_allocator, &file);                             \
+            if (result.is_err()) {                                                               \
+                /* Ignore errors in destruction */                                               \
+                iterator.drop();                                                                 \
+                return result;                                                                   \
+            }                                                                                    \
+        }                                                                                        \
+                                                                                                 \
+        return iterator.drop();                                                                  \
     }
 
-    return iterator.drop();
-}
-
-Result files(Allocator paths_allocator,
-             Allocator path_allocator,
-             const char* cstr_path,
-             Vector<Str>* files) {
-    String file = {};
-
-    Directory_Iterator iterator;
-    CZ_TRY(iterator.init(cstr_path, path_allocator, &file));
-
-    while (!iterator.done()) {
-        file.realloc(path_allocator);
-
-        files->reserve(paths_allocator, 1);
-        files->push(file);
-
-        file = {};
-        Result result = iterator.advance(path_allocator, &file);
-        if (result.is_err()) {
-            // ignore errors in destruction
-            iterator.drop();
-            return result;
-        }
-    }
-
-    return iterator.drop();
-}
-
-Result files_null_terminate(Allocator paths_allocator,
-                            Allocator path_allocator,
-                            const char* cstr_path,
-                            Vector<String>* files) {
-    String file = {};
-
-    Directory_Iterator iterator;
-    CZ_TRY(iterator.init(cstr_path, path_allocator, &file));
-
-    while (!iterator.done()) {
-        file.realloc_null_terminate(path_allocator);
-
-        files->reserve(paths_allocator, 1);
-        files->push(file);
-
-        file = {};
-        Result result = iterator.advance(path_allocator, &file);
-        if (result.is_err()) {
-            // ignore errors in destruction
-            iterator.drop();
-            return result;
-        }
-    }
-
-    return iterator.drop();
-}
-
-Result files_null_terminate(Allocator paths_allocator,
-                            Allocator path_allocator,
-                            const char* cstr_path,
-                            Vector<Str>* files) {
-    String file = {};
-
-    Directory_Iterator iterator;
-    CZ_TRY(iterator.init(cstr_path, path_allocator, &file));
-
-    while (!iterator.done()) {
-        file.realloc_null_terminate(path_allocator);
-
-        files->reserve(paths_allocator, 1);
-        files->push(file);
-
-        file = {};
-        Result result = iterator.advance(path_allocator, &file);
-        if (result.is_err()) {
-            // ignore errors in destruction
-            iterator.drop();
-            return result;
-        }
-    }
-
-    return iterator.drop();
-}
+// clang-format off
+define_files_function(String,)
+define_files_function(Str,)
+define_files_function(String, _null_terminate)
+define_files_function(Str, _null_terminate)
+// clang-format on
 
 }
