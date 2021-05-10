@@ -1,4 +1,4 @@
-#include <cz/fs/directory.hpp>
+#include <cz/directory.hpp>
 
 #include <errno.h>
 #include <cz/char_type.hpp>
@@ -16,7 +16,6 @@
 static_assert(std::is_same<void*, HANDLE>::value, "HANDLE must be void* on windows");
 
 namespace cz {
-namespace fs {
 
 static Result get_last_error() {
     Result result;
@@ -24,15 +23,13 @@ static Result get_last_error() {
     return result;
 }
 
-Result Directory_Iterator::advance(Allocator allocator) {
+Result Directory_Iterator::advance(Allocator allocator, String* out) {
     WIN32_FIND_DATA data;
     if (FindNextFileA(_handle, &data)) {
-        _file.set_len(0);
-
         Str file = data.cFileName;
-        _file.append(file);
-        _file.null_terminate();
-
+        out->reserve(allocator, file.len + 1);
+        out->append(file);
+        out->null_terminate();
         return Result::ok();
     } else if (GetLastError() == ERROR_NO_MORE_FILES) {
         _done = true;
@@ -42,8 +39,7 @@ Result Directory_Iterator::advance(Allocator allocator) {
     }
 }
 
-Result Directory_Iterator::drop(Allocator allocator) {
-    _file.drop(allocator);
+Result Directory_Iterator::drop() {
     if (FindClose(_handle)) {
         return Result::ok();
     } else {
@@ -51,18 +47,20 @@ Result Directory_Iterator::drop(Allocator allocator) {
     }
 }
 
-Result Directory_Iterator::init(Allocator allocator, const char* cstr_path) {
-    // Windows doesn't list the files in a directory, it findes files matching criteria.  Thus we
-    // must append \c "\*" to get all files in the directory \c cstr_path.
-    char buffer[_MAX_PATH];
+Result Directory_Iterator::init(const char* cstr_path, Allocator allocator, String* out) {
+    // Windows doesn't list the files in a directory, it findes files matching criteria.
+    // Thus we must append `"\*"` to get all files in the directory `cstr_path`.
     Str str_path = cstr_path;
-    str_path.len = min(sizeof(buffer) - strlen("\\*") - 1, str_path.len);
-    memcpy(buffer, str_path.buffer, str_path.len);
-    memcpy(buffer + str_path.len, "\\*", strlen("\\*"));
-    buffer[str_path.len + strlen("\\*")] = '\0';
+    String path = {};
+    path.reserve(allocator, str_path.len + 3);
+    path.append(str_path);
+    path.append("\\*");
+    path.null_terminate();
 
     WIN32_FIND_DATA data;
-    HANDLE handle = FindFirstFileA(buffer, &data);
+    HANDLE handle = FindFirstFileA(path.buffer(), &data);
+
+    path.drop(allocator);
 
     if (handle == INVALID_HANDLE_VALUE) {
         return get_last_error();
@@ -76,7 +74,7 @@ Result Directory_Iterator::init(Allocator allocator, const char* cstr_path) {
             _done = true;
             return Result::ok();
         } else {
-            drop(allocator);
+            drop();
             return get_last_error();
         }
     }
@@ -85,33 +83,26 @@ Result Directory_Iterator::init(Allocator allocator, const char* cstr_path) {
             _done = true;
             return Result::ok();
         } else {
-            drop(allocator);
+            drop();
             return get_last_error();
         }
     }
 
-    CZ_DEBUG_ASSERT(_file.len() == 0);
-
-    // _MAX_PATH (= 260) accounts for null terminator
-    _file.reserve(allocator, sizeof(buffer));
-
     Str file = data.cFileName;
-    _file.append(file);
-    _file.null_terminate();
-
+    out->reserve(allocator, file.len + 1);
+    out->append(file);
+    out->null_terminate();
     return Result::ok();
 }
 
-}
 }
 
 #else
 #include <dirent.h>
 
 namespace cz {
-namespace fs {
 
-Result Directory_Iterator::advance(Allocator allocator) {
+Result Directory_Iterator::advance(Allocator allocator, String* out) {
     errno = 0;
     dirent* dirent = readdir((DIR*)_dir);
     if (dirent) {
@@ -120,10 +111,9 @@ Result Directory_Iterator::advance(Allocator allocator) {
             return advance(allocator);
         }
 
-        _file.set_len(0);
-        _file.append(file);
-        _file.null_terminate();
-
+        out->reserve(file.len + 1);
+        out->append(file);
+        out->null_terminate();
         return Result::ok();
     } else if (errno == 0) {
         _done = true;
@@ -133,126 +123,139 @@ Result Directory_Iterator::advance(Allocator allocator) {
     }
 }
 
-Result Directory_Iterator::drop(Allocator allocator) {
-    _file.drop(allocator);
+Result Directory_Iterator::drop() {
     int ret = closedir((DIR*)_dir);
     (void)ret;
     CZ_DEBUG_ASSERT(ret == 0);
     return Result::ok();
 }
 
-Result Directory_Iterator::init(Allocator allocator, const char* cstr_path) {
+Result Directory_Iterator::init(const char* cstr_path, Allocator allocator, String* out) {
     DIR* dir = opendir(cstr_path);
     if (!dir) {
         return Result::last_error();
     }
 
-    // NAME_MAX doesn't account for null terminator
-    _file.reserve(allocator, NAME_MAX + 1);
     _dir = dir;
 
-    auto result = advance(allocator);
+    Result result = advance(allocator, out);
     if (result.is_err()) {
-        _file.drop(allocator);
         closedir(dir);
     }
     return result;
 }
 
 }
-}
 #endif
 
 namespace cz {
-namespace fs {
 
 Result files(Allocator paths_allocator,
              Allocator path_allocator,
              const char* cstr_path,
-             Vector<String>* paths) {
+             Vector<String>* files) {
+    cz::String file = {};
+
     Directory_Iterator iterator;
-    CZ_TRY(iterator.init(paths_allocator, cstr_path));
+    CZ_TRY(iterator.init(cstr_path, path_allocator, &file));
 
     while (!iterator.done()) {
-        paths->reserve(paths_allocator, 1);
-        paths->push(iterator.file().duplicate(path_allocator));
+        file.realloc(path_allocator);
 
-        auto result = iterator.advance(paths_allocator);
+        files->reserve(paths_allocator, 1);
+        files->push(file);
+
+        file = {};
+        Result result = iterator.advance(path_allocator, &file);
         if (result.is_err()) {
             // ignore errors in destruction
-            iterator.drop(paths_allocator);
+            iterator.drop();
             return result;
         }
     }
 
-    return iterator.drop(paths_allocator);
+    return iterator.drop();
 }
 
 Result files(Allocator paths_allocator,
              Allocator path_allocator,
              const char* cstr_path,
-             Vector<Str>* paths) {
+             Vector<Str>* files) {
+    String file = {};
+
     Directory_Iterator iterator;
-    CZ_TRY(iterator.init(paths_allocator, cstr_path));
+    CZ_TRY(iterator.init(cstr_path, path_allocator, &file));
 
     while (!iterator.done()) {
-        paths->reserve(paths_allocator, 1);
-        paths->push(iterator.file().duplicate(path_allocator));
+        file.realloc(path_allocator);
 
-        auto result = iterator.advance(paths_allocator);
+        files->reserve(paths_allocator, 1);
+        files->push(file);
+
+        file = {};
+        Result result = iterator.advance(path_allocator, &file);
         if (result.is_err()) {
             // ignore errors in destruction
-            iterator.drop(paths_allocator);
+            iterator.drop();
             return result;
         }
     }
 
-    return iterator.drop(paths_allocator);
+    return iterator.drop();
 }
 
 Result files_null_terminate(Allocator paths_allocator,
                             Allocator path_allocator,
                             const char* cstr_path,
-                            Vector<String>* paths) {
+                            Vector<String>* files) {
+    String file = {};
+
     Directory_Iterator iterator;
-    CZ_TRY(iterator.init(paths_allocator, cstr_path));
+    CZ_TRY(iterator.init(cstr_path, path_allocator, &file));
 
     while (!iterator.done()) {
-        paths->reserve(paths_allocator, 1);
-        paths->push(iterator.file().duplicate_null_terminate(path_allocator));
+        file.realloc_null_terminate(path_allocator);
 
-        auto result = iterator.advance(paths_allocator);
+        files->reserve(paths_allocator, 1);
+        files->push(file);
+
+        file = {};
+        Result result = iterator.advance(path_allocator, &file);
         if (result.is_err()) {
             // ignore errors in destruction
-            iterator.drop(paths_allocator);
+            iterator.drop();
             return result;
         }
     }
 
-    return iterator.drop(paths_allocator);
+    return iterator.drop();
 }
 
 Result files_null_terminate(Allocator paths_allocator,
                             Allocator path_allocator,
                             const char* cstr_path,
-                            Vector<Str>* paths) {
+                            Vector<Str>* files) {
+    String file = {};
+
     Directory_Iterator iterator;
-    CZ_TRY(iterator.init(paths_allocator, cstr_path));
+    CZ_TRY(iterator.init(cstr_path, path_allocator, &file));
 
     while (!iterator.done()) {
-        paths->reserve(paths_allocator, 1);
-        paths->push(iterator.file().duplicate_null_terminate(path_allocator));
+        file.realloc_null_terminate(path_allocator);
 
-        auto result = iterator.advance(paths_allocator);
+        files->reserve(paths_allocator, 1);
+        files->push(file);
+
+        file = {};
+        Result result = iterator.advance(path_allocator, &file);
         if (result.is_err()) {
             // ignore errors in destruction
-            iterator.drop(paths_allocator);
+            iterator.drop();
             return result;
         }
     }
 
-    return iterator.drop(paths_allocator);
+    return iterator.drop();
 }
 
-}
 }
