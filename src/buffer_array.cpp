@@ -64,6 +64,8 @@ void* Buffer_Array::realloc(void* _buffer_array, MemSlice old_mem, AllocInfo new
         char** new_buffers = cz::heap_allocator().realloc(
             buffer_array->buffers, buffer_array->num_buffers, buffer_array->num_buffers * 2);
         CZ_ASSERT(new_buffers);
+        memset(new_buffers + buffer_array->num_buffers, 0,
+               buffer_array->num_buffers * sizeof(*buffer_array->buffers));
         buffer_array->buffers = new_buffers;
         buffer_array->num_buffers *= 2;
     }
