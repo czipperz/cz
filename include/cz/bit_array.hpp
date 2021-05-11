@@ -16,8 +16,12 @@ struct Bit_Array {
 
     /// Initialize the bit array by allocating enough space for `len` bits.
     void init(cz::Allocator allocator, size_t len) {
-        buffer = allocator.alloc_zeroed<unsigned char>(alloc_size(len));
-        CZ_ASSERT(buffer);
+        if (len > 0) {
+            buffer = allocator.alloc_zeroed<unsigned char>(alloc_size(len));
+            CZ_ASSERT(buffer);
+        } else {
+            buffer = nullptr;
+        }
     }
 
     /// Deallocate the associated memory.
