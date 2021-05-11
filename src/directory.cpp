@@ -108,10 +108,10 @@ Result Directory_Iterator::advance(Allocator allocator, String* out) {
     if (dirent) {
         Str file = dirent->d_name;
         if (file == "." || file == "..") {
-            return advance(allocator);
+            return advance(allocator, out);
         }
 
-        out->reserve(file.len + 1);
+        out->reserve(allocator, file.len + 1);
         out->append(file);
         out->null_terminate();
         return Result::ok();
