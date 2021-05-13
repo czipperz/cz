@@ -49,6 +49,11 @@ void* Buffer_Array::realloc(void* _buffer_array, MemSlice old_mem, AllocInfo new
         starting_point = buffer_array->buffer_pointer;
     }
 
+    // Treat deallocation as just allocating 0 bytes.
+    if (new_info.alignment == 0) {
+        new_info.alignment = 1;
+    }
+
     // If there is enough space in this buffer then we allocate in it.
     void* ptr = advance_ptr_to_alignment(
         {starting_point, (size_t)(buffer_array->buffer_end - starting_point)}, new_info);

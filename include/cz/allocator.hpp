@@ -12,25 +12,46 @@ namespace cz {
 
 /// A memory allocator.
 struct Allocator {
+    /// Allocate, deallocate, shrink, or expand a memory region.
+    ///
+    /// If `new_info.alignment == 0` then the operation is deallocation.  The return value
+    /// is undefined.  If `old_mem.buffer == nullptr` then there is nothing to deallocate.
+    ///
+    /// Otherwise, this operation should be performed:
+    /// 1. Try to obtain a memory region matching `new_info` (even if `new_info.size == 0`).
+    ///    If this fails then immediately stop and return `nullptr`.
+    /// 2. If `old_mem.buffer != nullptr` then copy `min(old_mem.size, new_info.size)`
+    ///    bytes to the new memory region.
+    /// 3. If `old_mem.buffer != nullptr` then deallocate `old_mem`.
+    /// 4. Return the new memory region.
+    ///
+    /// Note that this differs from `std::realloc` in behavior when
+    /// `new_info.size == 0`; we disambiguate between trying to free
+    /// memory and allocate a `0` byte block by using the alignment.
     void* (*func)(void* data, MemSlice old_mem, AllocInfo new_info);
-    void* data;
 
-    /// Allocate memory using this allocator.
-    void* alloc(AllocInfo info) const {
-        CZ_DEBUG_ASSERT(info.size > 0);
-        return realloc({}, info);
-    }
-    /// Deallocate memory allocated using this allocator.
-    void dealloc(MemSlice old_mem) const { realloc(old_mem, {0, 1}); }
+    void* data;
 
 #ifndef NDEBUG
     // When compiled in debug mode we have out of line handlers that check preconditions
     // and fill uninitialized memory with random values to try to find bugs.
+
+    /// Allocate memory using this allocator.
+    void* alloc(AllocInfo info) const;
+    /// Reallocate memory allocated using this allocator or
+    /// allocate memory (if `old_mem.buffer` is `nullptr`).
+    void dealloc(MemSlice old_mem) const;
     /// Reallocate memory allocated using this allocator.
     void* realloc(MemSlice old_mem, AllocInfo new_info) const;
 #else
     // When compiled in release mode call the virtual function without any checks.
-    /// Reallocate memory allocated using this allocator.
+
+    /// Allocate memory using this allocator.
+    void* alloc(AllocInfo new_info) const { return func(data, {}, new_info); }
+    /// Deallocate memory allocated using this allocator.
+    void dealloc(MemSlice old_mem) const { func(data, old_mem, {0, 0}); }
+    /// Reallocate memory allocated using this allocator or
+    /// allocate memory (if `old_mem.buffer` is `nullptr`).
     void* realloc(MemSlice old_mem, AllocInfo new_info) const {
         return func(data, old_mem, new_info);
     }

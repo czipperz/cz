@@ -17,13 +17,20 @@ namespace cz {
 inline void* heap_allocator_realloc(void*, MemSlice old_mem, AllocInfo new_info) {
     ZoneScoped;
 
-    // `realloc` can't be called with `size = 0` so handle it manually.
-    if (new_info.size == 0) {
+    if (new_info.alignment == 0) {
+        // Deallocation.
         free(old_mem.buffer);
         TracyFree(old_mem.buffer);
         return nullptr;
     }
 
+    // Since it is undefined what happens when `std::realloc` is
+    // called with `size = 0` we just always allocate 1 byte.
+    if (new_info.size == 0) {
+        new_info.size = 1;
+    }
+
+    // Allocation or reallocation.
     CZ_DEBUG_ASSERT(new_info.alignment <= alignof(max_align_t));
     void* ptr = realloc(old_mem.buffer, new_info.size);
     if (ptr) {

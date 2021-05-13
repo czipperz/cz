@@ -22,6 +22,11 @@ void* Arena::realloc(void* _arena, MemSlice old_mem, AllocInfo new_info) {
         }
         return ptr;
     } else {
+        // Deallocate but we have nothing to do.
+        if (new_info.alignment == 0) {
+            return nullptr;
+        }
+
         // Ignore the dealloc and just allocate.
         MemSlice current = {arena->pointer, (size_t)(arena->end - arena->pointer)};
         void* ptr = advance_ptr_to_alignment(current, new_info);
