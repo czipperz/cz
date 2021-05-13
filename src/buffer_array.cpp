@@ -39,11 +39,37 @@ void* Buffer_Array::realloc(void* _buffer_array, MemSlice old_mem, AllocInfo new
     // First get the available memory to allocate.
     char* starting_point;
     if (old_mem.buffer) {
-        CZ_DEBUG_ASSERT("Attempt to free memory in Buffer_Array not most recently allocated" &&
-                        old_mem.end() == buffer_array->buffer_pointer);
-
-        // We can reuse the memory for the buffer because it was the most recently allocated object.
+        // We can reuse the memory for the buffer because it was
+        // the most recently allocated object in this buffer.
         starting_point = (char*)old_mem.buffer;
+
+        // If we don't match exactly then we must be deallocating from the previous buffer.
+        if (old_mem.end() != buffer_array->buffer_pointer) {
+            // Assert we're not skipping any allocations in this buffer.
+            CZ_DEBUG_ASSERT(buffer_array->buffer_pointer ==
+                            buffer_array->buffers[buffer_array->buffer_index]);
+
+            // Assert we are in bounds of the previous buffer.
+            CZ_DEBUG_ASSERT(buffer_array->buffer_index > 0);
+
+            // Assert we are in bounds of the previous buffer.
+            char* buffer_start = buffer_array->buffers[buffer_array->buffer_index - 1];
+            CZ_DEBUG_ASSERT(old_mem.buffer >= buffer_start);
+            CZ_DEBUG_ASSERT(old_mem.buffer < buffer_start + Buffer_Array::buffer_size);
+
+            // Retreat to the previous buffer.
+            --buffer_array->buffer_index;
+            buffer_array->buffer_pointer = (char*)old_mem.end();
+
+            // Calculate the buffer end.
+            if (old_mem.size > Buffer_Array::buffer_size) {
+                // We have a massive allocation that has its own buffer.
+                CZ_DEBUG_ASSERT(old_mem.buffer == buffer_start);
+                buffer_array->buffer_end = buffer_start + old_mem.size;
+            } else {
+                buffer_array->buffer_end = buffer_start + Buffer_Array::buffer_size;
+            }
+        }
     } else {
         // We can use the memory left in the buffer.
         starting_point = buffer_array->buffer_pointer;
