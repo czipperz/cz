@@ -48,7 +48,9 @@ struct Vector {
         if (new_elems) {
             _elems = new_elems;
             _cap = new_cap;
-            _len = std::min(_len, _cap);
+            if (_cap < _len) {
+                _len = _cap;
+            }
         }
     }
 

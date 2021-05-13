@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <algorithm>
 #include <cz/alloc_utils.hpp>
 #include <cz/assert.hpp>
 #include <cz/heap.hpp>
