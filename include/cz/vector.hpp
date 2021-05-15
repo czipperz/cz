@@ -159,6 +159,8 @@ struct Vector {
     constexpr size_t len() const { return _len; }
     constexpr size_t cap() const { return _cap; }
 
+    constexpr size_t remaining() const { return  _cap - _len; }
+
     T* begin() { return elems(); }
     constexpr const T* begin() const { return elems(); }
     T* start() { return elems(); }

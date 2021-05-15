@@ -96,6 +96,7 @@ struct String {
     size_t len() const;
     /// Get the capacity of the string in bytes.
     size_t cap() const;
+    constexpr size_t remaining() const { return _cap - _len; }
 
     char* start() { return buffer(); }
     const char* start() const { return buffer(); }
