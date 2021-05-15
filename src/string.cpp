@@ -6,23 +6,6 @@
 
 namespace cz {
 
-char* String::buffer() {
-    return _buffer;
-}
-const char* String::buffer() const {
-    return _buffer;
-}
-size_t String::len() const {
-    return _len;
-}
-size_t String::cap() const {
-    return _cap;
-}
-
-Str String::as_str() const {
-    return {_buffer, _len};
-}
-
 void String::reserve_total(Allocator allocator, size_t total) {
     if (_cap < total) {
         size_t new_cap = max(total, _cap * 2);

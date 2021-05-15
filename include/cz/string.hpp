@@ -89,13 +89,14 @@ struct String {
     void drop(Allocator);
 
     /// Get the byte buffer backing the string.
-    char* buffer();
+    char* buffer() { return _buffer; }
     /// Get the byte buffer backing the string.
-    const char* buffer() const;
+    const char* buffer() const { return _buffer; }
     /// Get the length of the string in bytes.
-    size_t len() const;
+    size_t len() const { return _len; }
     /// Get the capacity of the string in bytes.
-    size_t cap() const;
+    size_t cap() const { return _cap; }
+
     constexpr size_t remaining() const { return _cap - _len; }
 
     char* start() { return buffer(); }
@@ -190,7 +191,7 @@ struct String {
     cz::Str slice_end(const char* end) const { return as_str().slice_end(end); }
 
     /// Get a `Str` representing this `String` in its current state.
-    Str as_str() const;
+    constexpr Str as_str() const { return {_buffer, _len}; }
     /// See `String::as_str()`.
     operator Str() const { return as_str(); }
 
