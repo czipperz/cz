@@ -81,6 +81,9 @@ void* Buffer_Array::realloc(void* _buffer_array, MemSlice old_mem, AllocInfo new
         new_info.alignment = 1;
     }
 
+    // If this condition is false then the advance call will be total bogus.
+    CZ_DEBUG_ASSERT(buffer_array->buffer_end >= starting_point);
+
     // If there is enough space in this buffer then we allocate in it.
     void* ptr = advance_ptr_to_alignment(
         {starting_point, (size_t)(buffer_array->buffer_end - starting_point)}, new_info);
@@ -115,6 +118,8 @@ void* Buffer_Array::realloc(void* _buffer_array, MemSlice old_mem, AllocInfo new
 
     // Copy over the old contents if applicable.
     if (old_mem.buffer) {
+        // We have to be expanding because otherwise we would've shrunk in place.
+        CZ_DEBUG_ASSERT(old_mem.size < new_info.size);
         memcpy(buffer, old_mem.buffer, old_mem.size);
     }
 
