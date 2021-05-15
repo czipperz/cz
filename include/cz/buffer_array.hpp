@@ -59,6 +59,8 @@ struct Buffer_Array {
 
     void clear() { restore({0, 0}); }
 
+    const void* end_of_last_allocation() const { return buffer_pointer; }
+
     /// A save point allows you to instantly deallocate all allocations
     /// made after the point is created just by calling `restore`.
     struct Save_Point {
