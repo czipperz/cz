@@ -5,6 +5,13 @@
 
 namespace cz {
 
+/// An `Arena` splits up a memory buffer into a series of allocations.
+/// Allocating memory in the arena is as simple as just incrementing the pointer.
+///
+/// Deallocation isn't 100% foolproof because of the 0 overhead approach.
+/// Deallocating the most recently allocated entry will always succeed.  But
+/// deallocating after that point will only suceed if all allocations in the
+/// arena have the same alignment.  If deallocation fails then nothing happens.
 struct Arena {
     char* start;
     char* pointer;
