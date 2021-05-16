@@ -23,7 +23,7 @@ template <class... Ts>
 cz::String format(cz::Allocator allocator, Ts... ts) {
     cz::String string = {};
     append(allocator, &string, ts...);
-    string.realloc(allocator);
+    string.realloc_null_terminate(allocator);
     return string;
 }
 
@@ -32,7 +32,7 @@ template <class... Ts>
 cz::Heap_String format(Ts... ts) {
     cz::Heap_String string = {};
     append(&string, ts...);
-    string.realloc();
+    string.realloc_null_terminate();
     return string;
 }
 
