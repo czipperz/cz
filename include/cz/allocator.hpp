@@ -12,12 +12,8 @@ namespace cz {
 
 /// A memory allocator.
 struct Allocator {
-    /// Allocate, deallocate, shrink, or expand a memory region.
+    /// Allocate, shrink, or expand a memory region.
     ///
-    /// If `new_info.alignment == 0` then the operation is deallocation.  The return value
-    /// is undefined.  If `old_mem.buffer == nullptr` then there is nothing to deallocate.
-    ///
-    /// Otherwise, this operation should be performed:
     /// 1. Try to obtain a memory region matching `new_info` (even if `new_info.size == 0`).
     ///    If this fails then immediately stop and return `nullptr`.
     /// 2. If `old_mem.buffer != nullptr` then copy `min(old_mem.size, new_info.size)`
@@ -25,10 +21,15 @@ struct Allocator {
     /// 3. If `old_mem.buffer != nullptr` then deallocate `old_mem`.
     /// 4. Return the new memory region.
     ///
-    /// Note that this differs from `std::realloc` in behavior when
-    /// `new_info.size == 0`; we disambiguate between trying to free
-    /// memory and allocate a `0` byte block by using the alignment.
-    void* (*func)(void* data, MemSlice old_mem, AllocInfo new_info);
+    /// Note that this differs from `std::realloc` in behavior when `new_info.size
+    /// == 0`; this function should only return `nullptr` if no memory is left to
+    /// be allocated.  One way to do this is to convert `size = 0` to `size = 1`.
+    void* (*reallocate)(void* data, MemSlice old_mem, AllocInfo new_info);
+
+    /// Deallocate a memory region.
+    ///
+    /// If `old_mem.buffer == nullptr` then nothing should be done.
+    void (*deallocate)(void* data, MemSlice old_mem);
 
     void* data;
 
@@ -47,13 +48,13 @@ struct Allocator {
     // When compiled in release mode call the virtual function without any checks.
 
     /// Allocate memory using this allocator.
-    void* alloc(AllocInfo new_info) const { return func(data, {}, new_info); }
+    void* alloc(AllocInfo new_info) const { return reallocate(data, {}, new_info); }
     /// Deallocate memory allocated using this allocator.
-    void dealloc(MemSlice old_mem) const { func(data, old_mem, {0, 0}); }
+    void dealloc(MemSlice old_mem) const { deallocate(data, old_mem); }
     /// Reallocate memory allocated using this allocator or
     /// allocate memory (if `old_mem.buffer` is `nullptr`).
     void* realloc(MemSlice old_mem, AllocInfo new_info) const {
-        return func(data, old_mem, new_info);
+        return reallocate(data, old_mem, new_info);
     }
 #endif
 

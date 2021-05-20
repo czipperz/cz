@@ -11,7 +11,7 @@ static const unsigned char dealloc_fill = 0xDD;
 void* Allocator::alloc(AllocInfo new_info) const {
     CZ_DEBUG_ASSERT(new_info.alignment > 0);
 
-    void* ptr = func(data, {}, new_info);
+    void* ptr = reallocate(data, {}, new_info);
     if (ptr) {
         memset(ptr, alloc_fill, new_info.size);
     }
@@ -22,7 +22,7 @@ void Allocator::dealloc(MemSlice old_mem) const {
     if (old_mem.buffer) {
         memset(old_mem.buffer, dealloc_fill, old_mem.size);
     }
-    func(data, old_mem, {0, 0});
+    deallocate(data, old_mem);
 }
 
 void* Allocator::realloc(MemSlice old_mem, AllocInfo new_info) const {
@@ -34,7 +34,7 @@ void* Allocator::realloc(MemSlice old_mem, AllocInfo new_info) const {
         memset((char*)old_mem.buffer + new_info.size, dealloc_fill, old_mem.size - new_info.size);
     }
 
-    void* ptr = func(data, old_mem, new_info);
+    void* ptr = reallocate(data, old_mem, new_info);
     if (ptr && new_info.size > old_mem.size) {
         memset((char*)ptr + old_mem.size, alloc_fill, new_info.size - old_mem.size);
     }

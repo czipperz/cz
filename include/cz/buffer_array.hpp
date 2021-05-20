@@ -2,7 +2,6 @@
 
 #include <stdint.h>
 #include "allocator.hpp"
-#include "arena.hpp"
 
 namespace cz {
 
@@ -55,7 +54,7 @@ struct Buffer_Array {
     void init();
     void drop();
 
-    Allocator allocator() { return {Buffer_Array::realloc, this}; }
+    Allocator allocator() { return {Buffer_Array::realloc, Buffer_Array::dealloc, this}; }
 
     void clear() { restore({0, 0}); }
 
@@ -86,6 +85,7 @@ struct Buffer_Array {
     }
 
     static void* realloc(void* buffer_array, MemSlice old_mem, AllocInfo new_info);
+    static void dealloc(void* buffer_array, MemSlice old_mem);
 };
 
 }

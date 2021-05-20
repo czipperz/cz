@@ -32,10 +32,11 @@ struct Arena {
 
     void drop(Allocator allocator) { allocator.dealloc(start, end - start); }
 
-    Allocator allocator() { return {Arena::realloc, this}; }
+    Allocator allocator() { return {Arena::realloc, Arena::dealloc, this}; }
     size_t remaining() const { return end - pointer; }
 
     static void* realloc(void* arena, MemSlice old_mem, AllocInfo new_info);
+    static void dealloc(void* arena, MemSlice old_mem);
 };
 
 }

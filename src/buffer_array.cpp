@@ -34,6 +34,50 @@ void Buffer_Array::drop() {
     cz::heap_allocator().dealloc(buffers, num_buffers);
 }
 
+static char* get_starting_point(Buffer_Array* buffer_array, MemSlice old_mem) {
+    char* starting_point = (char*)old_mem.buffer;
+
+    // If we don't match exactly then we must be deallocating from the previous buffer.
+    if (old_mem.end() != buffer_array->buffer_pointer) {
+        // Assert we're not skipping any allocations in this buffer.
+        CZ_DEBUG_ASSERT(buffer_array->buffer_pointer ==
+                        buffer_array->buffers[buffer_array->buffer_index]);
+
+        // Assert we have a previous buffer.
+        CZ_DEBUG_ASSERT(buffer_array->buffer_index > 0);
+
+        // Assert we are in bounds of the previous buffer.
+        char* buffer_start = buffer_array->buffers[buffer_array->buffer_index - 1];
+        CZ_DEBUG_ASSERT(old_mem.buffer >= buffer_start);
+        CZ_DEBUG_ASSERT(old_mem.buffer < buffer_start + Buffer_Array::buffer_size);
+
+        // Retreat to the previous buffer.
+        --buffer_array->buffer_index;
+        buffer_array->buffer_pointer = (char*)old_mem.end();
+
+        // Calculate the buffer end.
+        if (old_mem.size > Buffer_Array::buffer_size) {
+            // We have a massive allocation that has its own buffer.
+            CZ_DEBUG_ASSERT(old_mem.buffer == buffer_start);
+            buffer_array->buffer_end = buffer_start + old_mem.size;
+        } else {
+            buffer_array->buffer_end = buffer_start + Buffer_Array::buffer_size;
+        }
+    }
+
+    return starting_point;
+}
+
+void Buffer_Array::dealloc(void* _buffer_array, MemSlice old_mem) {
+    // Nothing to be done here.
+    if (!old_mem.buffer) {
+        return;
+    }
+
+    Buffer_Array* buffer_array = (Buffer_Array*)_buffer_array;
+    buffer_array->buffer_pointer = get_starting_point(buffer_array, old_mem);
+}
+
 void* Buffer_Array::realloc(void* _buffer_array, MemSlice old_mem, AllocInfo new_info) {
     Buffer_Array* buffer_array = (Buffer_Array*)_buffer_array;
 
@@ -42,43 +86,10 @@ void* Buffer_Array::realloc(void* _buffer_array, MemSlice old_mem, AllocInfo new
     if (old_mem.buffer) {
         // We can reuse the memory for the buffer because it was
         // the most recently allocated object in this buffer.
-        starting_point = (char*)old_mem.buffer;
-
-        // If we don't match exactly then we must be deallocating from the previous buffer.
-        if (old_mem.end() != buffer_array->buffer_pointer) {
-            // Assert we're not skipping any allocations in this buffer.
-            CZ_DEBUG_ASSERT(buffer_array->buffer_pointer ==
-                            buffer_array->buffers[buffer_array->buffer_index]);
-
-            // Assert we are in bounds of the previous buffer.
-            CZ_DEBUG_ASSERT(buffer_array->buffer_index > 0);
-
-            // Assert we are in bounds of the previous buffer.
-            char* buffer_start = buffer_array->buffers[buffer_array->buffer_index - 1];
-            CZ_DEBUG_ASSERT(old_mem.buffer >= buffer_start);
-            CZ_DEBUG_ASSERT(old_mem.buffer < buffer_start + Buffer_Array::buffer_size);
-
-            // Retreat to the previous buffer.
-            --buffer_array->buffer_index;
-            buffer_array->buffer_pointer = (char*)old_mem.end();
-
-            // Calculate the buffer end.
-            if (old_mem.size > Buffer_Array::buffer_size) {
-                // We have a massive allocation that has its own buffer.
-                CZ_DEBUG_ASSERT(old_mem.buffer == buffer_start);
-                buffer_array->buffer_end = buffer_start + old_mem.size;
-            } else {
-                buffer_array->buffer_end = buffer_start + Buffer_Array::buffer_size;
-            }
-        }
+        starting_point = get_starting_point(buffer_array, old_mem);
     } else {
         // We can use the memory left in the buffer.
         starting_point = buffer_array->buffer_pointer;
-    }
-
-    // Treat deallocation as just allocating 0 bytes.
-    if (new_info.alignment == 0) {
-        new_info.alignment = 1;
     }
 
     // If this condition is false then the advance call will be total bogus.

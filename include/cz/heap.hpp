@@ -17,13 +17,6 @@ namespace cz {
 inline void* heap_allocator_realloc(void*, MemSlice old_mem, AllocInfo new_info) {
     ZoneScoped;
 
-    if (new_info.alignment == 0) {
-        // Deallocation.
-        free(old_mem.buffer);
-        TracyFree(old_mem.buffer);
-        return nullptr;
-    }
-
     // Since it is undefined what happens when `std::realloc` is
     // called with `size = 0` we just always allocate 1 byte.
     if (new_info.size == 0) {
@@ -40,9 +33,16 @@ inline void* heap_allocator_realloc(void*, MemSlice old_mem, AllocInfo new_info)
     return ptr;
 }
 
+inline void heap_allocator_dealloc(void*, MemSlice old_mem) {
+    ZoneScoped;
+
+    free(old_mem.buffer);
+    TracyFree(old_mem.buffer);
+}
+
 /// Make an allocator that allocates memory in the heap.
 inline Allocator heap_allocator() {
-    return {heap_allocator_realloc, nullptr};
+    return {heap_allocator_realloc, heap_allocator_dealloc, nullptr};
 }
 
 }

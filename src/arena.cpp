@@ -12,6 +12,8 @@ void* Arena::realloc(void* _arena, MemSlice old_mem, AllocInfo new_info) {
     CZ_DEBUG_ASSERT(arena->start != nullptr);
     CZ_DEBUG_ASSERT(arena->pointer >= arena->start);
     CZ_DEBUG_ASSERT(arena->pointer <= arena->end);
+    CZ_DEBUG_ASSERT(old_mem.buffer == nullptr || old_mem.start() >= arena->start);
+    CZ_DEBUG_ASSERT(old_mem.buffer == nullptr || old_mem.end() >= arena->end);
 
     if (old_mem.end() == arena->pointer) {
         // Realloc in place.
@@ -22,11 +24,6 @@ void* Arena::realloc(void* _arena, MemSlice old_mem, AllocInfo new_info) {
         }
         return ptr;
     } else {
-        // Deallocate but we have nothing to do.
-        if (new_info.alignment == 0) {
-            return nullptr;
-        }
-
         // Ignore the dealloc and just allocate.
         MemSlice current = {arena->pointer, (size_t)(arena->end - arena->pointer)};
         void* ptr = advance_ptr_to_alignment(current, new_info);
@@ -35,6 +32,20 @@ void* Arena::realloc(void* _arena, MemSlice old_mem, AllocInfo new_info) {
             memcpy(ptr, old_mem.buffer, old_mem.size);
         }
         return ptr;
+    }
+}
+
+void Arena::dealloc(void* _arena, MemSlice old_mem) {
+    Arena* arena = (Arena*)_arena;
+    CZ_DEBUG_ASSERT(arena->start != nullptr);
+    CZ_DEBUG_ASSERT(arena->pointer >= arena->start);
+    CZ_DEBUG_ASSERT(arena->pointer <= arena->end);
+    CZ_DEBUG_ASSERT(old_mem.buffer == nullptr || old_mem.start() >= arena->start);
+    CZ_DEBUG_ASSERT(old_mem.buffer == nullptr || old_mem.end() >= arena->end);
+
+    // Only deallocate the last allocation.
+    if (old_mem.end() == arena->pointer) {
+        arena->pointer = (char*)old_mem.buffer;
     }
 }
 
