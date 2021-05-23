@@ -304,14 +304,14 @@ int64_t Output_File::write_add_carriage_returns(const char* buffer, size_t size)
             if (res < 0) {
                 return -1;
             } else if (res < spot - start) {
-                return spot + res - buffer;
+                return start + res - buffer;
             }
 
             int64_t tres2 = write_binary("\r\n", 2);
             if (tres2 < 0) {
                 return -1;
             } else if (tres2 < 2) {
-                return spot + res - buffer;
+                return spot - buffer;
             }
 
             start = spot + 1;
