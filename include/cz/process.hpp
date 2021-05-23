@@ -79,6 +79,7 @@ struct Carriage_Return_Carry {
 };
 
 void strip_carriage_returns(char* buffer, size_t* size);
+void strip_carriage_returns(String* string);
 
 struct Input_File : File_Descriptor {
     /// Try to open a file for reading.
