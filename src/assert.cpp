@@ -1,6 +1,7 @@
 #include <cz/assert.hpp>
 
 #include <stdlib.h>
+#include <cz/debug.hpp>
 
 #ifdef TRACY_ENABLE
 #include <stdio.h>
@@ -27,6 +28,8 @@ void panic_reached(const char* message) {
     CZ_ASSERT(len >= 0);
     TracyMessage(buffer, len);
 #endif
+
+    dbreak();
 
     throw PanicReachedException(message);
 }
