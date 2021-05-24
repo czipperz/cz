@@ -5,6 +5,7 @@
 #include "../str.hpp"
 
 #include "../defer.hpp"
+#include <stdio.h>
 
 namespace cz {
 namespace dwim {
