@@ -10,7 +10,7 @@
 
 namespace cz {
 
-using namespace cz;
+constexpr const size_t Buffer_Array::buffer_size;
 
 void Buffer_Array::init() {
     num_buffers = 4;
