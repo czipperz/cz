@@ -40,7 +40,7 @@ void Mutex::init() {
 #endif
 
 #ifdef TRACY_ENABLE
-    context = new tracy::SharedLockableCtx([]() -> const tracy::SourceLocationData* {
+    context = new tracy::LockableCtx([]() -> const tracy::SourceLocationData* {
         static constexpr tracy::SourceLocationData srcloc{nullptr, "cz::Mutex", __FILE__, __LINE__,
                                                           0};
         return &srcloc;

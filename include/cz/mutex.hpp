@@ -24,7 +24,7 @@ struct Mutex {
     void* handle;
 
 #ifdef TRACY_ENABLE
-    tracy::SharedLockableCtx* context;
+    tracy::LockableCtx* context;
 #endif
 
     friend struct Condition_Variable;
