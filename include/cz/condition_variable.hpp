@@ -10,10 +10,8 @@ struct Mutex;
 /// A condition variable has pointer semantics.  So you are free
 /// to copy or move the struct as long as you only `drop` it once.
 struct Condition_Variable {
-private:
     void* handle;
 
-public:
     /// Create the condition variable.
     void init();
 

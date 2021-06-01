@@ -21,7 +21,6 @@ struct Condition_Variable;
 /// A mutex has pointer semantics.  So you are free to copy
 /// or move the struct as long as you only `drop` it once.
 struct Mutex {
-private:
     void* handle;
 
 #ifdef TRACY_ENABLE
@@ -30,7 +29,6 @@ private:
 
     friend struct Condition_Variable;
 
-public:
     /// Create the mutex.
     void init();
 

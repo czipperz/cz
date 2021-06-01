@@ -15,10 +15,8 @@ namespace cz {
 /// A semaphore has pointer semantics.  So you are free to copy
 /// or move the struct as long as you only `drop` it once.
 struct Semaphore {
-private:
     void* handle;
 
-public:
     /// Create the semaphore and initialize the value.
     void init(uint32_t initial_value);
 
