@@ -2,12 +2,12 @@
 
 namespace cz {
 
-inline bool is_cntrl(char ch) {
+inline bool is_control(char ch) {
     return ch < 32 || ch >= 127;
 }
 
 inline bool is_print(char ch) {
-    return !is_cntrl(ch);
+    return !is_control(ch);
 }
 
 inline bool is_space(char ch) {
