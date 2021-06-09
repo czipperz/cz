@@ -40,7 +40,7 @@ Result get_max_len(size_t* size) {
 Option<Str> directory_component(Str str) {
     const char* ptr = str.rfind('/');
     if (ptr) {
-        return {{str.buffer, static_cast<size_t>(ptr + 1 - str.buffer)}};
+        return {str.slice_end(ptr + 1)};
     } else {
         return {};
     }
@@ -48,14 +48,17 @@ Option<Str> directory_component(Str str) {
 
 Option<Str> name_component(Str str) {
     const char* ptr = str.rfind('/');
+
     if (ptr) {
-        if (ptr + 1 < str.end()) {
-            return {{ptr + 1, static_cast<size_t>(str.end() - (ptr + 1))}};
-        } else {
-            return {};
-        }
-    } else if (str.len > 0) {
-        return {str};
+        // Don't include `/` in name component.
+        ++ptr;
+    } else {
+        // No `/` at all -> entire string is one component.
+        ptr = str.buffer;
+    }
+
+    if (ptr < str.end()) {
+        return {str.slice_start(ptr)};
     } else {
         return {};
     }
