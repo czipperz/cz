@@ -123,16 +123,6 @@ bool name_component(Str path, Str* name) {
     return true;
 }
 
-bool directory_component(const char* path, size_t* len) {
-    const char* slash = cz::Str{path, *len}.rfind('/');
-    if (!slash) {
-        return false;
-    }
-
-    *len = slash - path;
-    return true;
-}
-
 bool has_component(Str path, Str component) {
     while (1) {
         const char* ptr = path.find(component);
