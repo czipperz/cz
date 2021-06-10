@@ -1,15 +1,7 @@
-/// \file path.hpp
-///
 /// Functions for manipulating paths.
 ///
-/// Paths are complicated and have different cross-platform behavior.  This
-/// module aims to abstract over the basic concepts without making them
-/// complicated to work with.  To do this we use forward slashes for all paths.
-///
-/// On *nix absolute paths start with \c / .  On Windows absolute paths are
-/// separate from drive specifiers.  Thus all of the following are valid: \c
-/// C:/x/y , \c C:x/y , \c /x/y , \c x/y .
-/// https://docs.microsoft.com/en-us/dotnet/standard/io/file-path-formats
+/// This module only manipulates paths formatted with forward slashes (`/`).  If on
+/// Windows you should use `convert_to_forward_slashes` to clean input strings.
 
 #pragma once
 
@@ -59,8 +51,9 @@ void flatten(String* path);
 
 /// Test if the path is absolute.
 ///
-/// On *nix, this means that it starts with `/`.  On Windows, this means that it
-/// starts with `X:/` where `X` is a drive.
+/// On *nix, this means that it starts with `/`.  On Windows, this means that
+/// it starts with `X:/` where `X` is an alphabetic character (drive name).
+/// See [https://docs.microsoft.com/en-us/dotnet/standard/io/file-path-formats].
 ///
 /// The path must use forward slashes.
 bool is_absolute(Str path);
@@ -73,20 +66,18 @@ bool is_absolute(Str path);
 /// The path must use forward slashes.
 Result make_absolute(Str relative_path, Allocator allocator, String* absolute_path_out);
 
-/// Convert the path to use forward slashes (`/`) instead of backward slashes (`\\`).
+/// Convert the path to use forward slashes (`'/'`) instead of backward slashes (`'\\'`).
 ///
-/// All the functions in this module rely on forward slashes being used as directory separators.
-///
-/// Note that this is only relevant to call on Windows (ie `_WIN32` is defined).
+/// This is only relevant on Windows as other platforms only use forward slashes.
 void convert_to_forward_slashes(char* path, size_t len);
 
 inline void convert_to_forward_slashes(String* path) {
     convert_to_forward_slashes(path->buffer(), path->len());
 }
 
-/// Convert the path to use back slashes (`\\`) instead of forward slashes (`/`).
+/// Convert the path to use back slashes (`'\\'`) instead of forward slashes (`'/'`).
 ///
-/// Note that this is only relevant to call on Windows (ie `_WIN32` is defined).
+/// This is only relevant on Windows as other platforms only use forward slashes.
 void convert_to_back_slashes(char* path, size_t len);
 
 inline void convert_to_back_slashes(String* path) {
