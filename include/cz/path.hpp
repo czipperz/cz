@@ -29,11 +29,18 @@ bool directory_component(Str path, Str* directory);
 bool pop_component(Str* path);
 bool pop_component(String* path);
 
+/// Same as `pop_component` but keeps the trailing `/`.  Note that
+/// calling `pop_name` more than one time will do nothing.
+bool pop_name(Str path, size_t* end);
+bool pop_name(Str* path);
+bool pop_name(String* path);
+
 /// Get the name component of the path.
 ///
 /// If the path ends in a forward slash, returns `false`.
-/// Otherwise, if the path contains a forward slash, returns the section after the last forward
-/// slash. Otherwise, returns the path.
+/// Otherwise, if the path contains a forward slash,
+/// returns the section after the last forward slash.
+/// Otherwise, returns the path.
 ///
 /// The path must use forward slashes.
 bool name_component(Str path, size_t* name_start);

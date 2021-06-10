@@ -47,7 +47,7 @@ bool directory_component(Str path, size_t* directory_end) {
 }
 
 bool directory_component(Str path, Str* directory) {
-    if (!directory_component(path.buffer, &path.len)) {
+    if (!directory_component(path, &path.len)) {
         return false;
     }
     *directory = path;
@@ -60,7 +60,35 @@ bool pop_component(Str* path) {
 
 bool pop_component(String* path) {
     size_t len = path->len();
-    if (!directory_component(path->buffer(), &len)) {
+    if (!directory_component(*path, &len)) {
+        return false;
+    }
+    path->set_len(len);
+    return true;
+}
+
+bool pop_name(Str path, size_t* end) {
+    size_t len;
+    if (!directory_component(path, &len)) {
+        return false;
+    }
+    // Include the trailing slash.
+    *end = len + 1;
+    return true;
+}
+
+bool pop_name(Str* path) {
+    size_t len;
+    if (!pop_name(*path, &len)) {
+        return false;
+    }
+    path->len = len;
+    return true;
+}
+
+bool pop_name(String* path) {
+    size_t len;
+    if (!pop_name(*path, &len)) {
         return false;
     }
     path->set_len(len);
