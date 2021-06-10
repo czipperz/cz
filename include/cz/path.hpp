@@ -16,22 +16,28 @@ namespace path {
 /// argument if there is no maximum.
 Result get_max_len(size_t* size);
 
-/// Get the directory component of the path, including the trailing slash.
+/// Get the directory component of the path.
 ///
-/// Returns none if there is no directory (no forward slash).
+/// If the path doesn't contain a forward slash, returns `false`.
+/// Otherwise, returns the section before the last forward slash.
 ///
 /// The path must use forward slashes.
-Option<Str> directory_component(Str path);
+bool directory_component(Str path, size_t* directory_end);
+bool directory_component(Str path, Str* directory);
+
+/// Run `directory_component` inline on the path.
+bool pop_component(Str* path);
+bool pop_component(String* path);
 
 /// Get the name component of the path.
 ///
-/// If the last character of the string is a forward slash, none is returned.
-/// If the input is empty, none is returned.
-/// If there is both a directory and a name, the part after the trailing slash
-/// is returned.
+/// If the path ends in a forward slash, returns `false`.
+/// Otherwise, if the path contains a forward slash, returns the section after the last forward
+/// slash. Otherwise, returns the path.
 ///
 /// The path must use forward slashes.
-Option<Str> name_component(Str path);
+bool name_component(Str path, size_t* name_start);
+bool name_component(Str path, Str* name);
 
 /// Test if the path has the component.
 bool has_component(Str path, Str component);

@@ -37,31 +37,72 @@ Result get_max_len(size_t* size) {
 #endif
 }
 
-Option<Str> directory_component(Str str) {
-    const char* ptr = str.rfind('/');
-    if (ptr) {
-        return {str.slice_end(ptr + 1)};
-    } else {
-        return {};
+bool directory_component(Str path, size_t* directory_end) {
+    const char* ptr = path.rfind('/');
+    if (!ptr) {
+        return false;
     }
+    *directory_end = ptr - path.buffer;
+    return true;
 }
 
-Option<Str> name_component(Str str) {
-    const char* ptr = str.rfind('/');
+bool directory_component(Str path, Str* directory) {
+    if (!directory_component(path.buffer, &path.len)) {
+        return false;
+    }
+    *directory = path;
+    return true;
+}
 
-    if (ptr) {
-        // Don't include `/` in name component.
-        ++ptr;
-    } else {
-        // No `/` at all -> entire string is one component.
-        ptr = str.buffer;
+bool pop_component(Str* path) {
+    return directory_component(*path, path);
+}
+
+bool pop_component(String* path) {
+    size_t len = path->len();
+    if (!directory_component(path->buffer(), &len)) {
+        return false;
+    }
+    path->set_len(len);
+    return true;
+}
+
+bool name_component(Str path, size_t* name_start) {
+    const char* ptr = path.rfind('/');
+
+    // No forward slashes -> all the name component.
+    if (!ptr) {
+        *name_start = 0;
+        return true;
     }
 
-    if (ptr < str.end()) {
-        return {str.slice_start(ptr)};
-    } else {
-        return {};
+    // Path ends in foward slash -> no name component.
+    if (ptr + 1 == path.end()) {
+        return false;
     }
+
+    // Has name component and directory component.
+    *name_start = ptr - path.buffer + 1;
+    return true;
+}
+
+bool name_component(Str path, Str* name) {
+    size_t name_start;
+    if (!name_component(path, &name_start)) {
+        return false;
+    }
+    *name = path.slice_start(name_start);
+    return true;
+}
+
+bool directory_component(const char* path, size_t* len) {
+    const char* slash = cz::Str{path, *len}.rfind('/');
+    if (!slash) {
+        return false;
+    }
+
+    *len = slash - path;
+    return true;
 }
 
 bool has_component(Str path, Str component) {
