@@ -45,22 +45,6 @@ TEST_CASE("Vector push in limits") {
     CHECK(vector[3] == 6);
 }
 
-#ifndef NDEBUG
-TEST_CASE("Vector first push outside bounds panics as no reserve") {
-    Vector<int> vector = {};
-    auto allocator = heap_allocator();
-    CZ_DEFER(vector.drop(allocator));
-    vector.reserve(allocator, 4);
-
-    vector.push(3);
-    vector.push(4);
-    vector.push(5);
-    vector.push(6);
-
-    REQUIRE_THROWS_AS(vector.push(7), PanicReachedException);
-}
-#endif
-
 TEST_CASE("Vector copy constructor copies pointer") {
     Vector<int> original = {};
     CZ_DEFER(original.drop(heap_allocator()));
