@@ -13,7 +13,7 @@ void* Arena::realloc(void* _arena, MemSlice old_mem, AllocInfo new_info) {
     CZ_DEBUG_ASSERT(arena->pointer >= arena->start);
     CZ_DEBUG_ASSERT(arena->pointer <= arena->end);
     CZ_DEBUG_ASSERT(old_mem.buffer == nullptr || old_mem.start() >= arena->start);
-    CZ_DEBUG_ASSERT(old_mem.buffer == nullptr || old_mem.end() >= arena->end);
+    CZ_DEBUG_ASSERT(old_mem.buffer == nullptr || old_mem.end() >= arena->pointer);
 
     if (old_mem.end() == arena->pointer) {
         // Realloc in place.
@@ -41,7 +41,7 @@ void Arena::dealloc(void* _arena, MemSlice old_mem) {
     CZ_DEBUG_ASSERT(arena->pointer >= arena->start);
     CZ_DEBUG_ASSERT(arena->pointer <= arena->end);
     CZ_DEBUG_ASSERT(old_mem.buffer == nullptr || old_mem.start() >= arena->start);
-    CZ_DEBUG_ASSERT(old_mem.buffer == nullptr || old_mem.end() >= arena->end);
+    CZ_DEBUG_ASSERT(old_mem.buffer == nullptr || old_mem.end() >= arena->pointer);
 
     // Only deallocate the last allocation.
     if (old_mem.end() == arena->pointer) {
