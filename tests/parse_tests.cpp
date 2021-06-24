@@ -52,6 +52,9 @@ TEST_CASE("parse signed") {
     CHECK(i8 == 127);
     CHECK(parse("-128", &i8) == 4);
     CHECK(i8 == -128);
+    i8 = -13;
+    CHECK(parse("-129", &i8) == -4);
+    CHECK(i8 == -13);
 
     int16_t i16;
     CHECK(parse("0", &i16) == 1);
@@ -66,6 +69,9 @@ TEST_CASE("parse signed") {
     CHECK(i16 == 32767);
     CHECK(parse("-32768", &i16) == 6);
     CHECK(i16 == -32768);
+    i16 = 13;
+    CHECK(parse("-32769", &i16) == -6);
+    CHECK(i16 == 13);
 
     int32_t i32;
     CHECK(parse("0", &i32) == 1);
@@ -80,6 +86,9 @@ TEST_CASE("parse signed") {
     CHECK(i32 == 2147483647);
     CHECK(parse("-2147483648", &i32) == 11);
     CHECK(i32 == -2147483648);
+    i32 = 13;
+    CHECK(parse("-2147483649", &i32) == -11);
+    CHECK(i32 == 13);
 
     int64_t i64;
     CHECK(parse("0", &i64) == 1);
@@ -94,4 +103,7 @@ TEST_CASE("parse signed") {
     CHECK(i64 == 9223372036854775807);
     CHECK(parse("-9223372036854775808", &i64) == 20);
     CHECK(i64 == -9223372036854775808);
+    i64 = 13;
+    CHECK(parse("-9223372036854775809", &i64) == -20);
+    CHECK(i64 == 13);
 }
