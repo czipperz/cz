@@ -8,7 +8,6 @@ namespace cz {
 
 template <class U>
 static int64_t parse_unsigned(cz::Str str, U* t) {
-    U max = std::numeric_limits<U>::max();
     U value = 0;
 
     for (size_t i = 0; i < str.len; ++i) {
@@ -42,7 +41,7 @@ static int64_t parse_unsigned(cz::Str str, U* t) {
 
 template <class S>
 static int64_t parse_signed(cz::Str str, S* s) {
-    using U = std::make_unsigned<S>::type;
+    using U = typename std::make_unsigned<S>::type;
 
     if (str.len == 0) {
         return 0;
