@@ -19,7 +19,7 @@
 namespace cz {
 namespace file {
 
-bool does_file_exist(const char* path) {
+bool exists(const char* path) {
     ZoneScoped;
 #ifdef _WIN32
     return GetFileAttributes(path) != 0xFFFFFFFF;

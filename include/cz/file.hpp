@@ -3,7 +3,10 @@
 namespace cz {
 namespace file {
 
-bool does_file_exist(const char* path);
+/// Returns `true` iff there is a file at `path`.
+bool exists(const char* path);
+
+/// Returns `true` iff `path` exists and it is a directory.
 bool is_directory(const char* path);
 
 }

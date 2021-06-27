@@ -18,7 +18,7 @@ bool find_file_up(Allocator allocator, String* path, Str file) {
         path->append(file);
         path->null_terminate();
 
-        if (file::does_file_exist(path->buffer())) {
+        if (file::exists(path->buffer())) {
             return true;
         }
 
