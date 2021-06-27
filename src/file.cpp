@@ -44,5 +44,31 @@ bool is_directory(const char* path) {
 #endif
 }
 
+int create_directory(const char* path) {
+#ifdef _WIN32
+    if (CreateDirectoryA(path, NULL)) {
+        return 0;
+    }
+
+    int error = GetLastError();
+    if (error == ERROR_ALREADY_EXISTS) {
+        return 2;
+    } else {
+        return 1;
+    }
+#else
+    if (mkdir(path, 0755) == 0) {
+        return 0;
+    }
+
+    int error = errno;
+    if (error == EEXIST) {
+        return 2;
+    } else {
+        return 1;
+    }
+#endif
+}
+
 }
 }
