@@ -5,6 +5,12 @@
 #include <cz/defer.hpp>
 #include <cz/try.hpp>
 
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#else
+#define ZoneScoped
+#endif
+
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -24,6 +30,8 @@ static Result get_last_error() {
 }
 
 Result Directory_Iterator::advance(Allocator allocator, String* out) {
+    ZoneScoped;
+
     WIN32_FIND_DATA data;
     if (FindNextFileA(_handle, &data)) {
         Str file = data.cFileName;
@@ -40,6 +48,8 @@ Result Directory_Iterator::advance(Allocator allocator, String* out) {
 }
 
 Result Directory_Iterator::drop() {
+    ZoneScoped;
+
     if (FindClose(_handle)) {
         return Result::ok();
     } else {
@@ -48,6 +58,8 @@ Result Directory_Iterator::drop() {
 }
 
 Result Directory_Iterator::init(const char* cstr_path, Allocator allocator, String* out) {
+    ZoneScoped;
+
     // Windows doesn't list the files in a directory, it findes files matching criteria.
     // Thus we must append `"\*"` to get all files in the directory `cstr_path`.
     Str str_path = cstr_path;
@@ -103,6 +115,8 @@ Result Directory_Iterator::init(const char* cstr_path, Allocator allocator, Stri
 namespace cz {
 
 Result Directory_Iterator::advance(Allocator allocator, String* out) {
+    ZoneScoped;
+
     errno = 0;
     dirent* dirent = readdir((DIR*)_dir);
     if (dirent) {
@@ -124,6 +138,8 @@ Result Directory_Iterator::advance(Allocator allocator, String* out) {
 }
 
 Result Directory_Iterator::drop() {
+    ZoneScoped;
+
     int ret = closedir((DIR*)_dir);
     (void)ret;
     CZ_DEBUG_ASSERT(ret == 0);
@@ -131,6 +147,8 @@ Result Directory_Iterator::drop() {
 }
 
 Result Directory_Iterator::init(const char* cstr_path, Allocator allocator, String* out) {
+    ZoneScoped;
+
     DIR* dir = opendir(cstr_path);
     if (!dir) {
         return Result::last_error();

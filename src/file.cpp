@@ -5,8 +5,8 @@
 #define NOMINMAX
 #include <windows.h>
 #else
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 #endif
 
@@ -29,6 +29,7 @@ bool exists(const char* path) {
 }
 
 bool is_directory(const char* path) {
+    ZoneScoped;
 #ifdef _WIN32
     DWORD result = GetFileAttributes(path);
     if (result == INVALID_FILE_ATTRIBUTES) {
@@ -45,6 +46,7 @@ bool is_directory(const char* path) {
 }
 
 int create_directory(const char* path) {
+    ZoneScoped;
 #ifdef _WIN32
     if (CreateDirectoryA(path, NULL)) {
         return 0;
