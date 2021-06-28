@@ -80,9 +80,9 @@ struct String {
     void set_len(size_t new_len);
 
     /// Create a new `String` with the same contents in a unique memory buffer.
-    String clone(Allocator allocator) const { return as_str().duplicate(allocator); }
+    String clone(Allocator allocator) const { return as_str().clone(allocator); }
     String clone_null_terminate(Allocator allocator) const {
-        return as_str().duplicate_null_terminate(allocator);
+        return as_str().clone_null_terminate(allocator);
     }
 
     /// Dealloc the `String`.

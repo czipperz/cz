@@ -104,7 +104,7 @@ struct Allocator {
 
     /// Duplicate a slice of memory by allocating a copy of it using this allocator.
     template <class T>
-    cz::Slice<T> duplicate(cz::Slice<T> slice) {
+    cz::Slice<T> clone(cz::Slice<T> slice) {
         T* new_elems = static_cast<T*>(alloc({sizeof(T) * slice.len, alignof(T)}));
         CZ_ASSERT(new_elems);
         memcpy(new_elems, slice.elems, sizeof(T) * slice.len);

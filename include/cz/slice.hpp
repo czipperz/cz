@@ -25,7 +25,7 @@ struct Slice {
     constexpr operator Slice<const T>() const { return {elems, len}; }
 
     // Note the implementation for this is in vector.hpp.
-    Vector<T> duplicate(Allocator allocator) const;
+    Vector<T> clone(Allocator allocator) const;
 
     constexpr T* begin() const { return elems; }
     constexpr T* start() const { return elems; }

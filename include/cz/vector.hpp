@@ -170,7 +170,7 @@ struct Vector {
 };
 
 template <class T>
-Vector<T> Slice<T>::duplicate(Allocator allocator) const {
+Vector<T> Slice<T>::clone(Allocator allocator) const {
     T* ts = allocator.alloc<T>(len);
     CZ_ASSERT(ts);
     memcpy(ts, elems, sizeof(T) * len);
