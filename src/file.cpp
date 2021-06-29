@@ -5,10 +5,10 @@
 #define NOMINMAX
 #include <windows.h>
 #else
+#include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <errno.h>
 #endif
 
 #ifdef TRACY_ENABLE
@@ -43,6 +43,23 @@ bool is_directory(const char* path) {
         return false;
     }
     return S_ISDIR(buf.st_mode);
+#endif
+}
+
+bool is_directory_and_not_symlink(const char* path) {
+    ZoneScoped;
+#ifdef _WIN32
+    DWORD result = GetFileAttributes(path);
+    if (result == INVALID_FILE_ATTRIBUTES) {
+        return false;
+    }
+    return (result & FILE_ATTRIBUTE_DIRECTORY) && !(result & FILE_ATTRIBUTE_REPARSE_POINT);
+#else
+    struct stat buf;
+    if (stat(path, &buf) < 0) {
+        return false;
+    }
+    return S_ISDIR(buf.st_mode) && !S_ISLNK(buf.st_mode);
 #endif
 }
 
