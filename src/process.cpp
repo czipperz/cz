@@ -50,7 +50,6 @@ bool File_Descriptor::is_open() const {
 bool Input_File::open(const char* file) {
     ZoneScoped;
     ZoneText(file, strlen(file));
-    CZ_DEBUG_ASSERT(!is_open());
 
 #ifdef _WIN32
     SECURITY_ATTRIBUTES sa;
@@ -255,7 +254,6 @@ int64_t Input_File::read_strip_carriage_returns(char* buffer,
 bool Output_File::open(const char* file) {
     ZoneScoped;
     ZoneText(file, strlen(file));
-    CZ_DEBUG_ASSERT(!is_open());
 
 #ifdef _WIN32
     SECURITY_ATTRIBUTES sa;
