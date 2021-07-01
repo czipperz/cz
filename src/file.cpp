@@ -56,7 +56,7 @@ bool is_directory_and_not_symlink(const char* path) {
     return (result & FILE_ATTRIBUTE_DIRECTORY) && !(result & FILE_ATTRIBUTE_REPARSE_POINT);
 #else
     struct stat buf;
-    if (stat(path, &buf) < 0) {
+    if (lstat(path, &buf) < 0) {
         return false;
     }
     return S_ISDIR(buf.st_mode) && !S_ISLNK(buf.st_mode);
