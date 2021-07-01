@@ -54,10 +54,13 @@ public:
     /// memory allocated once all strong and weak pointers have been dropped.
     void drop() noexcept;
 
-    /// Dereference the pointer.
+    /// Dereference the pointer.  Not valid if the pointer is null.
     T& operator*() const noexcept;
     T* operator->() const noexcept;
     T* get() const noexcept;
+
+    bool is_null() const noexcept;
+    bool is_not_null() const noexcept;
 };
 
 /// A weak reference to the reference counted pointer.  A weak reference can be
@@ -177,13 +180,24 @@ T& Arc<T>::operator*() const noexcept {
 
 template <class T>
 T* Arc<T>::operator->() const noexcept {
-    return get();
+    CZ_DEBUG_ASSERT(pointer);
+    return &pointer->value;
 }
 
 template <class T>
 T* Arc<T>::get() const noexcept {
     CZ_DEBUG_ASSERT(pointer);
     return &pointer->value;
+}
+
+template <class T>
+bool Arc<T>::is_null() const noexcept {
+    return pointer == nullptr;
+}
+
+template <class T>
+bool Arc<T>::is_not_null() const noexcept {
+    return pointer != nullptr;
 }
 
 template <class T>
