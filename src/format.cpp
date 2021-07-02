@@ -12,6 +12,7 @@ cz::String asprintf(cz::Allocator allocator, const char* format, ...) {
     cz::String string = {};
     append_vsprintf(allocator, &string, format, args);
     va_end(args);
+    string.realloc_null_terminate(allocator);
     return string;
 }
 
@@ -21,6 +22,7 @@ cz::Heap_String asprintf(const char* format, ...) {
     cz::Heap_String string = {};
     append_vsprintf(&string, format, args);
     va_end(args);
+    string.realloc_null_terminate();
     return string;
 }
 
@@ -43,12 +45,14 @@ void append_sprintf(cz::Heap_String* string, const char* format, ...) {
 cz::String avsprintf(cz::Allocator allocator, const char* format, va_list args) {
     cz::String string = {};
     append_vsprintf(allocator, &string, format, args);
+    string.realloc_null_terminate(allocator);
     return string;
 }
 
 cz::Heap_String avsprintf(const char* format, va_list args) {
     cz::Heap_String string = {};
     append_vsprintf(&string, format, args);
+    string.realloc_null_terminate();
     return string;
 }
 

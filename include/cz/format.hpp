@@ -6,7 +6,7 @@
 
 namespace cz {
 
-/// Run `sprintf` and make the result into a string.
+/// Run `sprintf` and make the result into a string; null terminates and truncates the string.
 cz::String asprintf(cz::Allocator allocator, const char* format, ...);
 cz::Heap_String asprintf(const char* format, ...);
 cz::String avsprintf(cz::Allocator allocator, const char* format, va_list args);
@@ -18,7 +18,7 @@ void append_sprintf(cz::Heap_String* string, const char* format, ...);
 void append_vsprintf(cz::Allocator allocator, cz::String* string, const char* format, va_list args);
 void append_vsprintf(cz::Heap_String* string, const char* format, va_list args);
 
-/// Format a bunch of things to a string.
+/// Format a bunch of things to a string; null terminates and truncates the string.
 template <class... Ts>
 cz::String format(cz::Allocator allocator, Ts... ts) {
     cz::String string = {};
@@ -27,7 +27,8 @@ cz::String format(cz::Allocator allocator, Ts... ts) {
     return string;
 }
 
-/// Format a bunch of things to a string that is heap allocated.
+/// Format a bunch of things to a string that is heap
+/// allocated; null terminates and truncates the string.
 template <class... Ts>
 cz::Heap_String format(Ts... ts) {
     cz::Heap_String string = {};
