@@ -247,6 +247,10 @@ Result make_absolute(Str file, Allocator allocator, String* path) {
     if (is_absolute(file)) {
         path->reserve(allocator, file.len + 1);
     } else {
+#ifdef _WIN32
+        size_t path_len = path->len();
+#endif
+
         CZ_TRY(get_working_directory(allocator, path));
 
 #ifdef _WIN32
@@ -254,11 +258,12 @@ Result make_absolute(Str file, Allocator allocator, String* path) {
         if (file.len >= 2 && cz::is_alpha(file[0]) && file[1] == ':') {
             CZ_DEBUG_ASSERT(path->len() >= 2 && cz::is_alpha((*path)[0]) && (*path)[1] == ':');
 
-            // Don't currently support get_working_directory on different drives
             if (cz::to_lower((*path)[0]) != cz::to_lower(file[0])) {
-                CZ_PANIC(
-                    "cz::fs::make_absolute(): Unimplemented get_working_directory() for other "
-                    "drives");
+                // The working directory is set on a different
+                // drive so pretend this file is absolute.
+                path->set_len(path_len);
+                path->reserve(allocator, 3 + file.len + 1);
+                path->append(file.slice_end(2));
             }
 
             // Remove X: prefix
