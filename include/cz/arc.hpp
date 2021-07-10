@@ -9,14 +9,16 @@
 namespace cz {
 
 template <class T>
+struct Arc_Weak;
+
+template <class T>
 struct Arc_Value {
     T value;
     std::atomic_uint32_t strong;
     std::atomic_uint32_t total;
-};
 
-template <class T>
-struct Arc_Weak;
+    Arc_Weak<T> create_arc_weak() noexcept;
+};
 
 /// An atomically reference counted pointer.  It heap allocates the value along
 /// with some information about how many references are active.  This struct is
@@ -79,6 +81,7 @@ private:
     Arc_Value<T>* pointer;
 
     friend struct Arc<T>;
+    friend struct Arc_Value<T>;
 
 public:
     /// Try to upgrade this weak reference to a strong reference (`Arc`).
@@ -92,6 +95,9 @@ public:
     /// pointers have been dropped.  Note that this method will never destroy the value because
     /// it doesn't have ownership over the value, only the storage for the reference count.
     void drop() noexcept;
+
+    /// Create another weak reference to the pointer.
+    Arc_Weak<T> clone_downgrade() const noexcept;
 };
 
 template <class T>
@@ -146,16 +152,26 @@ Arc<T> Arc<T>::clone() const noexcept {
 }
 
 template <class T>
-Arc_Weak<T> Arc<T>::clone_downgrade() const noexcept {
-    CZ_DEBUG_ASSERT(pointer);
-
-    uint32_t total = pointer->total.fetch_add(1);
+Arc_Weak<T> Arc_Value<T>::create_arc_weak() noexcept {
+    uint32_t total = this->total.fetch_add(1);
     (void)total;
     CZ_DEBUG_ASSERT(total > 0);
 
     Arc_Weak<T> copy;
-    copy.pointer = pointer;
+    copy.pointer = this;
     return copy;
+}
+
+template <class T>
+Arc_Weak<T> Arc<T>::clone_downgrade() const noexcept {
+    CZ_DEBUG_ASSERT(pointer);
+    return pointer->create_arc_weak();
+}
+
+template <class T>
+Arc_Weak<T> Arc_Weak<T>::clone_downgrade() const noexcept {
+    CZ_DEBUG_ASSERT(pointer);
+    return pointer->create_arc_weak();
 }
 
 template <class T>
