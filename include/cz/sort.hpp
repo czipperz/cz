@@ -1,21 +1,10 @@
 #pragma once
 
+#include <cz/template_generic.hpp>
 #include <cz/slice.hpp>
 #include <cz/vector.hpp>
 
 namespace cz {
-
-template <class T>
-bool generic_is_less_ptr(T* left, T* right) {
-    return *left < *right;
-}
-
-template <class T>
-void generic_swap_ptr(T* left, T* right) {
-    T temp = *left;
-    *left = *right;
-    *right = temp;
-}
 
 template <class Iterator, class Is_Less, class Swap>
 void generic_insertion_sort(Iterator start, Iterator end, Is_Less&& is_less, Swap&& swap) {
