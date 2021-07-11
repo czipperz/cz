@@ -77,7 +77,15 @@ bool is_absolute(Str path);
 /// Then in either case we flatten the path.
 ///
 /// The path must use forward slashes.
+///
+/// Returns an error if it fails to get the current working directory.
 Result make_absolute(Str relative_path, Allocator allocator, String* absolute_path_out);
+
+/// The same as `make_absolute` above except with a custom working directory.
+void make_absolute(Str relative_path,
+                   Str working_directory,
+                   Allocator allocator,
+                   String* absolute_path_out);
 
 /// Convert the path to use forward slashes (`'/'`) instead of backward slashes (`'\\'`).
 ///

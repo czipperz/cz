@@ -243,7 +243,8 @@ bool is_absolute(Str file) {
 #endif
 }
 
-Result make_absolute(Str file, Allocator allocator, String* path) {
+template <class PWD>
+static Result generic_make_absolute(Str file, Allocator allocator, String* path, PWD&& pwd) {
     if (is_absolute(file)) {
         path->reserve(allocator, file.len + 1);
     } else {
@@ -251,7 +252,7 @@ Result make_absolute(Str file, Allocator allocator, String* path) {
         size_t path_len = path->len();
 #endif
 
-        CZ_TRY(get_working_directory(allocator, path));
+        CZ_TRY(pwd(allocator, path));
 
 #ifdef _WIN32
         // Handle X:relpath
@@ -280,6 +281,18 @@ Result make_absolute(Str file, Allocator allocator, String* path) {
     flatten(path);
     path->null_terminate();
     return Result::ok();
+}
+
+Result make_absolute(Str file, Allocator allocator, String* path) {
+    return generic_make_absolute(file, allocator, path, get_working_directory);
+}
+
+void make_absolute(Str file, Str working_directory, Allocator allocator, String* path) {
+    generic_make_absolute(file, allocator, path, [&](Allocator allocator, String* path) {
+        path->reserve(allocator, working_directory.len);
+        path->append(working_directory);
+        return Result::ok();
+    });
 }
 
 void convert_to_forward_slashes(char* path, size_t len) {
