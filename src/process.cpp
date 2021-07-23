@@ -362,7 +362,7 @@ void read_to_string(Input_File file, cz::Allocator allocator, cz::String* out) {
     while (1) {
         int64_t read_result = file.read_text(buffer, sizeof(buffer), &carry);
         if (read_result < 0) {
-            // Todo: what do we do here?  I'm just ignoring the error for now
+            // TODO: what do we do here?  I'm just ignoring the error for now
         } else if (read_result == 0) {
             // End of file
             break;
