@@ -36,9 +36,11 @@ bool get_home(Allocator allocator, String* value) {
     return get(key, allocator, value);
 }
 
-bool get_path(Allocator vector_allocator, Allocator value_allocator, cz::Vector<Str>* values) {
-    cz::String string = {};
-    if (!get("PATH", value_allocator, &string)) {
+bool get_path(Allocator vector_allocator,
+              Allocator value_allocator,
+              Vector<Str>* values,
+              String* total) {
+    if (!get("PATH", value_allocator, total)) {
         return false;
     }
 
@@ -49,24 +51,24 @@ bool get_path(Allocator vector_allocator, Allocator value_allocator, cz::Vector<
     split = ':';
 #endif
 
-    string.split_into(split, vector_allocator, values);
+    total->split_into(split, vector_allocator, values);
     return true;
 }
 
 bool get_path_extensions(Allocator vector_allocator,
                          Allocator value_allocator,
-                         cz::Vector<Str>* values) {
-    cz::String string = {};
+                         Vector<Str>* values,
+                         String* total) {
 #ifdef _WIN32
-    if (!get("PATHEXT", value_allocator, &string)) {
+    if (!get("PATHEXT", value_allocator, total)) {
         return false;
     }
 #else
-    string.reserve(value_allocator, 1);
-    string.null_terminate();
+    total->reserve(value_allocator, 1);
+    total->null_terminate();
 #endif
 
-    string.split_into(';', vector_allocator, values);
+    total->split_into(';', vector_allocator, values);
     return true;
 }
 
