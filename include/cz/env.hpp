@@ -21,5 +21,7 @@ bool get_path_extensions(Allocator vector_allocator,
                          Vector<Str>* values,
                          String* total);
 
+bool in_path(Str file);
+
 }
 }
