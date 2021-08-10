@@ -11,7 +11,7 @@ bool get(const char* key, Allocator allocator, String* value) {
         return false;
     }
 
-    cz::Str str = cstr;
+    Str str = cstr;
     value->reserve(allocator, str.len + 1);
     value->append(str);
     value->null_terminate();

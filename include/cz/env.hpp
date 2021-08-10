@@ -14,11 +14,11 @@ bool get_home(Allocator allocator, String* value);
 
 bool get_path(Allocator vector_allocator,
               Allocator value_allocator,
-              cz::Vector<Str>* values,
+              Vector<Str>* values,
               String* total);
 bool get_path_extensions(Allocator vector_allocator,
                          Allocator value_allocator,
-                         cz::Vector<Str>* values,
+                         Vector<Str>* values,
                          String* total);
 
 }
