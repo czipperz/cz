@@ -156,6 +156,11 @@ struct Output_File : File_Descriptor {
     int64_t write_text(cz::Str str) { return write_text(str.buffer, str.len); }
 };
 
+int64_t write_binary_loop(Output_File file, const char* buffer, size_t size);
+inline int64_t write_binary_loop(Output_File file, cz::Str str) {
+    return write_binary_loop(file, str.buffer, str.len);
+}
+
 Input_File std_in_file();
 Output_File std_out_file();
 Output_File std_err_file();
