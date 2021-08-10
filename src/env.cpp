@@ -36,5 +36,39 @@ bool get_home(Allocator allocator, String* value) {
     return get(key, allocator, value);
 }
 
+bool get_path(Allocator vector_allocator, Allocator value_allocator, cz::Vector<Str>* values) {
+    cz::String string = {};
+    if (!get("PATH", value_allocator, &string)) {
+        return false;
+    }
+
+    char split = 0;
+#ifdef _WIN32
+    split = ';';
+#else
+    split = ':';
+#endif
+
+    string.split_into(split, vector_allocator, values);
+    return true;
+}
+
+bool get_path_extensions(Allocator vector_allocator,
+                         Allocator value_allocator,
+                         cz::Vector<Str>* values) {
+    cz::String string = {};
+#ifdef _WIN32
+    if (!get("PATHEXT", value_allocator, &string)) {
+        return false;
+    }
+#else
+    string.reserve(value_allocator, 1);
+    string.null_terminate();
+#endif
+
+    string.split_into(';', vector_allocator, values);
+    return true;
+}
+
 }
 }

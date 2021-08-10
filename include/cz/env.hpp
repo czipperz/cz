@@ -1,6 +1,7 @@
 #pragma once
 
 #include "string.hpp"
+#include "vector.hpp"
 
 namespace cz {
 namespace env {
@@ -10,6 +11,11 @@ bool set(const char* key, const char* value);
 bool remove(const char* key);
 
 bool get_home(Allocator allocator, String* value);
+
+bool get_path(Allocator vector_allocator, Allocator value_allocator, cz::Vector<Str>* values);
+bool get_path_extensions(Allocator vector_allocator,
+                         Allocator value_allocator,
+                         cz::Vector<Str>* values);
 
 }
 }
