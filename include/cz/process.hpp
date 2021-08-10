@@ -131,6 +131,7 @@ struct Output_File : File_Descriptor {
     ///
     /// On failure returns `-1`.  On end of file returns `0`.
     int64_t write_binary(const char* buffer, size_t size);
+    int64_t write_binary(cz::Str str) { return write_binary(str.buffer, str.len); }
 
     /// Write `size` bytes from `buffer` to the file, converting each `'\n'` to `"\r\n"`.
     ///
@@ -139,6 +140,9 @@ struct Output_File : File_Descriptor {
     ///
     /// On failure returns `-1`.  On end of file returns `0`.
     int64_t write_add_carriage_returns(const char* buffer, size_t size);
+    int64_t write_add_carriage_returns(cz::Str str) {
+        return write_add_carriage_returns(str.buffer, str.len);
+    }
 
     /// Wrapper for `write_binary` and `write_add_carriage_returns` that
     /// selects the implementation based on the host operating system.
@@ -149,6 +153,7 @@ struct Output_File : File_Descriptor {
         return write_binary(buffer, size);
 #endif
     }
+    int64_t write_text(cz::Str str) { return write_text(str.buffer, str.len); }
 };
 
 Input_File std_in_file();
