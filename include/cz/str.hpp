@@ -5,8 +5,9 @@
 #include <cstddef>
 #include "allocator.hpp"
 #include "assert.hpp"
-#include "slice.hpp"
 #include "char_type.hpp"
+#include "slice.hpp"
+#include "vector.hpp"
 
 namespace cz {
 
@@ -120,6 +121,8 @@ struct Str {
 
     cz::Str slice_end(size_t end) const { return slice((size_t)0, end); }
     cz::Str slice_end(const char* end) const { return slice((size_t)0, end); }
+
+    void split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str>* values);
 
     char operator[](size_t index) const {
         CZ_DEBUG_ASSERT(index < len);

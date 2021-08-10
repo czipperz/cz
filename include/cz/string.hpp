@@ -190,6 +190,10 @@ struct String {
     cz::Str slice_end(size_t end) const { return as_str().slice_end(end); }
     cz::Str slice_end(const char* end) const { return as_str().slice_end(end); }
 
+    void split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str>* values) {
+        as_str().split_into(separator, allocator, values);
+    }
+
     /// Get a `Str` representing this `String` in its current state.
     constexpr Str as_str() const { return {_buffer, _len}; }
     /// See `String::as_str()`.
