@@ -84,5 +84,27 @@ String run_script(Dwim* dwim, const char* script) {
     return output;
 }
 
+bool run_script(const char* script, Allocator allocator, String* string) {
+    Process process;
+    Input_File output;
+    CZ_DEFER(output.close());
+    {
+        Process_Options options;
+        CZ_DEFER(options.std_out.close());
+        if (!create_process_output_pipe(&options.std_out, &output)) {
+            return false;
+        }
+        options.std_err = options.std_out;
+
+        if (!process.launch_script(script, &options)) {
+            return false;
+        }
+    }
+
+    read_to_string(output, allocator, string);
+    process.join();
+    return true;
+}
+
 }
 }
