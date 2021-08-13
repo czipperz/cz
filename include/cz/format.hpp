@@ -56,6 +56,7 @@ inline void append(cz::Allocator allocator, cz::String* string, cz::Str str) {
     string->reserve(allocator, str.len);
     string->append(str);
 }
+/// Be warned that math operators promote chars to ints which cause this overload to not be chosen!
 inline void append(cz::Allocator allocator, cz::String* string, char ch) {
     string->reserve(allocator, 1);
     string->push(ch);
