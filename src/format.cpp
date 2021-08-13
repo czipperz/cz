@@ -79,30 +79,57 @@ void append_vsprintf(cz::Heap_String* string, const char* format, va_list args) 
     return append_vsprintf(cz::heap_allocator(), string, format, args);
 }
 
-void append(cz::Allocator allocator, cz::String* string, short x) {
-    append_sprintf(allocator, string, "%hd", x);
-}
-void append(cz::Allocator allocator, cz::String* string, unsigned short x) {
-    append_sprintf(allocator, string, "%hu", x);
-}
-void append(cz::Allocator allocator, cz::String* string, int x) {
-    append_sprintf(allocator, string, "%d", x);
-}
-void append(cz::Allocator allocator, cz::String* string, unsigned int x) {
-    append_sprintf(allocator, string, "%u", x);
-}
-void append(cz::Allocator allocator, cz::String* string, long x) {
-    append_sprintf(allocator, string, "%ld", x);
-}
-void append(cz::Allocator allocator, cz::String* string, unsigned long x) {
-    append_sprintf(allocator, string, "%lu", x);
-}
-void append(cz::Allocator allocator, cz::String* string, long long x) {
-    append_sprintf(allocator, string, "%lld", x);
-}
-void append(cz::Allocator allocator, cz::String* string, unsigned long long x) {
-    append_sprintf(allocator, string, "%llu", x);
-}
+#define APPEND_NUM(SIGNED, UNSIGNED, MIN)                                  \
+    void append(cz::Allocator allocator, cz::String* string, UNSIGNED x) { \
+        size_t start = string->len();                                      \
+                                                                           \
+        while (x >= 10) {                                                  \
+            append(allocator, string, '0' + x % 10);                       \
+            x /= 10;                                                       \
+        }                                                                  \
+        CZ_DEBUG_ASSERT(x < 10);                                           \
+        append(allocator, string, '0' + x);                                \
+                                                                           \
+        size_t end = (string->len() - start) / 2;                          \
+        for (size_t i = 0; i < end; ++i) {                                 \
+            cz::swap((*string)[i], (*string)[string->len() - i - 1]);      \
+        }                                                                  \
+    }                                                                      \
+                                                                           \
+    void append(cz::Allocator allocator, cz::String* string, SIGNED x) {   \
+        if (~x == 0) {                                                     \
+            append(allocator, string, #MIN);                               \
+            return;                                                        \
+        }                                                                  \
+                                                                           \
+        if (x < 0) {                                                       \
+            append(allocator, string, '-', (UNSIGNED)-x);                  \
+        } else {                                                           \
+            append(allocator, string, (UNSIGNED)x);                        \
+        }                                                                  \
+    }
+
+#define SIGNED int16_t
+#define UNSIGNED uint16_t
+#define MIN "-32768"
+#include "format_num.tpp"
+
+#define SIGNED int32_t
+#define UNSIGNED uint32_t
+#define MIN "-2147483648"
+#include "format_num.tpp"
+
+#define SIGNED int64_t
+#define UNSIGNED uint64_t
+#define MIN "-9223372036854775808"
+#include "format_num.tpp"
+
+#ifdef __SIZEOF_INT128__
+#define SIGNED __int128_t
+#define UNSIGNED __uint128_t
+#define MIN "-170141183460469231731687303715884105728"
+#include "format_num.tpp"
+#endif
 
 void append(cz::Allocator allocator, cz::String* string, AllocInfo x) {
     append(allocator, string, "AllocInfo { size: ", x.size, ", alignment: ", x.alignment, " }");

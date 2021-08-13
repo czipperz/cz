@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdarg.h>
+#include <stdint.h>
 #include "heap_string.hpp"
 #include "string.hpp"
 
@@ -60,14 +61,17 @@ inline void append(cz::Allocator allocator, cz::String* string, char ch) {
     string->push(ch);
 }
 
-void append(cz::Allocator allocator, cz::String* string, short);
-void append(cz::Allocator allocator, cz::String* string, unsigned short);
-void append(cz::Allocator allocator, cz::String* string, int);
-void append(cz::Allocator allocator, cz::String* string, unsigned int);
-void append(cz::Allocator allocator, cz::String* string, long);
-void append(cz::Allocator allocator, cz::String* string, unsigned long);
-void append(cz::Allocator allocator, cz::String* string, long long);
-void append(cz::Allocator allocator, cz::String* string, unsigned long long);
+void append(cz::Allocator allocator, cz::String* string, int16_t);
+void append(cz::Allocator allocator, cz::String* string, uint16_t);
+void append(cz::Allocator allocator, cz::String* string, int32_t);
+void append(cz::Allocator allocator, cz::String* string, uint32_t);
+void append(cz::Allocator allocator, cz::String* string, int64_t);
+void append(cz::Allocator allocator, cz::String* string, uint64_t);
+
+#ifdef __SIZEOF_INT128__
+void append(cz::Allocator allocator, cz::String* string, __int128_t);
+void append(cz::Allocator allocator, cz::String* string, __uint128_t);
+#endif
 
 void append(cz::Allocator allocator, cz::String* string, AllocInfo);
 void append(cz::Allocator allocator, cz::String* string, MemSlice);
