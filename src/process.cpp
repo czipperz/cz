@@ -584,28 +584,28 @@ bool Process::try_join(int* exit_code) {
 }
 
 #ifdef _WIN32
-static bool launch_script_(char* script, Process_Options* options, HANDLE* hProcess) {
+static bool launch_script_(char* script, const Process_Options& options, HANDLE* hProcess) {
     ZoneScoped;
 
     STARTUPINFO si;
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
     si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
-    si.hStdError = options->std_err.handle;
-    si.hStdOutput = options->std_out.handle;
-    si.hStdInput = options->std_in.handle;
+    si.hStdError = options.std_err.handle;
+    si.hStdOutput = options.std_out.handle;
+    si.hStdInput = options.std_in.handle;
     si.wShowWindow = SW_HIDE;
 
     PROCESS_INFORMATION pi;
     ZeroMemory(&pi, sizeof(pi));
 
     DWORD creation_flags = 0;
-    if (options->detach) {
+    if (options.detach) {
         creation_flags |= DETACHED_PROCESS;
     }
 
     if (!CreateProcessA(nullptr, script, nullptr, nullptr, TRUE, creation_flags, nullptr,
-                        options->working_directory, &si, &pi)) {
+                        options.working_directory, &si, &pi)) {
         return false;
     }
 
@@ -678,7 +678,7 @@ void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocato
     }
 }
 
-bool Process::launch_script(cz::Str script, Process_Options* options) {
+bool Process::launch_script(cz::Str script, const Process_Options& options) {
     ZoneScoped;
 
     cz::Str prefix = "cmd /C ";
@@ -694,7 +694,7 @@ bool Process::launch_script(cz::Str script, Process_Options* options) {
     return launch_script_(copy.buffer(), options, &hProcess);
 }
 
-bool Process::launch_program(cz::Slice<const cz::Str> args, Process_Options* options) {
+bool Process::launch_program(cz::Slice<const cz::Str> args, const Process_Options& options) {
     ZoneScoped;
 
     cz::String script = {};
@@ -799,7 +799,7 @@ void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocato
     }
 }
 
-bool Process::launch_script(cz::Str script, Process_Options* options) {
+bool Process::launch_script(cz::Str script, const Process_Options& options) {
     ZoneScoped;
 
     cz::Str args[] = {"/bin/sh", "-c", script, nullptr};
@@ -814,7 +814,7 @@ static void bind_pipe(int input, int output) {
     }
 }
 
-bool Process::launch_program(cz::Slice<const cz::Str> args, Process_Options* options) {
+bool Process::launch_program(cz::Slice<const cz::Str> args, const Process_Options& options) {
     ZoneScoped;
 
     char** new_args = cz::heap_allocator().alloc<char*>(args.len + 1);
@@ -834,21 +834,21 @@ bool Process::launch_program(cz::Slice<const cz::Str> args, Process_Options* opt
     if (pid < 0) {
         return false;
     } else if (pid == 0) {  // child process
-        bind_pipe(options->std_in.fd, 0);
-        bind_pipe(options->std_out.fd, 1);
-        bind_pipe(options->std_err.fd, 2);
+        bind_pipe(options.std_in.fd, 0);
+        bind_pipe(options.std_out.fd, 1);
+        bind_pipe(options.std_err.fd, 2);
 
-        close(options->std_in.fd);
-        close(options->std_out.fd);
-        if (options->std_err.fd != options->std_out.fd) {
-            close(options->std_err.fd);
+        close(options.std_in.fd);
+        close(options.std_out.fd);
+        if (options.std_err.fd != options.std_out.fd) {
+            close(options.std_err.fd);
         }
 
-        if (options->working_directory) {
-            chdir(options->working_directory);
+        if (options.working_directory) {
+            chdir(options.working_directory);
         }
 
-        if (options->detach) {
+        if (options.detach) {
             setsid();
         }
 

@@ -66,7 +66,7 @@ String run_script(Dwim* dwim, const char* script) {
 
     // Start the process.
     Process process;
-    if (!process.launch_script(script, &options)) {
+    if (!process.launch_script(script, options)) {
         dwim->errors.reserve(1);
         dwim->errors.push(
             format(dwim->buffer_array.allocator(), "Error starting script '", script, "'"));
@@ -96,7 +96,7 @@ bool run_script(const char* script, Allocator allocator, String* string) {
         }
         options.std_err = options.std_out;
 
-        if (!process.launch_script(script, &options)) {
+        if (!process.launch_script(script, options)) {
             return false;
         }
     }

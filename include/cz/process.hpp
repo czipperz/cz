@@ -78,14 +78,14 @@ public:
     /// default) are closed instead of being bound (in the new process).
     ///
     /// The return value is `true` if the program was successfully launched.
-    bool launch_program(cz::Slice<const cz::Str> args, Process_Options* options);
+    bool launch_program(cz::Slice<const cz::Str> args, const Process_Options& options);
 
     /// Launch a script as if it was ran on the command line.
     ///
     /// This runs the script through `cmd` on Windows and `/bin/sh` otherwise.
     ///
     /// See also `launch_program` for information on how `options` are handled.
-    bool launch_script(cz::Str script, Process_Options* options);
+    bool launch_script(cz::Str script, const Process_Options& options);
 
     /// Kill the child process and destroy the `Process`.
     void kill();
