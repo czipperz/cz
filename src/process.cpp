@@ -325,7 +325,7 @@ int64_t Output_File::write_add_carriage_returns(const char* buffer, size_t size)
 }
 
 int64_t write_binary_loop(Output_File file, const char* buffer, size_t size) {
-    int64_t written = 0;
+    size_t written = 0;
     while (written < size) {
         int64_t result = file.write_binary(buffer + written, size - written);
         if (result > 0) {
