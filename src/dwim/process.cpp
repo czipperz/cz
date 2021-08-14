@@ -46,6 +46,22 @@ String read_file(Dwim* dwim, const char* path) {
     return output;
 }
 
+bool read_file(Dwim* dwim, const char* path, cz::String* output) {
+    // Open the file.
+    Input_File file;
+    if (!file.open(path)) {
+        return false;
+    }
+    CZ_DEFER(file.close());
+
+    // Read the contents.
+    if (!read_to_string(dwim, &file, output)) {
+        return false;
+    }
+
+    return true;
+}
+
 String run_script(Dwim* dwim, const char* script) {
     String output = {};
 
