@@ -109,6 +109,56 @@ struct Str {
         return rfind_case_insensitive({&pattern, 1});
     }
 
+    /// Index overloads return `len` on no match.
+    size_t find_index(Str infix) const {
+        const char* ptr = find(infix);
+        if (!ptr)
+            return len;
+        return ptr - buffer;
+    }
+    size_t rfind_index(Str infix) const {
+        const char* ptr = rfind(infix);
+        if (!ptr)
+            return len;
+        return ptr - buffer;
+    }
+    size_t find_index(char pattern) const {
+        const char* ptr = find(pattern);
+        if (!ptr)
+            return len;
+        return ptr - buffer;
+    }
+    size_t rfind_index(char pattern) const {
+        const char* ptr = rfind(pattern);
+        if (!ptr)
+            return len;
+        return ptr - buffer;
+    }
+    size_t find_index_case_insensitive(Str infix) const {
+        const char* ptr = find_case_insensitive(infix);
+        if (!ptr)
+            return len;
+        return ptr - buffer;
+    }
+    size_t rfind_index_case_insensitive(Str infix) const {
+        const char* ptr = rfind_case_insensitive(infix);
+        if (!ptr)
+            return len;
+        return ptr - buffer;
+    }
+    size_t find_index_case_insensitive(char pattern) const {
+        const char* ptr = find_case_insensitive(pattern);
+        if (!ptr)
+            return len;
+        return ptr - buffer;
+    }
+    size_t rfind_index_case_insensitive(char pattern) const {
+        const char* ptr = rfind_case_insensitive(pattern);
+        if (!ptr)
+            return len;
+        return ptr - buffer;
+    }
+
     cz::Str slice(size_t start, size_t end) const { return {buffer + start, end - start}; }
     cz::Str slice(const char* start, size_t end) const { return slice(start - buffer, end); }
     cz::Str slice(size_t start, const char* end) const { return slice(start, end - buffer); }

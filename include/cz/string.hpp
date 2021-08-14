@@ -179,6 +179,31 @@ struct String {
         return as_str().rfind_case_insensitive(pattern);
     }
 
+    size_t find_index(Str infix) const {
+        return as_str().find_index(infix);
+    }
+    size_t rfind_index(Str infix) const {
+        return as_str().rfind_index(infix);
+    }
+    size_t find_index(char pattern) const {
+        return as_str().find_index(pattern);
+    }
+    size_t rfind_index(char pattern) const {
+        return as_str().rfind_index(pattern);
+    }
+    size_t find_index_case_insensitive(Str infix) const {
+        return as_str().find_index_case_insensitive(infix);
+    }
+    size_t rfind_index_case_insensitive(Str infix) const {
+        return as_str().rfind_index_case_insensitive(infix);
+    }
+    size_t find_index_case_insensitive(char pattern) const {
+        return as_str().find_index_case_insensitive(pattern);
+    }
+    size_t rfind_index_case_insensitive(char pattern) const {
+        return as_str().rfind_index_case_insensitive(pattern);
+    }
+
     cz::Str slice(size_t start, size_t end) const { return as_str().slice(start, end); }
     cz::Str slice(const char* start, size_t end) const { return as_str().slice(start, end); }
     cz::Str slice(size_t start, const char* end) const { return as_str().slice(start, end); }
