@@ -6,10 +6,27 @@
 #include <cz/file.hpp>
 #include <cz/heap.hpp>
 
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+#endif
+
 namespace cz {
 namespace env {
 
 bool get(const char* key, Allocator allocator, String* value) {
+#ifdef _WIN32
+    DWORD size = GetEnvironmentVariableA(key, nullptr, 0);
+    if (size <= 0) {
+        return false;
+    }
+
+    value->reserve(allocator, size);
+    GetEnvironmentVariableA(key, value->end(), value->remaining());
+    value->set_len(value->len() + size - 1);
+    return true;
+#else
     const char* cstr = getenv(key);
     if (!cstr) {
         return false;
@@ -20,14 +37,23 @@ bool get(const char* key, Allocator allocator, String* value) {
     value->append(str);
     value->null_terminate();
     return true;
+#endif
 }
 
 bool set(const char* key, const char* value) {
+#ifdef _WIN32
+    return SetEnvironmentVariableA(key, value) != 0;
+#else
     return setenv(key, value, /*overwrite=*/true) == 0;
+#endif
 }
 
 bool remove(const char* key) {
+#ifdef _WIN32
+    return SetEnvironmentVariableA(key, nullptr) != 0;
+#else
     return unsetenv(key) == 0;
+#endif
 }
 
 bool get_home(Allocator allocator, String* value) {
