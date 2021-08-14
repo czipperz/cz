@@ -876,7 +876,7 @@ void Process::escape_args(cz::Slice<const cz::Str> args,
 
     CZ_DEBUG_ASSERT(args.len >= 1);
 
-    script->reserve(cz::heap_allocator(), 32);
+    script->reserve(allocator, 32);
 
     for (size_t i = 0; i < args.len; ++i) {
         escape_arg(args[i], script, allocator);
