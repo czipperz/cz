@@ -823,7 +823,7 @@ bool Process::launch_program(cz::Slice<const cz::Str> args, const Process_Option
     CZ_DEFER(cz::heap_allocator().dealloc(new_args, args.len + 1));
 
     for (size_t i = 0; i < args.len; ++i) {
-        new_args[i] = args[i].clone_null_terminate(cz::heap_allocator()).buffer();
+        new_args[i] = args[i].clone_null_terminate(cz::heap_allocator()).buffer;
     }
     new_args[args.len] = nullptr;
 

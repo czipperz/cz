@@ -46,12 +46,10 @@ static void* freelist_realloc(void* freelist_,
 }
 
 void* Freelist::realloc(void* freelist_, MemSlice old_mem, AllocInfo new_info) {
-    Freelist* freelist = (Freelist*)freelist_;
-    return freelist_realloc(freelist_, freelist->backer, old_mem, new_info);
+    return freelist_realloc(freelist_, ((Freelist*)freelist_)->backer, old_mem, new_info);
 }
 
 void* Freelist_Heap::realloc(void* freelist_, MemSlice old_mem, AllocInfo new_info) {
-    Freelist_Heap* freelist = (Freelist_Heap*)freelist_;
     return freelist_realloc(freelist_, heap_allocator(), old_mem, new_info);
 }
 

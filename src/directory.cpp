@@ -67,7 +67,7 @@ int Directory_Iterator::init(const char* cstr_path) {
 
     return 1;
 #else
-    DIR* dir = opendir(path);
+    DIR* dir = opendir(cstr_path);
     if (!dir) {
         return -1;
     }
