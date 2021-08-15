@@ -92,6 +92,8 @@ struct Str {
 
     bool contains(Str infix) const { return find(infix); }
     bool contains(char infix) const { return find(infix); }
+    bool contains_case_insensitive(Str infix) const { return find_case_insensitive(infix); }
+    bool contains_case_insensitive(char infix) const { return find_case_insensitive(infix); }
 
     const char* find(Str infix) const;
     const char* rfind(Str infix) const;

@@ -138,6 +138,12 @@ struct String {
 
     bool contains(Str infix) const { return as_str().contains(infix); }
     bool contains(char infix) const { return as_str().contains(infix); }
+    bool contains_case_insensitive(Str infix) const {
+        return as_str().contains_case_insensitive(infix);
+    }
+    bool contains_case_insensitive(char infix) const {
+        return as_str().contains_case_insensitive(infix);
+    }
 
     char* find(Str pattern) { return const_cast<char*>(as_str().find(pattern)); }
     const char* find(Str pattern) const { return as_str().find(pattern); }
