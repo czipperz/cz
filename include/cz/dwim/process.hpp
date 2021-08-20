@@ -16,5 +16,8 @@ String read_file(Dwim* dwim, const char* path);
 /// Run a script and read the output (stdout and stderr) to a string allocated in the `dwim`.
 String run_script(Dwim* dwim, const char* script);
 
+/// Run a script and capture stdout/stderr.
+bool run_script(const char* script, Allocator allocator, String* output);
+
 }
 }
