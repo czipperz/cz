@@ -3,8 +3,8 @@
 A common library for build data-oriented C++ applications.  This mostly contains
 a variety of data structures, memory allocators, and utility classes.
 
-Cz is licensed under the MIT license as described in the file `LICENSE` in the
-root of the repository.
+Cz is licensed under GPL3.  If you wish to purchase a
+different license, email czipperz AT gmail DOT com.
 
 List of features:
 
