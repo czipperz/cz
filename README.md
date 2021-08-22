@@ -14,19 +14,18 @@ List of features:
 * Path manipulation (`path.hpp`).
 * Process control (`process.hpp`).
 * Environment and working directory manipulation (`env.hpp` and `working_directory.hpp`).
-* Formatting objects to text.
-* Parsing numbers from text.
+* Formatting objects to text (`format.hpp`).
+* Parsing numbers from text (`parse.hpp`).
 * Integration with Tracy.
 
 ## Building
 
 Requirements: `cmake` and a C++ compiler that supports C++11.
 
-Suggested: clone the repository and include it in your cmake build via
-`add_subdirectory()`.
+Suggested: clone the repository and include it in your cmake build via `add_subdirectory()`.
 
-Alternative: Build locally using `cmake` and then link the resulting library
-into your program.  The script `./build-release.sh` will do this automatically.
+Alternative: Build locally using `./build-release` and
+then link the resulting library into your program.
 
 ## Benchmarking
 
