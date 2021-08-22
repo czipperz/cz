@@ -1,23 +1,22 @@
 # cz
 
-A common library for build data-oriented C++ applications.  This mostly contains
-a variety of data structures, memory allocators, and utility classes.
+A common library for building data-oriented C++ applications.
 
 Cz is licensed under GPL3.  If you wish to purchase a
 different license, email czipperz AT gmail DOT com.
 
 List of features:
-
-* `Context` class allows injecting allocation and logging facilities to
-  applicable functions.
-* Explicit memory allocation.
-* Explicit memory deallocation.
-* Explicit memory copying.
-* A formatting library.
-* A logging library.
-* `String` and `Vector<T>` data structures.
-* `Str` and `Slice<T>` views into data structures.
-* Helpful macro utilities.
+* Explicit memory allocation and deallocation (`allocator.hpp`).
+* Memory allocators (`arena.hpp`, `buffer_array.hpp`, `heap.hpp`).
+* Basic data structures (`string.hpp`, `vector.hpp`, `str.hpp`, and `slice.hpp`).
+* Threading library (`mutex.hpp`, `semaphore.hpp`, `condition_variable.hpp`).
+* File system interface (`file.hpp`).
+* Path manipulation (`path.hpp`).
+* Process control (`process.hpp`).
+* Environment and working directory manipulation (`env.hpp` and `working_directory.hpp`).
+* Formatting objects to text.
+* Parsing numbers from text.
+* Integration with Tracy.
 
 ## Building
 
