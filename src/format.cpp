@@ -6,34 +6,34 @@ namespace cz {
 
 // Start of ... wrappers for va_list versions
 
-cz::String asprintf(cz::Allocator allocator, const char* format, ...) {
+String asprintf(Allocator allocator, const char* format, ...) {
     va_list args;
     va_start(args, format);
-    cz::String string = {};
+    String string = {};
     append_vsprintf(allocator, &string, format, args);
     va_end(args);
     string.realloc_null_terminate(allocator);
     return string;
 }
 
-cz::Heap_String asprintf(const char* format, ...) {
+Heap_String asprintf(const char* format, ...) {
     va_list args;
     va_start(args, format);
-    cz::Heap_String string = {};
+    Heap_String string = {};
     append_vsprintf(&string, format, args);
     va_end(args);
     string.realloc_null_terminate();
     return string;
 }
 
-void append_sprintf(cz::Allocator allocator, cz::String* string, const char* format, ...) {
+void append_sprintf(Allocator allocator, String* string, const char* format, ...) {
     va_list args;
     va_start(args, format);
     append_vsprintf(allocator, string, format, args);
     va_end(args);
 }
 
-void append_sprintf(cz::Heap_String* string, const char* format, ...) {
+void append_sprintf(Heap_String* string, const char* format, ...) {
     va_list args;
     va_start(args, format);
     append_vsprintf(string, format, args);
@@ -42,45 +42,59 @@ void append_sprintf(cz::Heap_String* string, const char* format, ...) {
 
 // End of ... wrappers for va_list versions
 
-cz::String avsprintf(cz::Allocator allocator, const char* format, va_list args) {
-    cz::String string = {};
-    append_vsprintf(allocator, &string, format, args);
-    string.realloc_null_terminate(allocator);
-    return string;
-}
-
-cz::Heap_String avsprintf(const char* format, va_list args) {
-    cz::Heap_String string = {};
-    append_vsprintf(&string, format, args);
-    string.realloc_null_terminate();
-    return string;
-}
-
-void append_vsprintf(cz::Allocator allocator,
-                     cz::String* string,
-                     const char* format,
-                     va_list args) {
+static void append_vsprintf_impl(Allocator allocator,
+                                 String* string,
+                                 const char* format,
+                                 va_list args,
+                                 bool exact) {
     va_list args2;
     va_copy(args2, args);
     int result = vsnprintf(nullptr, 0, format, args2);
     va_end(args2);
     CZ_DEBUG_ASSERT(result >= 0);
 
-    string->reserve(allocator, (size_t)result + 1);
+    if (exact) {
+        string->reserve_exact(allocator, (size_t)result + 1);
+    } else {
+        string->reserve(allocator, (size_t)result + 1);
+    }
 
     int result2 = vsnprintf(string->end(), result + 1, format, args);
     (void)result2;
     CZ_DEBUG_ASSERT(result2 == result);
 
-    string->set_len(string->len() + result);
+    string->len += result;
 }
 
-void append_vsprintf(cz::Heap_String* string, const char* format, va_list args) {
-    return append_vsprintf(cz::heap_allocator(), string, format, args);
+String avsprintf(Allocator allocator, const char* format, va_list args) {
+    String string = {};
+    append_vsprintf_impl(allocator, &string, format, args, true);
+    CZ_DEBUG_ASSERT(string.len + 1 == string.cap);
+    CZ_DEBUG_ASSERT(*string.end() == '\0');
+    return string;
+}
+
+Heap_String avsprintf(const char* format, va_list args) {
+    Heap_String string = {};
+    append_vsprintf_impl(heap_allocator(), &string, format, args, true);
+    CZ_DEBUG_ASSERT(string.len + 1 == string.cap);
+    CZ_DEBUG_ASSERT(*string.end() == '\0');
+    return string;
+}
+
+void append_vsprintf(Allocator allocator,
+                     String* string,
+                     const char* format,
+                     va_list args) {
+    append_vsprintf_impl(allocator, string, format, args, false);
+}
+
+void append_vsprintf(Heap_String* string, const char* format, va_list args) {
+    append_vsprintf_impl(heap_allocator(), string, format, args, false);
 }
 
 #define APPEND_NUM(SIGNED, UNSIGNED, MIN)                                  \
-    void append(cz::Allocator allocator, cz::String* string, UNSIGNED x) { \
+    void append(Allocator allocator, String* string, UNSIGNED x) { \
         size_t start = string->len();                                      \
                                                                            \
         while (x >= 10) {                                                  \
@@ -92,11 +106,11 @@ void append_vsprintf(cz::Heap_String* string, const char* format, va_list args) 
                                                                            \
         size_t end = (string->len() - start) / 2;                          \
         for (size_t i = 0; i < end; ++i) {                                 \
-            cz::swap((*string)[i], (*string)[string->len() - i - 1]);      \
+            swap((*string)[i], (*string)[string->len() - i - 1]);      \
         }                                                                  \
     }                                                                      \
                                                                            \
-    void append(cz::Allocator allocator, cz::String* string, SIGNED x) {   \
+    void append(Allocator allocator, String* string, SIGNED x) {   \
         if (~x == 0) {                                                     \
             append(allocator, string, #MIN);                               \
             return;                                                        \
@@ -131,18 +145,18 @@ void append_vsprintf(cz::Heap_String* string, const char* format, va_list args) 
 #include "format_num.tpp"
 #endif
 
-void append(cz::Allocator allocator, cz::String* string, AllocInfo x) {
+void append(Allocator allocator, String* string, AllocInfo x) {
     append(allocator, string, "AllocInfo { size: ", x.size, ", alignment: ", x.alignment, " }");
 }
-void append(cz::Allocator allocator, cz::String* string, MemSlice x) {
+void append(Allocator allocator, String* string, MemSlice x) {
     append(allocator, string, "MemSlice { buffer: ", address(x.buffer), ", size: ", x.size, " }");
 }
 
-void append(cz::Allocator allocator, cz::String* string, Format_Address address) {
+void append(Allocator allocator, String* string, Format_Address address) {
     append_sprintf(allocator, string, "0x%h", address.x);
 }
 
-void append(cz::Allocator allocator, cz::String* string, Format_Many many) {
+void append(Allocator allocator, String* string, Format_Many many) {
     string->reserve(allocator, many.count);
     string->push_many(many.ch, many.count);
 }

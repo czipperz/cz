@@ -215,9 +215,9 @@ void strip_carriage_returns(char* buffer, size_t* size) {
 }
 
 void strip_carriage_returns(String* string) {
-    size_t len = string->len();
-    strip_carriage_returns(string->buffer(), &len);
-    string->set_len(len);
+    size_t len = string->len;
+    strip_carriage_returns(string->buffer, &len);
+    string->len = len;
 }
 
 int64_t Input_File::read_strip_carriage_returns(char* buffer,
@@ -691,7 +691,7 @@ bool Process::launch_script(cz::Str script, const Process_Options& options) {
     copy.append(script);
     copy.null_terminate();
 
-    return launch_script_(copy.buffer(), options, &hProcess);
+    return launch_script_(copy.buffer, options, &hProcess);
 }
 
 bool Process::launch_program(cz::Slice<const cz::Str> args, const Process_Options& options) {
@@ -702,7 +702,7 @@ bool Process::launch_program(cz::Slice<const cz::Str> args, const Process_Option
 
     escape_args(args, &script, cz::heap_allocator());
 
-    return launch_script_(script.buffer(), options, &hProcess);
+    return launch_script_(script.buffer, options, &hProcess);
 }
 
 #else

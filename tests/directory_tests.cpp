@@ -20,14 +20,14 @@ void set_wd() {
 
     REQUIRE(!cz::is_err(get_working_directory(allocator, &path)));
 
-    printf("cwd: %s\n", path.buffer());
+    printf("cwd: %s\n", path.buffer);
 
 #if _WIN32
     Str end = "/out/build/x64-Debug";
     if (path.ends_with(end)) {
-        path.set_len(path.len() - end.len);
+        path.len = path.len - end.len;
         path.push('\0');
-        set_working_directory(path.buffer());
+        set_working_directory(path.buffer);
     }
 #endif
 
@@ -49,16 +49,16 @@ TEST_CASE("files works") {
 
     Vector<String> paths = {};
     CZ_DEFER(paths.drop(allocator));
-    CZ_DEFER(for (size_t i = 0; i < paths.len(); ++i) { paths[i].drop(allocator); });
+    CZ_DEFER(for (size_t i = 0; i < paths.len; ++i) { paths[i].drop(allocator); });
     REQUIRE(files(allocator, allocator, dir, &paths).is_ok());
 
     size_t i = 0;
     while (!iterator.done()) {
         fputs("ls: ", stdout);
-        fwrite(file.buffer(), 1, file.len(), stdout);
+        fwrite(file.buffer, 1, file.len, stdout);
         putchar('\n');
         REQUIRE(file == paths[i++]);
-        file.set_len(0);
+        file.len = 0;
         REQUIRE(iterator.advance(allocator, &file).is_ok());
     }
 }

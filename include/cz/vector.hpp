@@ -2,172 +2,238 @@
 
 #include "allocator.hpp"
 #include "assert.hpp"
+#include "next_power_of_two.hpp"
 #include "slice.hpp"
 #include "util.hpp"
 
 namespace cz {
 
+/// A dynamic allocated array.
+///
+/// # Example
+///
+/// ```
+/// #include <cz/defer.hpp>
+/// #include <cz/heap.hpp>
+/// #include <cz/vector.hpp>
+///
+/// cz::Vector<int> vector = {};
+/// CZ_DEFER(vector.drop(cz::heap_allocator()));
+///
+/// vector.reserve(cz::heap_allocator(), 2);
+/// vector.push(42);
+/// vector.push(-3);
+/// ```
 template <class T>
 struct Vector {
-    T* _elems;
-    size_t _len;
-    size_t _cap;
+    T* elems;
+    size_t len;
+    size_t cap;
 
-    void reserve(Allocator allocator, size_t extra) {
-        return reserve_total(allocator, _len + extra);
-    }
+    /// Deallocate the vector's memory.
+    void drop(Allocator allocator) { allocator.dealloc(elems, cap); }
 
-    void reserve_total(Allocator allocator, size_t total) {
-        if (this->cap() < total) {
-            size_t new_cap = max(total, this->cap() * 2);
+    ///
+    /// Allocation methods.
+    ///
 
-            T* new_elems = allocator.realloc(_elems, _cap, new_cap);
-            CZ_ASSERT(new_elems != nullptr);
+    /// Ensure there are `extra` spaces available.  Amortizing expansion.
+    void reserve(Allocator allocator, size_t extra) { reserve_total(allocator, len + extra); }
+    void reserve_total(Allocator allocator, size_t total);
 
-            this->_elems = new_elems;
-            this->_cap = new_cap;
-        }
-    }
-
-    void drop(Allocator allocator) { allocator.dealloc(_elems, _cap); }
+    /// Ensure there are `extra` spaces available.  Exact expansion.
+    void reserve_exact(Allocator allocator, size_t extra) { reserve_exact_total(allocator, len + extra); }
+    void reserve_exact_total(Allocator allocator, size_t total);
 
     /// Reallocate such that the capacity matches the length.
     void realloc(Allocator allocator) {
-        T* new_elems = allocator.realloc(_elems, _cap, _len);
+        T* new_elems = allocator.realloc(elems, cap, len);
         if (new_elems) {
-            _elems = new_elems;
-            _cap = _len;
+            elems = new_elems;
+            cap = len;
         }
     }
 
     /// Reallocates the vector to have `new_cap` as the new capacity.  If this
     /// causes the vector to shrink then the length will be adjusted accordingly.
     void resize(Allocator allocator, size_t new_cap) {
-        T* new_elems = allocator.realloc(_elems, _cap, new_cap);
-
+        T* new_elems = allocator.realloc(elems, cap, new_cap);
         if (new_elems) {
-            _elems = new_elems;
-            _cap = new_cap;
-            if (_cap < _len) {
-                _len = _cap;
+            elems = new_elems;
+            cap = new_cap;
+            if (cap < len) {
+                len = cap;
             }
         }
     }
 
+    /// Duplicate the vector.
     Vector clone(Allocator allocator) const {
         Vector result = {};
-        result.reserve(allocator, _len);
-        memcpy(result._elems, _elems, _len * sizeof(T));
-        result._len = _len;
+        result.reserve_exact_total(allocator, len);
+        memcpy(result.elems, elems, len * sizeof(T));
+        result.len = len;
         return result;
     }
 
+    ///
+    /// Insertion methods.
+    /// Must `reserve` space before attempting to insert.
+    /// Indices must be manually bounds checked.
+    ///
+
+    /// Push an element.
     void push(T t) {
-        CZ_DEBUG_ASSERT(_cap - _len >= 1);
-        _elems[_len] = t;
-        ++_len;
+        CZ_DEBUG_ASSERT(cap - len >= 1);
+        elems[len] = t;
+        ++len;
     }
 
+    /// Append many elements.
     void append(Slice<const T> slice) {
-        CZ_DEBUG_ASSERT(_cap - _len >= slice.len);
-        memcpy(_elems + _len, slice.elems, slice.len * sizeof(T));
-        _len += slice.len;
+        CZ_DEBUG_ASSERT(cap - len >= slice.len);
+        memcpy(elems + len, slice.elems, slice.len * sizeof(T));
+        len += slice.len;
     }
 
-    T pop() {
-        CZ_DEBUG_ASSERT(_len >= 1);
-        --_len;
-        return _elems[_len];
-    }
-
+    /// Insert an element into the middle of the vector.
     void insert(size_t index, T t) {
-        CZ_DEBUG_ASSERT(index <= _len);
-        CZ_DEBUG_ASSERT(_cap - _len >= 1);
-        memmove(_elems + index + 1, _elems + index, (_len - index) * sizeof(T));
-        _elems[index] = t;
-        ++_len;
+        CZ_DEBUG_ASSERT(index <= len);
+        CZ_DEBUG_ASSERT(cap - len >= 1);
+        memmove(elems + index + 1, elems + index, (len - index) * sizeof(T));
+        elems[index] = t;
+        ++len;
     }
 
+    /// Insert many elements into the middle of the vector.
     void insert_slice(size_t index, cz::Slice<const T> slice) {
-        CZ_DEBUG_ASSERT(index <= _len);
-        CZ_DEBUG_ASSERT(_cap - _len >= slice.len);
-        memmove(_elems + index + slice.len, _elems + index, (_len - index) * sizeof(T));
-        memcpy(_elems + index, slice.elems, slice.len * sizeof(T));
-        _len += slice.len;
+        CZ_DEBUG_ASSERT(index <= len);
+        CZ_DEBUG_ASSERT(cap - len >= slice.len);
+        memmove(elems + index + slice.len, elems + index, (len - index) * sizeof(T));
+        memcpy(elems + index, slice.elems, slice.len * sizeof(T));
+        len += slice.len;
     }
 
+    ///
+    /// Removal methods.
+    /// Indices must be manually bounds checked.
+    ///
+
+    /// Pop one element.  Note: must have an element to pop!
+    T pop() {
+        CZ_DEBUG_ASSERT(len >= 1);
+        --len;
+        return elems[len];
+    }
+
+    /// Remove an element from the middle of the vector.
     void remove(size_t index) {
-        CZ_DEBUG_ASSERT(index < _len);
-        memmove(_elems + index, _elems + index + 1, sizeof(T) * (_len - index - 1));
-        --_len;
+        CZ_DEBUG_ASSERT(index < len);
+        memmove(elems + index, elems + index + 1, sizeof(T) * (len - index - 1));
+        --len;
     }
 
+    /// Remove many elements from the middle of the vector.
     void remove_many(size_t index, size_t count) {
-        CZ_DEBUG_ASSERT(index + count <= _len);
-        memmove(_elems + index, _elems + index + count, sizeof(T) * (_len - index - count));
-        _len -= count;
+        CZ_DEBUG_ASSERT(index + count <= len);
+        memmove(elems + index, elems + index + count, sizeof(T) * (len - index - count));
+        len -= count;
     }
 
+    /// Remove the range of elements from the middle of the vector.
     void remove_range(size_t start, size_t end) {
         CZ_DEBUG_ASSERT(end >= start);
         return remove_many(start, end - start);
     }
 
+    ///
+    /// Miscellaneous commands.
+    ///
+
+    constexpr size_t remaining() const { return cap - len; }
+
+    /// Pointer iterators.
+    T* start() { return elems; }
+    constexpr const T* start() const { return elems; }
+    T* begin() { return elems; }
+    constexpr const T* begin() const { return elems; }
+    T* end() { return elems + len; }
+    constexpr const T* end() const { return elems + len; }
+
+    /// Utility.
+    T& first() { return get(0); }
+    const T& first() const { return get(0); }
     T& last() {
-        CZ_DEBUG_ASSERT(len() > 0);
-        return (*this)[len() - 1];
+        CZ_DEBUG_ASSERT(len > 0);
+        return (*this)[len - 1];
     }
     const T& last() const {
-        CZ_DEBUG_ASSERT(len() > 0);
-        return (*this)[len() - 1];
+        CZ_DEBUG_ASSERT(len > 0);
+        return (*this)[len - 1];
     }
 
-    T& operator[](size_t i) {
-        CZ_DEBUG_ASSERT(i < len());
-        return elems()[i];
+    /// Must manually bounds check!
+    T& operator[](size_t i) { return get(i); }
+    const T& operator[](size_t i) const { return get(i); }
+
+    T& get(size_t i) {
+        CZ_DEBUG_ASSERT(i < len);
+        return elems[i];
     }
-    const T& operator[](size_t i) const {
-        CZ_DEBUG_ASSERT(i < len());
-        return elems()[i];
+    const T& get(size_t i) const {
+        CZ_DEBUG_ASSERT(i < len);
+        return elems[i];
     }
 
-    operator Slice<T>() { return {elems(), _len}; }
-    constexpr operator Slice<const T>() const { return {elems(), _len}; }
+    ///
+    /// Slice methods
+    ///
+
+    operator Slice<T>() { return {elems, len}; }
+    constexpr operator Slice<const T>() const { return {elems, len}; }
 
     Slice<T> as_slice() { return *this; }
     constexpr Slice<const T> as_slice() const { return *this; }
 
-    Slice<T> slice(size_t start, size_t end) const { return {_elems + start, end - start}; }
-    Slice<T> slice(const T* start, size_t end) const { return slice(start - _elems, end); }
-    Slice<T> slice(size_t start, const T* end) const { return slice(start, end - _elems); }
-    Slice<T> slice(const T* start, const T* end) const {
-        return slice(start - _elems, end - _elems);
-    }
+    Slice<T> slice(size_t start, size_t end) const { return {elems + start, end - start}; }
+    Slice<T> slice(const T* start, size_t end) const { return slice(start - elems, end); }
+    Slice<T> slice(size_t start, const T* end) const { return slice(start, end - elems); }
+    Slice<T> slice(const T* start, const T* end) const { return slice(start - elems, end - elems); }
 
-    Slice<T> slice_start(size_t start) const { return slice(start, _len); }
-    Slice<T> slice_start(const T* start) const { return slice(start, _len); }
+    Slice<T> slice_start(size_t start) const { return slice(start, len); }
+    Slice<T> slice_start(const T* start) const { return slice(start, len); }
 
     Slice<T> slice_end(size_t end) const { return slice((size_t)0, end); }
     Slice<T> slice_end(const T* end) const { return slice((size_t)0, end); }
-
-    T* elems() { return _elems; }
-    constexpr const T* elems() const { return _elems; }
-    void set_len(size_t new_len) {
-        CZ_DEBUG_ASSERT(new_len <= cap());
-        _len = new_len;
-    }
-    constexpr size_t len() const { return _len; }
-    constexpr size_t cap() const { return _cap; }
-
-    constexpr size_t remaining() const { return  _cap - _len; }
-
-    T* begin() { return elems(); }
-    constexpr const T* begin() const { return elems(); }
-    T* start() { return elems(); }
-    constexpr const T* start() const { return elems(); }
-    T* end() { return elems() + len(); }
-    constexpr const T* end() const { return elems() + len(); }
 };
+
+template <class T>
+static void realloc_new_cap(Vector<T>* vector, Allocator allocator, size_t new_cap) {
+    T* new_elems = allocator.realloc(vector->elems, vector->cap, new_cap);
+    CZ_ASSERT(new_elems != nullptr);
+
+    vector->elems = new_elems;
+    vector->cap = new_cap;
+}
+
+template <class T>
+void Vector<T>::reserve_total(Allocator allocator, size_t total) {
+    if (cap < total) {
+        size_t new_cap = next_power_of_two(total);
+        if (new_cap < 8) {
+            new_cap = 8;
+        }
+
+        realloc_new_cap(this, allocator, new_cap);
+    }
+}
+
+template <class T>
+void Vector<T>::reserve_exact_total(Allocator allocator, size_t total) {
+    if (cap < total) {
+        realloc_new_cap(this, allocator, total);
+    }
+}
 
 template <class T>
 Vector<T> Slice<T>::clone(Allocator allocator) const {

@@ -93,7 +93,7 @@ void make_absolute(Str relative_path,
 void convert_to_forward_slashes(char* path, size_t len);
 
 inline void convert_to_forward_slashes(String* path) {
-    convert_to_forward_slashes(path->buffer(), path->len());
+    convert_to_forward_slashes(path->buffer, path->len);
 }
 
 /// Convert the path to use back slashes (`'\\'`) instead of forward slashes (`'/'`).
@@ -102,7 +102,7 @@ inline void convert_to_forward_slashes(String* path) {
 void convert_to_back_slashes(char* path, size_t len);
 
 inline void convert_to_back_slashes(String* path) {
-    convert_to_back_slashes(path->buffer(), path->len());
+    convert_to_back_slashes(path->buffer, path->len);
 }
 
 /// Test if the character is a directory separator on this platform.

@@ -8,21 +8,21 @@
 namespace cz {
 
 /// Run `sprintf` and make the result into a string; null terminates and truncates the string.
-cz::String asprintf(cz::Allocator allocator, const char* format, ...);
-cz::Heap_String asprintf(const char* format, ...);
-cz::String avsprintf(cz::Allocator allocator, const char* format, va_list args);
-cz::Heap_String avsprintf(const char* format, va_list args);
+String asprintf(Allocator allocator, const char* format, ...);
+Heap_String asprintf(const char* format, ...);
+String avsprintf(Allocator allocator, const char* format, va_list args);
+Heap_String avsprintf(const char* format, va_list args);
 
 /// Run `sprintf` and append the result to a string.
-void append_sprintf(cz::Allocator allocator, cz::String* string, const char* format, ...);
-void append_sprintf(cz::Heap_String* string, const char* format, ...);
-void append_vsprintf(cz::Allocator allocator, cz::String* string, const char* format, va_list args);
-void append_vsprintf(cz::Heap_String* string, const char* format, va_list args);
+void append_sprintf(Allocator allocator, String* string, const char* format, ...);
+void append_sprintf(Heap_String* string, const char* format, ...);
+void append_vsprintf(Allocator allocator, String* string, const char* format, va_list args);
+void append_vsprintf(Heap_String* string, const char* format, va_list args);
 
 /// Format a bunch of things to a string; null terminates and truncates the string.
 template <class... Ts>
-cz::String format(cz::Allocator allocator, Ts... ts) {
-    cz::String string = {};
+String format(Allocator allocator, Ts... ts) {
+    String string = {};
     append(allocator, &string, ts...);
     string.realloc_null_terminate(allocator);
     return string;
@@ -31,8 +31,8 @@ cz::String format(cz::Allocator allocator, Ts... ts) {
 /// Format a bunch of things to a string that is heap
 /// allocated; null terminates and truncates the string.
 template <class... Ts>
-cz::Heap_String format(Ts... ts) {
-    cz::Heap_String string = {};
+Heap_String format(Ts... ts) {
+    Heap_String string = {};
     append(&string, ts...);
     string.realloc_null_terminate();
     return string;
@@ -40,42 +40,42 @@ cz::Heap_String format(Ts... ts) {
 
 /// Append a bunch of things to a string.
 template <class T1, class T2, class... Ts>
-void append(cz::Allocator allocator, cz::String* string, T1 t1, T2 t2, Ts... ts) {
+void append(Allocator allocator, String* string, T1 t1, T2 t2, Ts... ts) {
     append(allocator, string, t1);
     append(allocator, string, t2, ts...);
 }
 
 /// Append a bunch of things to a heap allocated string.
 template <class... Ts>
-inline void append(cz::Heap_String* string, Ts... ts) {
-    append(cz::heap_allocator(), string, ts...);
+inline void append(Heap_String* string, Ts... ts) {
+    append(heap_allocator(), string, ts...);
 }
 
 /// Default implementations for basic types.
-inline void append(cz::Allocator allocator, cz::String* string, cz::Str str) {
+inline void append(Allocator allocator, String* string, Str str) {
     string->reserve(allocator, str.len);
     string->append(str);
 }
 /// Be warned that math operators promote chars to ints which cause this overload to not be chosen!
-inline void append(cz::Allocator allocator, cz::String* string, char ch) {
+inline void append(Allocator allocator, String* string, char ch) {
     string->reserve(allocator, 1);
     string->push(ch);
 }
 
-void append(cz::Allocator allocator, cz::String* string, int16_t);
-void append(cz::Allocator allocator, cz::String* string, uint16_t);
-void append(cz::Allocator allocator, cz::String* string, int32_t);
-void append(cz::Allocator allocator, cz::String* string, uint32_t);
-void append(cz::Allocator allocator, cz::String* string, int64_t);
-void append(cz::Allocator allocator, cz::String* string, uint64_t);
+void append(Allocator allocator, String* string, int16_t);
+void append(Allocator allocator, String* string, uint16_t);
+void append(Allocator allocator, String* string, int32_t);
+void append(Allocator allocator, String* string, uint32_t);
+void append(Allocator allocator, String* string, int64_t);
+void append(Allocator allocator, String* string, uint64_t);
 
 #ifdef __SIZEOF_INT128__
-void append(cz::Allocator allocator, cz::String* string, __int128_t);
-void append(cz::Allocator allocator, cz::String* string, __uint128_t);
+void append(Allocator allocator, String* string, __int128_t);
+void append(Allocator allocator, String* string, __uint128_t);
 #endif
 
-void append(cz::Allocator allocator, cz::String* string, AllocInfo);
-void append(cz::Allocator allocator, cz::String* string, MemSlice);
+void append(Allocator allocator, String* string, AllocInfo);
+void append(Allocator allocator, String* string, MemSlice);
 
 struct Format_Address {
     void* x;
@@ -83,7 +83,7 @@ struct Format_Address {
 inline Format_Address address(void* x) {
     return Format_Address{x};
 }
-void append(cz::Allocator allocator, cz::String* string, Format_Address);
+void append(Allocator allocator, String* string, Format_Address);
 
 struct Format_Many {
     char ch;
@@ -92,6 +92,6 @@ struct Format_Many {
 inline Format_Many many(char ch, size_t count) {
     return Format_Many{ch, count};
 }
-void append(cz::Allocator allocator, cz::String* string, Format_Many);
+void append(Allocator allocator, String* string, Format_Many);
 
 }

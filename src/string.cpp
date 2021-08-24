@@ -6,90 +6,94 @@
 
 namespace cz {
 
-void String::reserve_total(Allocator allocator, size_t total) {
-    if (_cap < total) {
-        size_t new_cap = max(total, _cap * 2);
-        char* new_buffer = allocator.realloc(_buffer, _cap, new_cap);
-        CZ_ASSERT(new_buffer != nullptr);
+void String::drop(Allocator allocator) {
+    allocator.dealloc(buffer, cap);
+}
 
-        _buffer = new_buffer;
-        _cap = new_cap;
+static void realloc_new_cap(String* string, Allocator allocator, size_t new_cap) {
+    char* new_buffer = allocator.realloc(string->buffer, string->cap, new_cap);
+    CZ_ASSERT(new_buffer != nullptr);
+
+    string->buffer = new_buffer;
+    string->cap = new_cap;
+}
+
+void String::reserve_total(Allocator allocator, size_t total) {
+    if (cap < total) {
+        size_t new_cap = next_power_of_two(total);
+        if (new_cap < 16) {
+            new_cap = 16;
+        }
+
+        realloc_new_cap(this, allocator, new_cap);
     }
 }
 
-void String::push_many(char ch, size_t count) {
-    CZ_DEBUG_ASSERT(_cap - _len >= count);
-    memset(_buffer + _len, ch, count);
-    _len += count;
-    CZ_DEBUG_ASSERT(_len <= _cap);
-}
-
-void String::append(Str str) {
-    CZ_DEBUG_ASSERT(_cap - _len >= str.len);
-    memcpy(_buffer + _len, str.buffer, str.len);
-    _len += str.len;
-    CZ_DEBUG_ASSERT(_len <= _cap);
-}
-
-void String::null_terminate() {
-    CZ_DEBUG_ASSERT(_cap - _len >= 1);
-    *end() = '\0';
-}
-
-void String::insert(size_t index, Str str) {
-    CZ_DEBUG_ASSERT(index <= _len);
-    CZ_DEBUG_ASSERT(_cap - _len >= str.len);
-    memmove(_buffer + index + str.len, _buffer + index, len() - index);
-    memcpy(_buffer + index, str.buffer, str.len);
-    _len += str.len;
-    CZ_DEBUG_ASSERT(_len <= _cap);
-}
-
-void String::remove(size_t index) {
-    CZ_DEBUG_ASSERT(index < _len);
-    memmove(_buffer + index, _buffer + index + 1, len() - index - 1);
-    _len -= 1;
-}
-
-void String::remove_many(size_t index, size_t count) {
-    CZ_DEBUG_ASSERT(index + count <= _len);
-    memmove(_buffer + index, _buffer + index + count, len() - index - count);
-    _len -= count;
-}
-
-char String::pop() {
-    CZ_DEBUG_ASSERT(_len >= 1);
-    _len--;
-    return _buffer[_len];
+void String::reserve_exact_total(Allocator allocator, size_t total) {
+    if (cap < total) {
+        realloc_new_cap(this, allocator, total);
+    }
 }
 
 void String::realloc(Allocator allocator) {
-    if (!_buffer) {
-        return;
-    }
-
-    char* res = allocator.realloc(_buffer, _cap, _len);
+    char* res = allocator.realloc(buffer, cap, len);
     if (res) {
-        _buffer = res;
-        _cap = _len;
+        buffer = res;
+        cap = len;
     }
 }
 
 void String::realloc_null_terminate(Allocator allocator) {
-    char* res = allocator.realloc(_buffer, _cap, _len + 1);
-    CZ_ASSERT(res);
-    _buffer = res;
-    _buffer[_len] = '\0';
-    _cap = _len + 1;
+    realloc_new_cap(this, allocator, len + 1);
+    buffer[len] = '\0';
 }
 
-void String::set_len(size_t new_len) {
-    CZ_DEBUG_ASSERT(new_len <= cap());
-    _len = new_len;
+void String::push(char ch) {
+    CZ_DEBUG_ASSERT(cap - len >= 1);
+    buffer[len++] = ch;
 }
 
-void String::drop(Allocator allocator) {
-    allocator.dealloc(_buffer, _cap);
+void String::push_many(char ch, size_t count) {
+    CZ_DEBUG_ASSERT(cap - len >= count);
+    memset(buffer + len, ch, count);
+    len += count;
+}
+
+void String::append(Str str) {
+    CZ_DEBUG_ASSERT(cap - len >= str.len);
+    memcpy(buffer + len, str.buffer, str.len);
+    len += str.len;
+}
+
+void String::null_terminate() {
+    CZ_DEBUG_ASSERT(cap - len >= 1);
+    *end() = '\0';
+}
+
+void String::insert(size_t index, Str str) {
+    CZ_DEBUG_ASSERT(index <= len);
+    CZ_DEBUG_ASSERT(cap - len >= str.len);
+    memmove(buffer + index + str.len, buffer + index, len - index);
+    memcpy(buffer + index, str.buffer, str.len);
+    len += str.len;
+}
+
+char String::pop() {
+    CZ_DEBUG_ASSERT(len >= 1);
+    len--;
+    return buffer[len];
+}
+
+void String::remove(size_t index) {
+    CZ_DEBUG_ASSERT(index < len);
+    memmove(buffer + index, buffer + index + 1, len - index - 1);
+    len -= 1;
+}
+
+void String::remove_many(size_t index, size_t count) {
+    CZ_DEBUG_ASSERT(index + count <= len);
+    memmove(buffer + index, buffer + index + count, len - index - count);
+    len -= count;
 }
 
 }

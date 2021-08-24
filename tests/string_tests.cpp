@@ -20,7 +20,7 @@ TEST_CASE("String::String(char*, size_t, size_t)") {
     String string = {buffer, 2, 4};
 
     REQUIRE(string == "ab");
-    REQUIRE(string.cap() == 4);
+    REQUIRE(string.cap == 4);
 }
 
 TEST_CASE("String::append from empty string") {
@@ -53,7 +53,7 @@ TEST_CASE("String::insert empty string") {
     String string = {};
     string.insert(0, "");
 
-    CHECK(string.buffer() == nullptr);
+    CHECK(string.buffer == nullptr);
     REQUIRE(string == "");
 }
 
@@ -63,9 +63,9 @@ TEST_CASE("String::insert beginning") {
 
     string.insert(0, "abc");
 
-    CHECK(string.buffer() == buffer);
-    CHECK(string.len() == 6);
-    CHECK(string.cap() >= 6);
+    CHECK(string.buffer == buffer);
+    CHECK(string.len == 6);
+    CHECK(string.cap >= 6);
     REQUIRE(string == "abcxyz");
 }
 
@@ -75,9 +75,9 @@ TEST_CASE("String::insert middle") {
 
     string.insert(1, "abc");
 
-    CHECK(string.buffer() == buffer);
-    CHECK(string.len() == 6);
-    CHECK(string.cap() >= 6);
+    CHECK(string.buffer == buffer);
+    CHECK(string.len == 6);
+    CHECK(string.cap >= 6);
     REQUIRE(string == "xabcyz");
 }
 
@@ -87,9 +87,9 @@ TEST_CASE("String::insert end") {
 
     string.insert(3, "abc");
 
-    CHECK(string.buffer() == buffer);
-    CHECK(string.len() == 6);
-    CHECK(string.cap() >= 6);
+    CHECK(string.buffer == buffer);
+    CHECK(string.len == 6);
+    CHECK(string.cap >= 6);
     REQUIRE(string == "xyzabc");
 }
 
@@ -99,9 +99,9 @@ TEST_CASE("String::insert resize boundary") {
 
     string.insert(3, "abc");
 
-    CHECK(string.buffer() == buffer);
-    CHECK(string.len() == 6);
-    CHECK(string.cap() == 6);
+    CHECK(string.buffer == buffer);
+    CHECK(string.len == 6);
+    CHECK(string.cap == 6);
     REQUIRE(string == "xyzabc");
 }
 
@@ -112,17 +112,6 @@ TEST_CASE("String::insert into long string") {
     string.insert(8, "n ");
 
     CHECK(string == "once upon a time in a land far far away");
-}
-
-TEST_CASE("String::set_len(0) doesn't drop") {
-    char buffer[3] = "ab";
-    String string = {buffer, 2, 3};
-
-    string.set_len(0);
-
-    CHECK(string.buffer() == buffer);
-    CHECK(string.len() == 0);
-    REQUIRE(string.cap() == 3);
 }
 
 TEST_CASE("Str==Str same length") {

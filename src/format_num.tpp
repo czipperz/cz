@@ -3,7 +3,7 @@
 #endif
 
 void append(cz::Allocator allocator, cz::String* string, UNSIGNED x) {
-    size_t start = string->len();
+    size_t start = string->len;
 
     while (x >= 10) {
         append(allocator, string, (char)('0' + x % 10));
@@ -12,9 +12,9 @@ void append(cz::Allocator allocator, cz::String* string, UNSIGNED x) {
     CZ_DEBUG_ASSERT(x < 10);
     append(allocator, string, (char)('0' + x));
 
-    size_t end = (string->len() - start) / 2;
+    size_t end = (string->len - start) / 2;
     for (size_t i = 0; i < end; ++i) {
-        cz::swap((*string)[start + i], (*string)[string->len() - i - 1]);
+        cz::swap((*string)[start + i], (*string)[string->len - i - 1]);
     }
 }
 

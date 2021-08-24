@@ -13,10 +13,12 @@ namespace cz {
 
 struct String;
 
+/// An immutable slice of a string.
 struct Str {
     const char* buffer;
     size_t len;
 
+    /// Convenience constructors.
     Str() = default;
     constexpr Str(std::nullptr_t) : buffer(nullptr), len(0) {}
     Str(const char* cstr) : buffer(cstr), len(strlen(cstr)) {}

@@ -60,7 +60,7 @@ struct Buffer_Array {
     static void dealloc(void* buffer_array, MemSlice old_mem);
 };
 
-inline Save_Point Buffer_Array::save() const {
+Buffer_Array::Save_Point Buffer_Array::save() const {
     return {
         buffer_index,
         (size_t)(buffer_pointer - buffers[buffer_index]),

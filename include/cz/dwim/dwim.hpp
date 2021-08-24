@@ -26,13 +26,13 @@ struct Dwim {
     }
 
     void print_errors() const {
-        for (size_t i = 0; i < errors.len(); ++i) {
+        for (size_t i = 0; i < errors.len; ++i) {
             fwrite(errors[i].buffer, 1, errors[i].len, stderr);
             putc('\n', stderr);
         }
     }
 
-    int exit_code() const { return errors.len() > 0; }
+    int exit_code() const { return errors.len > 0; }
 };
 
 }

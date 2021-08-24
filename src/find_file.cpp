@@ -14,15 +14,15 @@ bool find_file_up(Allocator allocator, String* path, Str file) {
     path->push('/');
 
     while (1) {
-        size_t old_len = path->len();
+        size_t old_len = path->len;
         path->append(file);
         path->null_terminate();
 
-        if (file::exists(path->buffer())) {
+        if (file::exists(path->buffer)) {
             return true;
         }
 
-        path->set_len(old_len - 1);
+        path->len = old_len - 1;
         if (!path::pop_name(path)) {
             return false;
         }
@@ -34,7 +34,7 @@ bool find_dir_with_file_up(Allocator allocator, String* path, Str file) {
         return false;
     }
 
-    path->set_len(path->len() - file.len - 1);
+    path->len = path->len - file.len - 1;
     path->null_terminate();
     return true;
 }

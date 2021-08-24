@@ -23,8 +23,8 @@ bool get(const char* key, Allocator allocator, String* value) {
     }
 
     value->reserve(allocator, size);
-    GetEnvironmentVariableA(key, value->end(), value->remaining());
-    value->set_len(value->len() + size - 1);
+    GetEnvironmentVariableA(key, value->end(), (DWORD)value->remaining());
+    value->len = value->len + size - 1;
     return true;
 #else
     const char* cstr = getenv(key);
@@ -121,31 +121,31 @@ bool in_path(Str file) {
     }
 
     size_t max_path = 0;
-    for (size_t i = 0; i < paths.len(); ++i) {
+    for (size_t i = 0; i < paths.len; ++i) {
         max_path = std::max(max_path, paths[i].len);
     }
 
     size_t max_pathext = 0;
-    for (size_t i = 0; i < pathexts.len(); ++i) {
+    for (size_t i = 0; i < pathexts.len; ++i) {
         max_pathext = std::max(max_pathext, pathexts[i].len);
     }
 
     String test = {};
     test.reserve(cz::heap_allocator(), max_path + max_pathext + 1 + file.len + 1);
     CZ_DEFER(test.drop(cz::heap_allocator()));
-    for (size_t p = 0; p < paths.len(); ++p) {
-        test.set_len(0);
+    for (size_t p = 0; p < paths.len; ++p) {
+        test.len = 0;
         test.append(paths[p]);
         test.push('/');
         test.append(file);
-        size_t baselen = test.len();
+        size_t baselen = test.len;
 
-        for (size_t pe = 0; pe < pathexts.len(); ++pe) {
-            test.set_len(baselen);
+        for (size_t pe = 0; pe < pathexts.len; ++pe) {
+            test.len = baselen;
             test.append(pathexts[pe]);
             test.null_terminate();
 
-            if (cz::file::exists(test.buffer())) {
+            if (cz::file::exists(test.buffer)) {
                 return true;
             }
         }

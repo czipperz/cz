@@ -12,7 +12,7 @@ std::string std_string_format(Ts... ts) {
     CZ_DEFER(string.drop());
 
     std::string std_string;
-    std_string.assign(string.buffer(), string.len());
+    std_string.assign(string.buffer, string.len);
     return std_string;
 }
 

@@ -70,7 +70,7 @@ Result Directory_Iterator::init(const char* cstr_path, Allocator allocator, Stri
     path.null_terminate();
 
     WIN32_FIND_DATA data;
-    HANDLE handle = FindFirstFileA(path.buffer(), &data);
+    HANDLE handle = FindFirstFileA(path.buffer, &data);
 
     path.drop(allocator);
 

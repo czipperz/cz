@@ -88,27 +88,20 @@ struct Allocator {
     template <class T>
     T* create() const {
         T* obj = alloc<T>();
-        CZ_ASSERT(obj);
-        new (obj) T();
+        if (obj) {
+            new (obj) T();
+        }
         return obj;
     }
 
-    /// Clone an object into the allocator.
+    /// Clone an object into the allocator.  Note: to clone a slice use `Slice::clone`.
     template <class T>
     T* clone(const T& t) {
         T* ptr = alloc<T>();
-        CZ_ASSERT(ptr);
-        *ptr = t;
+        if (ptr) {
+            *ptr = t;
+        }
         return ptr;
-    }
-
-    /// Duplicate a slice of memory by allocating a copy of it using this allocator.
-    template <class T>
-    cz::Slice<T> clone(cz::Slice<T> slice) {
-        T* new_elems = static_cast<T*>(alloc({sizeof(T) * slice.len, alignof(T)}));
-        CZ_ASSERT(new_elems);
-        memcpy(new_elems, slice.elems, sizeof(T) * slice.len);
-        return {new_elems, slice.len};
     }
 
     /// Deallocate an array of a given type or a single element if the count isn't passed.

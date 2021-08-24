@@ -57,7 +57,7 @@ void dedup(cz::Slice<T>* slice) {
 template <class T, class Is_Equal, class Set>
 void dedup(cz::Vector<T>* vector, Is_Equal&& is_equal, Set&& set) {
     cz::Slice<T> slice = dedup(vector->as_slice(), is_equal, set);
-    vector->set_len(slice.len);
+    vector->len = slice.len;
 }
 template <class T, class Is_Equal>
 void dedup(cz::Vector<T>* vector, Is_Equal&& is_equal) {

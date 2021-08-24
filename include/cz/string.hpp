@@ -6,78 +6,49 @@
 
 namespace cz {
 
+/// A mutable string.
+
+/// ```
+/// #include <cz/defer.hpp>
+/// #include <cz/heap.hpp>
+/// #include <cz/string.hpp>
+///
+/// cz::String<int> string = {};
+/// CZ_DEFER(string.drop(cz::heap_allocator()));
+///
+/// string.reserve(cz::heap_allocator(), 3);
+/// string.push('a');
+/// string.push('3');
+/// string.null_terminate();
+///
+/// CZ_ASSERT(string.find('3') == string.buffer + 1);
+/// ```
 struct String {
-    char* _buffer;
-    size_t _len;
-    size_t _cap;
+    char* buffer;
+    size_t len;
+    size_t cap;
 
-    /// Reserve `extra` extra spaces in the buffer.  Ensures `cap() >= len() + extra`.
-    void reserve(Allocator allocator, size_t extra) {
-        return reserve_total(allocator, _len + extra);
-    }
-    /// Reserve `total` total spaces in the buffer.  Ensures `cap() >= total`.
-    void reserve_total(Allocator, size_t total);
+    /// Dealloc the `String`.
+    void drop(Allocator);
 
-    /// Push character `ch` onto the end of the string.
     ///
-    /// Panics if there isn't enough space.
-    void push(char ch) { append({&ch, 1}); }
-    /// Calls `push` `count` times.
-    void push_many(char ch, size_t count);
-    /// Append the string `str` to the buffer.
+    /// Allocation methods.
     ///
-    /// Panics if there isn't enough space.
-    void append(Str str);
 
-    /// Push `'\0'` onto the end of the string without changing the length.
-    ///
-    /// Panics if there isn't enough space.
-    void null_terminate();
-
-    /// Insert the character `ch` into the middle of the buffer.
-    ///
-    /// Panics if there isn't enough space or if `index > len()`.
-    void insert(size_t index, char ch) { insert(index, {&ch, 1}); }
-    /// Insert the string `str` into the middle of the buffer.
-    ///
-    /// Panics if there isn't enough space or if `index > len()`.
-    void insert(size_t index, Str str);
-
-    /// Removes the character at `index`.
-    ///
-    /// Panics if `index >= len()`.
-    void remove(size_t index);
-
-    /// Removes `count` characters starting at `index`.
-    ///
-    /// Panics if `index + count > len()`.
-    void remove_many(size_t index, size_t count);
-
-    /// Removes all characters starting at `start` up to but not including `end`.
-    ///
-    /// Panics if `end > start` or `end > len()`.
-    void remove_range(size_t start, size_t end) {
-        CZ_DEBUG_ASSERT(end >= start);
-        return remove_many(start, end - start);
-    }
-
-    /// Pop the last character off the string.
-    ///
-    /// Panics if `len() == 0`.
-    char pop();
+    /// Ensure there are `extra` spaces available.  Amortizing expansion.
+    void reserve(Allocator allocator, size_t extra) { reserve_total(allocator, extra + len); }
+    void reserve_total(Allocator allocator, size_t total);
+    /// Ensure there are `extra` spaces available.  Exact expansion.
+    void reserve_exact(Allocator allocator, size_t extra) { reserve_exact(allocator, extra + len); }
+    void reserve_exact_total(Allocator allocator, size_t total);
 
     /// Reallocate the buffer so that the length is the same as the capacity.
-    ///
     /// If the reallocation fails, nothing happens.
     void realloc(Allocator);
 
     /// Reallocate the buffer so that the capacity is one greater than the length.
-    ///
     /// Panics if the reallocation fails.
     void realloc_null_terminate(Allocator);
-
-    /// Set `len()` to `new_len`.  Panics if `new_len > cap()`.
-    void set_len(size_t new_len);
 
     /// Create a new `String` with the same contents in a unique memory buffer.
     String clone(Allocator allocator) const { return as_str().clone(allocator); }
@@ -85,33 +56,97 @@ struct String {
         return as_str().clone_null_terminate(allocator);
     }
 
-    /// Dealloc the `String`.
-    void drop(Allocator);
+    ///
+    /// Insertion methods.
+    /// Must `reserve` space before attempting to insert.
+    /// Indices must be manually bounds checked.
+    ///
 
-    /// Get the byte buffer backing the string.
-    char* buffer() { return _buffer; }
-    /// Get the byte buffer backing the string.
-    const char* buffer() const { return _buffer; }
-    /// Get the length of the string in bytes.
-    size_t len() const { return _len; }
-    /// Get the capacity of the string in bytes.
-    size_t cap() const { return _cap; }
+    /// Push character `ch` onto the end of the string.
+    void push(char ch);
+    /// Calls `push` `count` times.
+    void push_many(char ch, size_t count);
+    /// Append the string `str` to the buffer.
+    void append(Str str);
 
-    constexpr size_t remaining() const { return _cap - _len; }
+    /// Push `'\0'` onto the end of the string without changing the length.
+    void null_terminate();
 
-    char* start() { return buffer(); }
-    const char* start() const { return buffer(); }
-    char* end() { return buffer() + len(); }
-    const char* end() const { return buffer() + len(); }
+    /// Insert the character `ch` into the middle of the buffer.
+    /// Must manually bounds check!
+    void insert(size_t index, char ch) { insert(index, {&ch, 1}); }
+    /// Insert the string `str` into the middle of the buffer.
+    /// Must manually bounds check!
+    void insert(size_t index, Str str);
 
+    ///
+    /// Removal methods.
+    /// Indices must be manually bounds checked.
+    ///
+
+    /// Pop the last character off the string.
+    char pop();
+
+    /// Removes the character at `index`.
+    void remove(size_t index);
+
+    /// Removes `count` characters starting at `index`.
+    void remove_many(size_t index, size_t count);
+
+    /// Removes all characters starting at `start` up to but not including `end`.
+    void remove_range(size_t start, size_t end) {
+        CZ_DEBUG_ASSERT(end >= start);
+        return remove_many(start, end - start);
+    }
+
+    ///
+    /// Miscellaneous commands.
+    ///
+
+    constexpr size_t remaining() const { return cap - len; }
+
+    /// Pointer iterators.
+    char* start() { return buffer; }
+    const char* start() const { return buffer; }
+    char* begin() { return buffer; }
+    const char* begin() const { return buffer; }
+    char* end() { return buffer + len; }
+    const char* end() const { return buffer + len; }
+
+    /// Utility.
     char first() const {
-        CZ_DEBUG_ASSERT(_len > 0);
-        return _buffer[0];
+        CZ_DEBUG_ASSERT(len > 0);
+        return buffer[0];
     }
     char last() const {
-        CZ_DEBUG_ASSERT(_len > 0);
-        return _buffer[_len - 1];
+        CZ_DEBUG_ASSERT(len > 0);
+        return buffer[len - 1];
     }
+
+    /// Logical string comparison.
+    bool operator==(const Str& other) const { return this->as_str() == other; }
+    bool operator!=(const Str& other) const { return this->as_str() != other; }
+    bool operator<(const Str& other) const { return this->as_str() < other; }
+    bool operator>(const Str& other) const { return this->as_str() > other; }
+    bool operator<=(const Str& other) const { return this->as_str() <= other; }
+    bool operator>=(const Str& other) const { return this->as_str() >= other; }
+
+    /// Must manually bounds check!
+    char operator[](size_t i) const { return get(i); }
+    char& operator[](size_t i) { return get(i); }
+
+    char get(size_t i) const {
+        CZ_DEBUG_ASSERT(i < len);
+        return buffer[i];
+    }
+    char& get(size_t i) {
+        CZ_DEBUG_ASSERT(i < len);
+        return buffer[i];
+    }
+
+    ///
+    /// Str methods.
+    ///
 
     bool equals_case_insensitive(Str prefix) const {
         return as_str().equals_case_insensitive(prefix);
@@ -202,6 +237,10 @@ struct String {
         return as_str().rfind_index_case_insensitive(pattern);
     }
 
+    void split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str>* values) {
+        as_str().split_into(separator, allocator, values);
+    }
+
     cz::Str slice(size_t start, size_t end) const { return as_str().slice(start, end); }
     cz::Str slice(const char* start, size_t end) const { return as_str().slice(start, end); }
     cz::Str slice(size_t start, const char* end) const { return as_str().slice(start, end); }
@@ -213,30 +252,10 @@ struct String {
     cz::Str slice_end(size_t end) const { return as_str().slice_end(end); }
     cz::Str slice_end(const char* end) const { return as_str().slice_end(end); }
 
-    void split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str>* values) {
-        as_str().split_into(separator, allocator, values);
-    }
-
     /// Get a `Str` representing this `String` in its current state.
-    constexpr Str as_str() const { return {_buffer, _len}; }
+    constexpr Str as_str() const { return {buffer, len}; }
     /// See `String::as_str()`.
     operator Str() const { return as_str(); }
-
-    bool operator==(const Str& other) const { return this->as_str() == other; }
-    bool operator!=(const Str& other) const { return this->as_str() != other; }
-    bool operator<(const Str& other) const { return this->as_str() < other; }
-    bool operator>(const Str& other) const { return this->as_str() > other; }
-    bool operator<=(const Str& other) const { return this->as_str() <= other; }
-    bool operator>=(const Str& other) const { return this->as_str() >= other; }
-
-    char operator[](size_t i) const {
-        CZ_DEBUG_ASSERT(i < len());
-        return buffer()[i];
-    }
-    char& operator[](size_t i) {
-        CZ_DEBUG_ASSERT(i < len());
-        return buffer()[i];
-    }
 };
 
 }

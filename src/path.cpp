@@ -59,11 +59,11 @@ bool pop_component(Str* path) {
 }
 
 bool pop_component(String* path) {
-    size_t len = path->len();
+    size_t len = path->len;
     if (!directory_component(*path, &len)) {
         return false;
     }
-    path->set_len(len);
+    path->len = len;
     return true;
 }
 
@@ -91,7 +91,7 @@ bool pop_name(String* path) {
     if (!pop_name(*path, &len)) {
         return false;
     }
-    path->set_len(len);
+    path->len = len;
     return true;
 }
 
@@ -230,9 +230,9 @@ void flatten(char* buffer, size_t* len) {
 }
 
 void flatten(String* string) {
-    size_t len = string->len();
-    flatten(string->buffer(), &len);
-    string->set_len(len);
+    size_t len = string->len;
+    flatten(string->buffer, &len);
+    string->len = len;
 }
 
 bool is_absolute(Str file) {
@@ -249,7 +249,7 @@ static Result generic_make_absolute(Str file, Allocator allocator, String* path,
         path->reserve(allocator, file.len + 1);
     } else {
 #ifdef _WIN32
-        size_t path_len = path->len();
+        size_t path_len = path->len;
 #endif
 
         CZ_TRY(pwd(allocator, path));
@@ -257,12 +257,12 @@ static Result generic_make_absolute(Str file, Allocator allocator, String* path,
 #ifdef _WIN32
         // Handle X:relpath
         if (file.len >= 2 && cz::is_alpha(file[0]) && file[1] == ':') {
-            CZ_DEBUG_ASSERT(path->len() >= 2 && cz::is_alpha((*path)[0]) && (*path)[1] == ':');
+            CZ_DEBUG_ASSERT(path->len >= 2 && cz::is_alpha((*path)[0]) && (*path)[1] == ':');
 
             if (cz::to_lower((*path)[0]) != cz::to_lower(file[0])) {
                 // The working directory is set on a different
                 // drive so pretend this file is absolute.
-                path->set_len(path_len);
+                path->len = path_len;
                 path->reserve(allocator, 3 + file.len + 1);
                 path->append(file.slice_end(2));
             }

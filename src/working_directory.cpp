@@ -34,7 +34,7 @@ Result get_working_directory(Allocator allocator, String* path) {
     size_t size = 128;
     CZ_TRY(path::get_max_len(&size));
 
-    path->set_len(0);
+    path->len = 0;
     path->reserve(allocator, size);
 
     while (!getcwd(path->end(), (int)size)) {
@@ -48,10 +48,10 @@ Result get_working_directory(Allocator allocator, String* path) {
         }
     }
 
-    path->set_len(strlen(path->buffer()));
+    path->len = strlen(path->buffer);
 
 #ifdef _WIN32
-    cz::path::convert_to_forward_slashes(path->buffer(), path->len());
+    cz::path::convert_to_forward_slashes(path->buffer, path->len);
 #endif
 
     return Result::ok();
