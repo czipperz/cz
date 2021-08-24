@@ -39,17 +39,34 @@ static char* get_starting_point(Buffer_Array* buffer_array, MemSlice old_mem) {
 
     // If we don't match exactly then we must be deallocating from the previous buffer.
     if (old_mem.end() != buffer_array->buffer_pointer) {
-        // Assert we're not skipping any allocations in this buffer.
-        CZ_DEBUG_ASSERT(buffer_array->buffer_pointer ==
-                        buffer_array->buffers[buffer_array->buffer_index]);
+#ifndef NDEBUG
+        {
+            // Note to the reader: deallocation from a `Buffer_Array` will panic if it
+            // is not the most recently allocated object.  We do this to catch "hole"s
+            // in the buffer array.  If you really want to use a buffer array then you
+            // will need to use multiple.  Adding a buffer array that tracks the stack
+            // (scoped allocation/deallocation) will typically do the trick.
 
-        // Assert we have a previous buffer.
-        CZ_DEBUG_ASSERT(buffer_array->buffer_index > 0);
+            // Assert we're not skipping any allocations in this buffer.
+            if (buffer_array->buffer_pointer != buffer_array->buffers[buffer_array->buffer_index]) {
+                CZ_PANIC("Deallocation would skip allocated items");
+            }
 
-        // Assert we are in bounds of the previous buffer.
+            // Assert we have a previous buffer.
+            if (buffer_array->buffer_index == 0) {
+                CZ_PANIC("Dealloc called with invalid pointer -- first buffer");
+            }
+
+            // Assert we are in bounds of the previous buffer.
+            char* buffer_start = buffer_array->buffers[buffer_array->buffer_index - 1];
+            if (old_mem.buffer < buffer_start ||
+                old_mem.buffer >= buffer_start + Buffer_Array::buffer_size) {
+                CZ_PANIC("Dealloc called with invalid pointer");
+            }
+        }
+#endif
+
         char* buffer_start = buffer_array->buffers[buffer_array->buffer_index - 1];
-        CZ_DEBUG_ASSERT(old_mem.buffer >= buffer_start);
-        CZ_DEBUG_ASSERT(old_mem.buffer < buffer_start + Buffer_Array::buffer_size);
 
         // Retreat to the previous buffer.
         --buffer_array->buffer_index;
@@ -135,6 +152,32 @@ void* Buffer_Array::realloc(void* _buffer_array, MemSlice old_mem, AllocInfo new
     }
 
     return buffer;
+}
+
+void Buffer_Array::restore(Save_Point sp) {
+#ifndef NDEBUG
+    const unsigned char dealloc_fill = 0xDD;
+
+    // Fill each buffer that is completely deallocated.
+    for (size_t i = sp.outer + 1; i <= buffer_index; ++i) {
+        memset(buffers[i], dealloc_fill, Buffer_Array::buffer_size);
+    }
+
+    // Fill the rest of this buffer.
+    if (sp.inner < Buffer_Array::buffer_size) {
+        memset(buffers[sp.outer] + sp.inner, dealloc_fill, Buffer_Array::buffer_size - sp.inner);
+    }
+#endif
+
+    buffer_index = sp.outer;
+    buffer_pointer = buffers[sp.outer] + sp.inner;
+    buffer_end = buffers[sp.outer] + Buffer_Array::buffer_size;
+
+    // If we are restoring to the point after a large
+    // allocation then the size is larger than buffer_size.
+    if (buffer_pointer > buffer_end) {
+        buffer_end = buffer_pointer;
+    }
 }
 
 }
