@@ -1,7 +1,16 @@
 #!/bin/bash
 
-config="$1"
+set -e
+
+cd "$(dirname "$0")"
+
+directory="$1"
+config="$2"
+shift
 shift
 
-cmake -DCMAKE_BUILD_TYPE="$config" "$@" ../..
-cmake --build .
+mkdir -p "$directory"
+cd "$directory"
+
+cmake -DCMAKE_BUILD_TYPE="$config" "$@" ../.. >/dev/null
+cmake --build . --config "$config"

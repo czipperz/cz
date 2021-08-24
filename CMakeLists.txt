@@ -19,7 +19,7 @@ export(TARGETS ${TEST_BASE_NAME} FILE ${TEST_BASE_NAME}LibraryConfig.cmake)
 
 if (CZ_BUILD_TESTS)
   file(GLOB_RECURSE TEST_SRCS tests/*.cpp)
-  set(TEST_EXECUTABLE test)
+  set(TEST_EXECUTABLE cz-test)
   add_executable(${TEST_EXECUTABLE} ${TEST_SRCS})
   target_link_libraries(${TEST_EXECUTABLE} ${PROJECT_NAME})
   target_link_libraries(${TEST_EXECUTABLE} ${TEST_BASE_NAME})
