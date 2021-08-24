@@ -51,7 +51,7 @@ Result get_working_directory(Allocator allocator, String* path) {
     path->len = strlen(path->buffer);
 
 #ifdef _WIN32
-    cz::path::convert_to_forward_slashes(path->buffer, path->len);
+    cz::path::convert_to_forward_slashes(path);
 #endif
 
     return Result::ok();

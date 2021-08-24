@@ -34,7 +34,7 @@ bool find_dir_with_file_up(Allocator allocator, String* path, Str file) {
         return false;
     }
 
-    path->len = path->len - file.len - 1;
+    path->len -= file.len + 1;
     path->null_terminate();
     return true;
 }

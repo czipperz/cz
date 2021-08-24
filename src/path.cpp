@@ -59,12 +59,7 @@ bool pop_component(Str* path) {
 }
 
 bool pop_component(String* path) {
-    size_t len = path->len;
-    if (!directory_component(*path, &len)) {
-        return false;
-    }
-    path->len = len;
-    return true;
+    return directory_component(*path, &path->len);
 }
 
 bool pop_name(Str path, size_t* end) {
@@ -78,21 +73,11 @@ bool pop_name(Str path, size_t* end) {
 }
 
 bool pop_name(Str* path) {
-    size_t len;
-    if (!pop_name(*path, &len)) {
-        return false;
-    }
-    path->len = len;
-    return true;
+    return pop_name(*path, &path->len);
 }
 
 bool pop_name(String* path) {
-    size_t len;
-    if (!pop_name(*path, &len)) {
-        return false;
-    }
-    path->len = len;
-    return true;
+    return pop_name(*path, &path->len);
 }
 
 bool name_component(Str path, size_t* name_start) {
@@ -230,9 +215,7 @@ void flatten(char* buffer, size_t* len) {
 }
 
 void flatten(String* string) {
-    size_t len = string->len;
-    flatten(string->buffer, &len);
-    string->len = len;
+    flatten(string->buffer, &string->len);
 }
 
 bool is_absolute(Str file) {

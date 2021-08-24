@@ -24,7 +24,7 @@ bool get(const char* key, Allocator allocator, String* value) {
 
     value->reserve(allocator, size);
     GetEnvironmentVariableA(key, value->end(), (DWORD)value->remaining());
-    value->len = value->len + size - 1;
+    value->len += size - 1;
     return true;
 #else
     const char* cstr = getenv(key);

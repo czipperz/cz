@@ -25,7 +25,7 @@ void set_wd() {
 #if _WIN32
     Str end = "/out/build/x64-Debug";
     if (path.ends_with(end)) {
-        path.len = path.len - end.len;
+        path.len -= end.len;
         path.push('\0');
         set_working_directory(path.buffer);
     }

@@ -215,9 +215,7 @@ void strip_carriage_returns(char* buffer, size_t* size) {
 }
 
 void strip_carriage_returns(String* string) {
-    size_t len = string->len;
-    strip_carriage_returns(string->buffer, &len);
-    string->len = len;
+    strip_carriage_returns(string->buffer, &string->len);
 }
 
 int64_t Input_File::read_strip_carriage_returns(char* buffer,
