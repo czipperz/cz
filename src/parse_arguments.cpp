@@ -1,6 +1,7 @@
 #include <cz/parse_arguments.hpp>
 
 #include <stdio.h>
+#include <cz/parse.hpp>
 
 namespace cz {
 
@@ -14,7 +15,7 @@ bool Arg_Parser::advance() {
     return true;
 }
 
-bool Arg_Parser::parse_string(cz::Str flag, cz::Str* out) {
+bool Arg_Parser::parse_string(Str flag, Str* out) {
     if (!arg.starts_with(flag)) {
         return false;
     }
@@ -37,11 +38,11 @@ bool Arg_Parser::parse_string(cz::Str flag, cz::Str* out) {
     return true;
 
 error:
-    cz::append(&errors, "Error: ", flag, " requires either ", flag, " * or ", flag, "=*\n");
+    append(&errors, "Error: ", flag, " requires either ", flag, " * or ", flag, "=*\n");
     return true;
 }
 
-bool Arg_Parser::parse_string_no_set(cz::Str flag, cz::Str* out) {
+bool Arg_Parser::parse_string_no_set(Str flag, Str* out) {
     if (!arg.starts_with(flag)) {
         return false;
     }
@@ -60,31 +61,31 @@ bool Arg_Parser::parse_string_no_set(cz::Str flag, cz::Str* out) {
     return true;
 
 error:
-    cz::append(&errors, "Error: ", flag, " requires either ", flag, " * or ", flag, "*\n");
+    append(&errors, "Error: ", flag, " requires either ", flag, " * or ", flag, "*\n");
     return true;
 }
 
-bool Arg_Parser::parse_numeric(cz::Str flag, long* out) {
-    cz::Str arg2;
+bool Arg_Parser::parse_numeric(Str flag, int64_t* out) {
+    Str arg2;
     if (!parse_string(flag, &arg2)) {
         return false;
     }
 
-    if (sscanf(arg2.buffer, "%ld", out) < 0) {
-        cz::append(&errors, "Error: ", flag, " requires either ", flag, " * or ", flag, "=*\n");
+    if (parse(arg2, out) < 0) {
+        append(&errors, "Error: ", flag, " requires either ", flag, " * or ", flag, "=*\n");
     }
 
     return true;
 }
 
-bool Arg_Parser::parse_numeric_no_set(cz::Str flag, long* out) {
-    cz::Str arg2;
+bool Arg_Parser::parse_numeric_no_set(Str flag, int64_t* out) {
+    Str arg2;
     if (!parse_string_no_set(flag, &arg2)) {
         return false;
     }
 
-    if (sscanf(arg2.buffer, "%ld", out) < 0) {
-        cz::append(&errors, "Error: ", flag, " requires either ", flag, " * or ", flag, "*\n");
+    if (parse(arg2, out) < 0) {
+        append(&errors, "Error: ", flag, " requires either ", flag, " * or ", flag, "*\n");
     }
 
     return true;

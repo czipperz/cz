@@ -20,8 +20,8 @@ namespace cz {
 /// ```
 /// // Note: config variables must have default values!
 /// cz::Str config = "default";
-/// long timeout = 1000;
-/// long num = 32;
+/// int64_t timeout = 1000;
+/// int64_t num = 32;
 /// cz::Heap_Vector<cz::Str> generic_arguments = {};
 /// CZ_DEFER(generic_arguments.drop());
 ///
@@ -86,10 +86,10 @@ struct Arg_Parser {
     bool parse_string_no_set(cz::Str flag, cz::Str* out);
 
     /// Parse `flag *` or `flag=*` and parse `*` as a number.
-    bool parse_numeric(cz::Str flag, long* out);
+    bool parse_numeric(cz::Str flag, int64_t* out);
 
     /// Parse `flag *` or `flag*` and parse `*` as a number.
-    bool parse_numeric_no_set(cz::Str flag, long* out);
+    bool parse_numeric_no_set(cz::Str flag, int64_t* out);
 };
 
 }
