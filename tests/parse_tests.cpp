@@ -107,3 +107,9 @@ TEST_CASE("parse signed") {
     CHECK(parse("-9223372036854775809", &i64) == -20);
     CHECK(i64 == 13);
 }
+
+TEST_CASE("parse bogus makes no progress") {
+    int64_t i64;
+    CHECK(parse("", &i64) == 0);
+    CHECK(parse("hello world", &i64) == 0);
+}
