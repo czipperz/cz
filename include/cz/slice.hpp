@@ -7,8 +7,6 @@ struct Allocator;
 template <class T>
 struct Vector;
 
-#define CZ_DIM(ARRAY) (sizeof(ARRAY) / sizeof(*(ARRAY)))
-
 /// A slice of an array of the given type.
 ///
 /// If you want the inner type to be \c void, instead use \c MemSlice.
