@@ -21,6 +21,7 @@ struct Slice {
     constexpr Slice(T (&arr)[len]) : elems(arr), len(len) {}
 
     constexpr T& operator[](size_t index) const { return elems[index]; }
+    constexpr T& get(size_t index) const { return elems[index]; }
 
     constexpr operator Slice<const T>() const { return {elems, len}; }
 
@@ -44,6 +45,38 @@ struct Slice {
 
     Slice slice_end(size_t end) const { return slice((size_t)0, end); }
     Slice slice_end(const T* end) const { return slice((size_t)0, end); }
+
+    /// Find the first / last instance of the `infix` / `element`.
+    /// Returns `nullptr` on no match.
+    T* find(const T& element) const;
+    T* rfind(const T& element) const;
+    T* find(Slice<T> infix) const;
+    T* rfind(Slice<T> infix) const;
+
+    /// Or overloads return `otherwise` on no match.
+    size_t find_or(const T& element, size_t otherwise) const {
+        return orelse(find(element), elems, otherwise);
+    }
+    size_t rfind_or(const T& element, size_t otherwise) const {
+        return orelse(rfind(element), elems, otherwise);
+    }
+    size_t find_or(Slice<T> element, size_t otherwise) const {
+        return orelse(find(element), elems, otherwise);
+    }
+    size_t rfind_or(Slice<T> element, size_t otherwise) const {
+        return orelse(rfind(element), elems, otherwise);
+    }
+
+    /// Index overloads return `len` on no match.
+    size_t find_index(const T& element) const { return find_or(element, len); }
+    size_t rfind_index(const T& element) const { return rfind_or(element, len); }
+    size_t find_index(Slice<T> element) const { return find_or(element, len); }
+    size_t rfind_index(Slice<T> element) const { return rfind_or(element, len); }
+
+    /// Comparator operators.  Length and all elements must match to be considered equal.
+    /// For ordering operators (ex. `<`), see comparators.hpp.
+    bool operator==(Slice<T> other) const;
+    bool operator!=(Slice<T> other) const { return !(*this == other); }
 };
 
 template <class T, size_t len_>
@@ -91,3 +124,5 @@ struct MemSlice {
 };
 
 }
+
+#include "slice.tpp"

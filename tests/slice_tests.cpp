@@ -36,6 +36,14 @@ TEST_CASE("slice(T*, size_t)") {
     REQUIRE(slice.len == 2);
 }
 
+TEST_CASE("Slice ==") {
+    int arr3[] = {1, 2, 3};
+    CHECK(cz::slice(arr3) == cz::slice(arr3));
+    CHECK(cz::slice(arr3).slice_start(1) != cz::slice(arr3));
+    CHECK(cz::slice(arr3).slice_end(2) != cz::slice(arr3));
+    CHECK(cz::slice(arr3).slice_end((size_t)0) == cz::slice(arr3).slice(2, 2));
+}
+
 TEST_CASE("MemSlice()") {
     cz::MemSlice slice;
     REQUIRE(slice.buffer == nullptr);
