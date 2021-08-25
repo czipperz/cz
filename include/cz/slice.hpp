@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+#include "ptr.hpp"
 
 namespace cz {
 struct Allocator;
@@ -45,6 +46,9 @@ struct Slice {
 
     Slice slice_end(size_t end) const { return slice((size_t)0, end); }
     Slice slice_end(const T* end) const { return slice((size_t)0, end); }
+
+    bool contains(const T& element) const { return find(element); }
+    bool contains(Slice<T> infix) const { return find(infix); }
 
     /// Find the first / last instance of the `infix` / `element`.
     /// Returns `nullptr` on no match.
