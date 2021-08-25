@@ -71,8 +71,8 @@ struct MemSlice {
     size_t size;
 
     constexpr MemSlice() : buffer(nullptr), size(0) {}
-    template <size_t size>
-    constexpr MemSlice(char (&buffer)[size]) : buffer(buffer), size(size) {}
+    template <size_t size2>
+    constexpr MemSlice(char (&buffer)[size2]) : buffer(buffer), size(size2) {}
     template <class T>
     constexpr MemSlice(Slice<T> slice) : buffer(slice.elems), size(slice.len * sizeof(T)) {}
     constexpr MemSlice(void* buffer, size_t size) : buffer(buffer), size(size) {}
@@ -83,7 +83,7 @@ struct MemSlice {
     constexpr bool operator!=(MemSlice other) const { return !(*this == other); }
 
     constexpr void* start() const { return buffer; }
-    constexpr void* end() const { return (char*)buffer + size; }
+    void* end() const { return (char*)buffer + size; }
 
     constexpr bool contains(MemSlice other) const {
         return start() <= other.start() && end() >= other.end();
