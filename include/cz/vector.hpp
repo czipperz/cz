@@ -42,7 +42,9 @@ struct Vector {
     void reserve_total(Allocator allocator, size_t total);
 
     /// Ensure there are `extra` spaces available.  Exact expansion.
-    void reserve_exact(Allocator allocator, size_t extra) { reserve_exact_total(allocator, len + extra); }
+    void reserve_exact(Allocator allocator, size_t extra) {
+        reserve_exact_total(allocator, len + extra);
+    }
     void reserve_exact_total(Allocator allocator, size_t total);
 
     /// Reallocate such that the capacity matches the length.
@@ -205,6 +207,39 @@ struct Vector {
 
     Slice<T> slice_end(size_t end) const { return slice((size_t)0, end); }
     Slice<T> slice_end(const T* end) const { return slice((size_t)0, end); }
+
+    bool contains(const T& element) const { return find(element); }
+    bool contains(Slice<T> infix) const { return find(infix); }
+
+    T* find(const T& element) { return (T*)as_slice().find(element); }
+    const T* find(const T& element) const { return as_slice().find(element); }
+    T* rfind(const T& element) { return (T*)as_slice().rfind(element); }
+    const T* rfind(const T& element) const { return as_slice().rfind(element); }
+    T* find(Slice<T> infix) { return (T*)as_slice().find(infix); }
+    const T* find(Slice<T> infix) const { return as_slice().find(infix); }
+    T* rfind(Slice<T> infix) { return (T*)as_slice().rfind(infix); }
+    const T* rfind(Slice<T> infix) const { return as_slice().rfind(infix); }
+
+    size_t find_or(const T& element, size_t otherwise) const {
+        return as_slice().find_or(element, otherwise);
+    }
+    size_t rfind_or(const T& element, size_t otherwise) const {
+        return as_slice().rfind_or(element, otherwise);
+    }
+    size_t find_or(Slice<T> infix, size_t otherwise) const {
+        return as_slice().find_or(infix, otherwise);
+    }
+    size_t rfind_or(Slice<T> infix, size_t otherwise) const {
+        return as_slice().rfind_or(infix, otherwise);
+    }
+
+    size_t find_index(const T& element) const { return as_slice().find_index(element); }
+    size_t rfind_index(const T& element) const { return as_slice().rfind_index(element); }
+    size_t find_index(Slice<T> infix) const { return as_slice().find_index(infix); }
+    size_t rfind_index(Slice<T> infix) const { return as_slice().rfind_index(infix); }
+
+    bool operator==(Slice<T> other) const { return as_slice() == other; }
+    bool operator!=(Slice<T> other) const { return as_slice() != other; }
 };
 
 template <class T>
