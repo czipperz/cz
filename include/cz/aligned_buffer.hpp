@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stddef.h>
+#include "slice.hpp"
 
 namespace cz {
 
