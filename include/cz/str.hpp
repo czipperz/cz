@@ -6,6 +6,7 @@
 #include "allocator.hpp"
 #include "assert.hpp"
 #include "char_type.hpp"
+#include "ptr.hpp"
 #include "slice.hpp"
 #include "vector.hpp"
 
@@ -47,8 +48,33 @@ struct Str {
         return buffer[len - 1];
     }
 
+    /// Must manually bounds check!
+    char operator[](size_t index) const { return get(index); }
+    char get(size_t index) const {
+        CZ_DEBUG_ASSERT(index < len);
+        return buffer[index];
+    }
+
+    /// Simple comparison operators.
+    bool operator==(const Str& other) const {
+        return len == other.len && memcmp(buffer, other.buffer, len) == 0;
+    }
+    bool operator!=(const Str& other) const { return !(*this == other); }
+
+    bool operator<(const Str& other) const {
+        auto x = memcmp(buffer, other.buffer, len < other.len ? len : other.len);
+        if (x == 0) {
+            return len < other.len;
+        }
+        return x < 0;
+    }
+    bool operator>(const Str& other) const { return other < *this; }
+    bool operator<=(const Str& other) const { return !(other < *this); }
+    bool operator>=(const Str& other) const { return !(*this < other); }
+
     bool equals_case_insensitive(Str other) const;
 
+    /// Combined slice and comparison methods.
     bool starts_with(Str prefix) const {
         if (len < prefix.len) {
             return false;
@@ -77,26 +103,30 @@ struct Str {
         return len > 0 && cz::to_lower(buffer[len - 1]) == cz::to_lower(c);
     }
 
+    /// Count the number of occurrences of a character in the string.
     size_t count(char c) const {
-        cz::Str cpy = *this;
+        size_t start = 0;
         size_t cnt = 0;
         while (1) {
-            const char* spot = cpy.find(c);
-            if (spot) {
-                ++cnt;
-                cpy.buffer = spot + 1;
-                cpy.len = len + buffer - cpy.buffer;
-            } else {
-                return cnt;
+            const char* spot = slice_start(start).find(c);
+            if (!spot) {
+                break;
             }
+
+            ++cnt;
+            start = spot - buffer;
         }
+        return cnt;
     }
 
+    /// Check if the string contains another string or a character.
     bool contains(Str infix) const { return find(infix); }
     bool contains(char infix) const { return find(infix); }
     bool contains_case_insensitive(Str infix) const { return find_case_insensitive(infix); }
     bool contains_case_insensitive(char infix) const { return find_case_insensitive(infix); }
 
+    /// Find the first / last instance of the `infix`/`pattern`.
+    /// Returns `nullptr` on no match.
     const char* find(Str infix) const;
     const char* rfind(Str infix) const;
 
@@ -113,56 +143,53 @@ struct Str {
         return rfind_case_insensitive({&pattern, 1});
     }
 
-    /// Index overloads return `len` on no match.
-    size_t find_index(Str infix) const {
-        const char* ptr = find(infix);
-        if (!ptr)
-            return len;
-        return ptr - buffer;
+    /// Or overloads return `otherwise` on no match.
+    size_t find_or(Str infix, size_t otherwise) const {
+        return orelse(find(infix), buffer, otherwise);
     }
-    size_t rfind_index(Str infix) const {
-        const char* ptr = rfind(infix);
-        if (!ptr)
-            return len;
-        return ptr - buffer;
+    size_t rfind_or(Str infix, size_t otherwise) const {
+        return orelse(rfind(infix), buffer, otherwise);
     }
-    size_t find_index(char pattern) const {
-        const char* ptr = find(pattern);
-        if (!ptr)
-            return len;
-        return ptr - buffer;
+    size_t find_or(char pattern, size_t otherwise) const {
+        return orelse(find(pattern), buffer, otherwise);
     }
-    size_t rfind_index(char pattern) const {
-        const char* ptr = rfind(pattern);
-        if (!ptr)
-            return len;
-        return ptr - buffer;
+    size_t rfind_or(char pattern, size_t otherwise) const {
+        return orelse(rfind(pattern), buffer, otherwise);
     }
-    size_t find_index_case_insensitive(Str infix) const {
-        const char* ptr = find_case_insensitive(infix);
-        if (!ptr)
-            return len;
-        return ptr - buffer;
+    size_t find_or_case_insensitive(Str infix, size_t otherwise) const {
+        return orelse(find_case_insensitive(infix), buffer, otherwise);
     }
-    size_t rfind_index_case_insensitive(Str infix) const {
-        const char* ptr = rfind_case_insensitive(infix);
-        if (!ptr)
-            return len;
-        return ptr - buffer;
+    size_t rfind_or_case_insensitive(Str infix, size_t otherwise) const {
+        return orelse(rfind_case_insensitive(infix), buffer, otherwise);
     }
-    size_t find_index_case_insensitive(char pattern) const {
-        const char* ptr = find_case_insensitive(pattern);
-        if (!ptr)
-            return len;
-        return ptr - buffer;
+    size_t find_or_case_insensitive(char pattern, size_t otherwise) const {
+        return orelse(find_case_insensitive(pattern), buffer, otherwise);
     }
-    size_t rfind_index_case_insensitive(char pattern) const {
-        const char* ptr = rfind_case_insensitive(pattern);
-        if (!ptr)
-            return len;
-        return ptr - buffer;
+    size_t rfind_or_case_insensitive(char pattern, size_t otherwise) const {
+        return orelse(rfind_case_insensitive(pattern), buffer, otherwise);
     }
 
+    /// Index overloads return `len` on no match.
+    size_t find_index(Str infix) const { return find_or(infix, len); }
+    size_t rfind_index(Str infix) const { return rfind_or(infix, len); }
+    size_t find_index(char pattern) const { return find_or(pattern, len); }
+    size_t rfind_index(char pattern) const { return rfind_or(pattern, len); }
+    size_t find_index_case_insensitive(Str infix) const {
+        return find_or_case_insensitive(infix, len);
+    }
+    size_t rfind_index_case_insensitive(Str infix) const {
+        return rfind_or_case_insensitive(infix, len);
+    }
+    size_t find_index_case_insensitive(char pattern) const {
+        return find_or_case_insensitive(pattern, len);
+    }
+    size_t rfind_index_case_insensitive(char pattern) const {
+        return rfind_or_case_insensitive(pattern, len);
+    }
+
+    void split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str>* values);
+
+    /// Take a substring of the string.
     cz::Str slice(size_t start, size_t end) const { return {buffer + start, end - start}; }
     cz::Str slice(const char* start, size_t end) const { return slice(start - buffer, end); }
     cz::Str slice(size_t start, const char* end) const { return slice(start, end - buffer); }
@@ -175,29 +202,6 @@ struct Str {
 
     cz::Str slice_end(size_t end) const { return slice((size_t)0, end); }
     cz::Str slice_end(const char* end) const { return slice((size_t)0, end); }
-
-    void split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str>* values);
-
-    char operator[](size_t index) const {
-        CZ_DEBUG_ASSERT(index < len);
-        return buffer[index];
-    }
-
-    bool operator==(const Str& other) const {
-        return len == other.len && memcmp(buffer, other.buffer, len) == 0;
-    }
-    bool operator!=(const Str& other) const { return !(*this == other); }
-
-    bool operator<(const Str& other) const {
-        auto x = memcmp(buffer, other.buffer, len < other.len ? len : other.len);
-        if (x == 0) {
-            return len < other.len;
-        }
-        return x < 0;
-    }
-    bool operator>(const Str& other) const { return other < *this; }
-    bool operator<=(const Str& other) const { return !(other < *this); }
-    bool operator>=(const Str& other) const { return !(*this < other); }
 };
 
 }

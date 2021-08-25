@@ -220,6 +220,31 @@ struct String {
         return as_str().rfind_case_insensitive(pattern);
     }
 
+    /// Or overloads return `otherwise` on no match.
+    size_t find_or(Str infix, size_t otherwise) const { return as_str().find_or(infix, otherwise); }
+    size_t rfind_or(Str infix, size_t otherwise) const {
+        return as_str().rfind_or(infix, otherwise);
+    }
+    size_t find_or(char pattern, size_t otherwise) const {
+        return as_str().find_or(pattern, otherwise);
+    }
+    size_t rfind_or(char pattern, size_t otherwise) const {
+        return as_str().rfind_or(pattern, otherwise);
+    }
+    size_t find_or_case_insensitive(Str infix, size_t otherwise) const {
+        return as_str().find_or_case_insensitive(infix, otherwise);
+    }
+    size_t rfind_or_case_insensitive(Str infix, size_t otherwise) const {
+        return as_str().rfind_or_case_insensitive(infix, otherwise);
+    }
+    size_t find_or_case_insensitive(char pattern, size_t otherwise) const {
+        return as_str().find_or_case_insensitive(pattern, otherwise);
+    }
+    size_t rfind_or_case_insensitive(char pattern, size_t otherwise) const {
+        return as_str().rfind_or_case_insensitive(pattern, otherwise);
+    }
+
+    /// Index overloads return `len` on no match.
     size_t find_index(Str infix) const { return as_str().find_index(infix); }
     size_t rfind_index(Str infix) const { return as_str().rfind_index(infix); }
     size_t find_index(char pattern) const { return as_str().find_index(pattern); }
@@ -241,6 +266,7 @@ struct String {
         as_str().split_into(separator, allocator, values);
     }
 
+    /// Take a substring of the string.
     cz::Str slice(size_t start, size_t end) const { return as_str().slice(start, end); }
     cz::Str slice(const char* start, size_t end) const { return as_str().slice(start, end); }
     cz::Str slice(size_t start, const char* end) const { return as_str().slice(start, end); }
