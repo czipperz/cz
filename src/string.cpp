@@ -20,7 +20,7 @@ static void realloc_new_cap(String* string, Allocator allocator, size_t new_cap)
 
 void String::reserve_total(Allocator allocator, size_t total) {
     if (cap < total) {
-        size_t new_cap = next_power_of_two(total);
+        size_t new_cap = next_power_of_two(total - 1);
         if (new_cap < 16) {
             new_cap = 16;
         }

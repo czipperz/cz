@@ -254,7 +254,7 @@ static void realloc_new_cap(Vector<T>* vector, Allocator allocator, size_t new_c
 template <class T>
 void Vector<T>::reserve_total(Allocator allocator, size_t total) {
     if (cap < total) {
-        size_t new_cap = next_power_of_two(total);
+        size_t new_cap = next_power_of_two(total - 1);
         if (new_cap < 8) {
             new_cap = 8;
         }

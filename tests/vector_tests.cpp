@@ -45,6 +45,38 @@ TEST_CASE("Vector push in limits") {
     CHECK(vector[3] == 6);
 }
 
+TEST_CASE("Vector reserve large numbers") {
+    Vector<int> vector = {};
+
+    {
+        vector = {};
+        CZ_DEFER(vector.drop(heap_allocator()));
+        vector.reserve(heap_allocator(), 1024);
+        CHECK(vector.cap == 1024);
+    }
+
+    {
+        vector = {};
+        CZ_DEFER(vector.drop(heap_allocator()));
+        vector.reserve(heap_allocator(), 1023);
+        CHECK(vector.cap == 1024);
+    }
+
+    {
+        vector = {};
+        CZ_DEFER(vector.drop(heap_allocator()));
+        vector.reserve(heap_allocator(), 4096);
+        CHECK(vector.cap == 4096);
+    }
+
+    {
+        vector = {};
+        CZ_DEFER(vector.drop(heap_allocator()));
+        vector.reserve(heap_allocator(), 4095);
+        CHECK(vector.cap == 4096);
+    }
+}
+
 TEST_CASE("Vector copy constructor copies pointer") {
     Vector<int> original = {};
     CZ_DEFER(original.drop(heap_allocator()));
