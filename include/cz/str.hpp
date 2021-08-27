@@ -114,7 +114,7 @@ struct Str {
             }
 
             ++cnt;
-            start = spot - buffer;
+            start = spot + 1 - buffer;
         }
         return cnt;
     }
