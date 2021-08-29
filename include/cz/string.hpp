@@ -39,7 +39,7 @@ struct String {
     void reserve(Allocator allocator, size_t extra) { reserve_total(allocator, extra + len); }
     void reserve_total(Allocator allocator, size_t total);
     /// Ensure there are `extra` spaces available.  Exact expansion.
-    void reserve_exact(Allocator allocator, size_t extra) { reserve_exact(allocator, extra + len); }
+    void reserve_exact(Allocator allocator, size_t extra) { reserve_exact_total(allocator, extra + len); }
     void reserve_exact_total(Allocator allocator, size_t total);
 
     /// Reallocate the buffer so that the length is the same as the capacity.
