@@ -109,7 +109,7 @@ struct Input_File : File_Descriptor {
     /// to the number of bytes written to `buffer`.
     ///
     /// On failure returns `-1`.  On end of file returns `0`.
-    int64_t read_binary(char* buffer, size_t size);
+    int64_t read(void* buffer, size_t size);
 
     /// Read up to `size` bytes from the file into `buffer`.
     ///
@@ -119,14 +119,14 @@ struct Input_File : File_Descriptor {
     /// On failure returns `-1`.  On end of file returns `0`.
     int64_t read_strip_carriage_returns(char* buffer, size_t size, Carriage_Return_Carry*);
 
-    /// Wrapper for `read_binary` and `read_strip_carriage_returns` that
+    /// Wrapper for `read` and `read_strip_carriage_returns` that
     /// selects the implementation based on the host operating system.
     int64_t read_text(char* buffer, size_t size, Carriage_Return_Carry* carry) {
 #ifdef _WIN32
         return read_strip_carriage_returns(buffer, size, carry);
 #else
         (void)carry;  // remove unused parameter warnings
-        return read_binary(buffer, size);
+        return read(buffer, size);
 #endif
     }
 };
@@ -146,8 +146,8 @@ struct Output_File : File_Descriptor {
     /// to the number of bytes from `buffer` written.
     ///
     /// On failure returns `-1`.  On end of file returns `0`.
-    int64_t write_binary(const char* buffer, size_t size);
-    int64_t write_binary(cz::Str str) { return write_binary(str.buffer, str.len); }
+    int64_t write(const void* buffer, size_t size);
+    int64_t write(cz::Str str) { return write(str.buffer, str.len); }
 
     /// Write `size` bytes from `buffer` to the file, converting each `'\n'` to `"\r\n"`.
     ///
@@ -172,9 +172,9 @@ struct Output_File : File_Descriptor {
     int64_t write_text(cz::Str str) { return write_text(str.buffer, str.len); }
 };
 
-int64_t write_binary_loop(Output_File file, const char* buffer, size_t size);
-inline int64_t write_binary_loop(Output_File file, cz::Str str) {
-    return write_binary_loop(file, str.buffer, str.len);
+int64_t write_loop(Output_File file, const char* buffer, size_t size);
+inline int64_t write_loop(Output_File file, cz::Str str) {
+    return write_loop(file, str.buffer, str.len);
 }
 
 Input_File std_in_file();

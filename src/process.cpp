@@ -169,7 +169,7 @@ int64_t File_Descriptor::get_size() {
 #endif
 }
 
-int64_t Input_File::read_binary(char* buffer, size_t size) {
+int64_t Input_File::read(void* buffer, size_t size) {
     ZoneScoped;
     CZ_DEBUG_ASSERT(is_open());
 
@@ -231,7 +231,7 @@ int64_t Input_File::read_strip_carriage_returns(char* buffer,
         ++start;
     }
 
-    int64_t res = read_binary(start, end - start);
+    int64_t res = read(start, end - start);
     if (res < 0) {
         return -1;
     } else {
@@ -272,7 +272,7 @@ bool Output_File::open(const char* file) {
 #endif
 }
 
-int64_t Output_File::write_binary(const char* buffer, size_t size) {
+int64_t Output_File::write(const void* buffer, size_t size) {
     ZoneScoped;
     CZ_DEBUG_ASSERT(is_open());
 
@@ -297,14 +297,14 @@ int64_t Output_File::write_add_carriage_returns(const char* buffer, size_t size)
     while (1) {
         const char* spot = (const char*)memchr(start, '\n', end - start);
         if (spot) {
-            int64_t res = write_binary(start, spot - start);
+            int64_t res = write(start, spot - start);
             if (res < 0) {
                 return -1;
             } else if (res < spot - start) {
                 return start + res - buffer;
             }
 
-            int64_t tres2 = write_binary("\r\n", 2);
+            int64_t tres2 = write("\r\n", 2);
             if (tres2 < 0) {
                 return -1;
             } else if (tres2 < 2) {
@@ -313,7 +313,7 @@ int64_t Output_File::write_add_carriage_returns(const char* buffer, size_t size)
 
             start = spot + 1;
         } else {
-            int64_t res = write_binary(start, end - start);
+            int64_t res = write(start, end - start);
             if (res < 0) {
                 return -1;
             }
@@ -322,10 +322,10 @@ int64_t Output_File::write_add_carriage_returns(const char* buffer, size_t size)
     }
 }
 
-int64_t write_binary_loop(Output_File file, const char* buffer, size_t size) {
+int64_t write_loop(Output_File file, const char* buffer, size_t size) {
     size_t written = 0;
     while (written < size) {
-        int64_t result = file.write_binary(buffer + written, size - written);
+        int64_t result = file.write(buffer + written, size - written);
         if (result > 0) {
             written += result;
         } else if (result == 0) {
