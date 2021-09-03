@@ -109,7 +109,40 @@ const char* Str::rfind_case_insensitive(cz::Str infix) const {
     return nullptr;
 }
 
-void Str::split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str>* values) {
+bool Str::split_excluding(char separator, Str* before, Str* after) const {
+    const char* sep = find(separator);
+    if (!sep)
+        return false;
+
+    Str ta = slice_start(sep + 1);
+    *before = slice_end(sep);
+    *after = ta;
+    return true;
+}
+
+bool Str::split_before(char separator, Str* before, Str* after) const {
+    const char* sep = find(separator);
+    if (!sep)
+        return false;
+
+    Str ta = slice_start(sep);
+    *before = slice_end(sep);
+    *after = ta;
+    return true;
+}
+
+bool Str::split_after(char separator, Str* before, Str* after) const {
+    const char* sep = find(separator);
+    if (!sep)
+        return false;
+
+    Str ta = slice_start(sep + 1);
+    *before = slice_end(sep + 1);
+    *after = ta;
+    return true;
+}
+
+void Str::split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str>* values) const {
     const char* start = buffer;
     while (1) {
         cz::Str str = slice_start(start);

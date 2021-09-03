@@ -187,7 +187,18 @@ struct Str {
         return rfind_or_case_insensitive(pattern, len);
     }
 
-    void split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str>* values);
+    /// Split the string into two pieces divided by the separator.
+    ///
+    /// If the separator is found, returns `true` and fills `*before` and `*after`.
+    /// Otherwise it returns `false` and doesn't modify the pointers.
+    ///
+    /// You can safely pass `this` as either `before` or `after`.
+    bool split_excluding(char separator, cz::Str* before, cz::Str* after) const;
+    bool split_before(char separator, cz::Str* before, cz::Str* after) const;
+    bool split_after(char separator, cz::Str* before, cz::Str* after) const;
+
+    /// Split the string into pieces excluding the separator.
+    void split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str>* values) const;
 
     /// Take a substring of the string.
     cz::Str slice(size_t start, size_t end) const { return {buffer + start, end - start}; }

@@ -88,3 +88,21 @@ TEST_CASE("Str::rfind in empty string is null") {
     Str str("");
     REQUIRE(str.rfind('a') == nullptr);
 }
+
+TEST_CASE("Str::split_excluding basic") {
+    Str str = "hello world";
+    Str before, after;
+    REQUIRE(str.split_excluding(' ', &before, &after));
+    CHECK(before == "hello");
+    CHECK(after == "world");
+
+    REQUIRE(!after.split_excluding(' ', &before, &after));
+}
+
+TEST_CASE("Str::split_excluding self as before") {
+    Str str = "hello world";
+    Str after;
+    REQUIRE(str.split_excluding(' ', &str, &after));
+    CHECK(str == "hello");
+    CHECK(after == "world");
+}

@@ -262,6 +262,15 @@ struct String {
         return as_str().rfind_index_case_insensitive(pattern);
     }
 
+    void split_excluding(char separator, cz::Str *before, cz::Str* after) const {
+        as_str().split_excluding(separator, before, after);
+    }
+    void split_before(char separator, cz::Str *before, cz::Str* after) const {
+        as_str().split_before(separator, before, after);
+    }
+    void split_after(char separator, cz::Str *before, cz::Str* after) const {
+        as_str().split_after(separator, before, after);
+    }
     void split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str>* values) {
         as_str().split_into(separator, allocator, values);
     }
