@@ -160,13 +160,13 @@ struct Output_File : File_Descriptor {
         return write_add_carriage_returns(str.buffer, str.len);
     }
 
-    /// Wrapper for `write_binary` and `write_add_carriage_returns` that
+    /// Wrapper for `write` and `write_add_carriage_returns` that
     /// selects the implementation based on the host operating system.
     int64_t write_text(const char* buffer, size_t size) {
 #ifdef _WIN32
         return write_add_carriage_returns(buffer, size);
 #else
-        return write_binary(buffer, size);
+        return write(buffer, size);
 #endif
     }
     int64_t write_text(cz::Str str) { return write_text(str.buffer, str.len); }

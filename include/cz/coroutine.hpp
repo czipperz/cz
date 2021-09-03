@@ -25,7 +25,7 @@
 ///         CZ_CO_YIELD(false);
 ///
 ///         char buffer[1024];
-///         int64_t result = file.read_binary(buffer, sizeof(buffer));
+///         int64_t result = file.read(buffer, sizeof(buffer));
 ///         if (result > 0) {
 ///             // Process output.
 ///             string.reserve(cz::heap_allocator(), result);
