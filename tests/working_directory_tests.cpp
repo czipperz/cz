@@ -11,7 +11,7 @@ TEST_CASE("get_working_directory() returns non-empty") {
     Allocator allocator = heap_allocator();
     CZ_DEFER(path.drop(allocator));
 
-    REQUIRE(!cz::is_err(get_working_directory(allocator, &path)));
+    REQUIRE(get_working_directory(allocator, &path));
 
     REQUIRE(path != "");
 }

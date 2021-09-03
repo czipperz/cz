@@ -3,7 +3,6 @@
 #include <cz/assert.hpp>
 #include <cz/path.hpp>
 #include <cz/string.hpp>
-#include <cz/try.hpp>
 
 #include <cz/char_type.hpp>
 #include <errno.h>
@@ -21,20 +20,15 @@
 
 namespace cz {
 
-Result set_working_directory(const char* cstr_path) {
-    if (chdir(cstr_path) < 0) {
-        return Result::last_error();
-    } else {
-        return Result::ok();
-    }
+bool set_working_directory(const char* cstr_path) {
+    return chdir(cstr_path) == 0;
 }
 
-Result get_working_directory(Allocator allocator, String* path) {
+bool get_working_directory(Allocator allocator, String* path) {
     // @RandomConstant: for case where there is no limit to the path size
     size_t size = 128;
-    CZ_TRY(path::get_max_len(&size));
+    (void)path::get_max_len(&size);
 
-    path->len = 0;
     path->reserve(allocator, size);
 
     while (!getcwd(path->end(), (int)size)) {
@@ -44,7 +38,7 @@ Result get_working_directory(Allocator allocator, String* path) {
             path->reserve(allocator, size);
         } else {
             // actual error
-            return Result::last_error();
+            return false;
         }
     }
 
@@ -54,7 +48,7 @@ Result get_working_directory(Allocator allocator, String* path) {
     cz::path::convert_to_forward_slashes(path);
 #endif
 
-    return Result::ok();
+    return true;
 }
 
 }

@@ -6,15 +6,14 @@
 #pragma once
 
 #include "option.hpp"
-#include "result.hpp"
 #include "string.hpp"
 
 namespace cz {
 namespace path {
 
-/// Get the max length of a path on the current platform.  Does not write to the
-/// argument if there is no maximum.
-Result get_max_len(size_t* size);
+/// Get the max length of a path on the current platform.  On failure
+/// returns `false` and **does not store to `*size`**.
+bool get_max_len(size_t* size);
 
 /// Get the directory component of the path.
 ///
@@ -79,7 +78,7 @@ bool is_absolute(Str path);
 /// The path must use forward slashes.
 ///
 /// Returns an error if it fails to get the current working directory.
-Result make_absolute(Str relative_path, Allocator allocator, String* absolute_path_out);
+bool make_absolute(Str relative_path, Allocator allocator, String* absolute_path_out);
 
 /// The same as `make_absolute` above except with a custom working directory.
 void make_absolute(Str relative_path,

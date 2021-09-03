@@ -18,7 +18,7 @@ void set_wd() {
     String path = {};
     CZ_DEFER(path.drop(allocator));
 
-    REQUIRE(!cz::is_err(get_working_directory(allocator, &path)));
+    REQUIRE(get_working_directory(allocator, &path));
 
     printf("cwd: %s\n", path.buffer);
 
@@ -46,7 +46,7 @@ TEST_CASE("files works") {
     Vector<String> paths = {};
     CZ_DEFER(paths.drop(allocator));
     CZ_DEFER(for (size_t i = 0; i < paths.len; ++i) { paths[i].drop(allocator); });
-    REQUIRE(files(allocator, allocator, dir, &paths).is_ok());
+    REQUIRE(files(allocator, allocator, dir, &paths));
 
     Directory_Iterator iterator;
     REQUIRE(iterator.init(dir) == 1);

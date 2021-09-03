@@ -1,7 +1,6 @@
 #include <cz/path.hpp>
 
 #include <cz/char_type.hpp>
-#include <cz/try.hpp>
 #include <cz/working_directory.hpp>
 
 #ifdef _WIN32
@@ -14,10 +13,10 @@
 namespace cz {
 namespace path {
 
-Result get_max_len(size_t* size) {
+bool get_max_len(size_t* size) {
 #ifdef _WIN32
     *size = _MAX_PATH;
-    return Result::ok();
+    return true;
 #else
     errno = 0;
 
@@ -25,14 +24,10 @@ Result get_max_len(size_t* size) {
 
     if (path_max == -1) {
         // errno is only set if there is a limit
-        if (errno != 0) {
-            return Result::last_error();
-        } else {
-            return Result::ok();
-        }
+        return errno == 0;
     } else {
         *size = path_max;
-        return Result::ok();
+        return true;
     }
 #endif
 }
@@ -227,7 +222,7 @@ bool is_absolute(Str file) {
 }
 
 template <class PWD>
-static Result generic_make_absolute(Str file, Allocator allocator, String* path, PWD&& pwd) {
+static bool generic_make_absolute(Str file, Allocator allocator, String* path, PWD&& pwd) {
     if (is_absolute(file)) {
         path->reserve(allocator, file.len + 1);
     } else {
@@ -235,7 +230,9 @@ static Result generic_make_absolute(Str file, Allocator allocator, String* path,
         size_t path_len = path->len;
 #endif
 
-        CZ_TRY(pwd(allocator, path));
+        bool success = pwd(allocator, path);
+        if (!success)
+            return false;
 
 #ifdef _WIN32
         // Handle X:relpath
@@ -263,10 +260,10 @@ static Result generic_make_absolute(Str file, Allocator allocator, String* path,
     path->append(file);
     flatten(path);
     path->null_terminate();
-    return Result::ok();
+    return true;
 }
 
-Result make_absolute(Str file, Allocator allocator, String* path) {
+bool make_absolute(Str file, Allocator allocator, String* path) {
     return generic_make_absolute(file, allocator, path, get_working_directory);
 }
 
@@ -274,7 +271,7 @@ void make_absolute(Str file, Str working_directory, Allocator allocator, String*
     generic_make_absolute(file, allocator, path, [&](Allocator allocator, String* path) {
         path->reserve(allocator, working_directory.len);
         path->append(working_directory);
-        return Result::ok();
+        return true;
     });
 }
 
