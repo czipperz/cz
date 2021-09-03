@@ -165,7 +165,7 @@ void Str::split_clone(char separator,
         cz::Str value = remaining;
         bool split = remaining.split_excluding(separator, &value, &remaining);
 
-        values->reserve(allocator, 1);
+        values->reserve(vector_allocator, 1);
         values->push(value.clone(string_allocator));
 
         if (!split)
@@ -182,7 +182,7 @@ void Str::split_clone_nt(char separator,
         cz::Str value = remaining;
         bool split = remaining.split_excluding(separator, &value, &remaining);
 
-        values->reserve(allocator, 1);
+        values->reserve(vector_allocator, 1);
         values->push(value.clone_null_terminate(string_allocator));
 
         if (!split)
