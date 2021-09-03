@@ -39,7 +39,9 @@ struct String {
     void reserve(Allocator allocator, size_t extra) { reserve_total(allocator, extra + len); }
     void reserve_total(Allocator allocator, size_t total);
     /// Ensure there are `extra` spaces available.  Exact expansion.
-    void reserve_exact(Allocator allocator, size_t extra) { reserve_exact_total(allocator, extra + len); }
+    void reserve_exact(Allocator allocator, size_t extra) {
+        reserve_exact_total(allocator, extra + len);
+    }
     void reserve_exact_total(Allocator allocator, size_t total);
 
     /// Reallocate the buffer so that the length is the same as the capacity.
@@ -262,17 +264,30 @@ struct String {
         return as_str().rfind_index_case_insensitive(pattern);
     }
 
-    void split_excluding(char separator, cz::Str *before, cz::Str* after) const {
+    void split_excluding(char separator, cz::Str* before, cz::Str* after) const {
         as_str().split_excluding(separator, before, after);
     }
-    void split_before(char separator, cz::Str *before, cz::Str* after) const {
+    void split_before(char separator, cz::Str* before, cz::Str* after) const {
         as_str().split_before(separator, before, after);
     }
-    void split_after(char separator, cz::Str *before, cz::Str* after) const {
+    void split_after(char separator, cz::Str* before, cz::Str* after) const {
         as_str().split_after(separator, before, after);
     }
+
     void split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str>* values) {
         as_str().split_into(separator, allocator, values);
+    }
+    void split_clone(char separator,
+                     cz::Allocator vector_allocator,
+                     cz::Allocator string_allocator,
+                     cz::Vector<cz::Str>* values) const {
+        as_str().split_clone(separator, vector_allocator, string_allocator, values);
+    }
+    void split_clone_nt(char separator,
+                        cz::Allocator vector_allocator,
+                        cz::Allocator string_allocator,
+                        cz::Vector<cz::Str>* values) const {
+        as_str().split_clone_nt(separator, vector_allocator, string_allocator, values);
     }
 
     /// Take a substring of the string.

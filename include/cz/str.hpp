@@ -199,6 +199,16 @@ struct Str {
 
     /// Split the string into pieces excluding the separator.
     void split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str>* values) const;
+    /// Same as `split_into` except clones each piece using `string_allocator`.
+    void split_clone(char separator,
+                     cz::Allocator vector_allocator,
+                     cz::Allocator string_allocator,
+                     cz::Vector<cz::Str>* values) const;
+    /// Same as `split_into` except clones each piece using `string_allocator` and null terminates.
+    void split_clone_nt(char separator,
+                        cz::Allocator vector_allocator,
+                        cz::Allocator string_allocator,
+                        cz::Vector<cz::Str>* values) const;
 
     /// Take a substring of the string.
     cz::Str slice(size_t start, size_t end) const { return {buffer + start, end - start}; }
