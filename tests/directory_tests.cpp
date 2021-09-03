@@ -43,22 +43,29 @@ TEST_CASE("files works") {
     cz::String file = {};
     CZ_DEFER(file.drop(allocator));
 
-    Directory_Iterator iterator;
-    REQUIRE(iterator.init(dir, allocator, &file).is_ok());
-    CZ_DEFER(REQUIRE(iterator.drop().is_ok()));
-
     Vector<String> paths = {};
     CZ_DEFER(paths.drop(allocator));
     CZ_DEFER(for (size_t i = 0; i < paths.len; ++i) { paths[i].drop(allocator); });
     REQUIRE(files(allocator, allocator, dir, &paths).is_ok());
 
+    Directory_Iterator iterator;
+    REQUIRE(iterator.init(dir) == 1);
+    CZ_DEFER(REQUIRE(iterator.drop()));
+
     size_t i = 0;
-    while (!iterator.done()) {
+    while (i < paths.len) {
+        file.len = 0;
+        iterator.append_name(allocator, &file);
+
         fputs("ls: ", stdout);
         fwrite(file.buffer, 1, file.len, stdout);
         putchar('\n');
-        REQUIRE(file == paths[i++]);
-        file.len = 0;
-        REQUIRE(iterator.advance(allocator, &file).is_ok());
+        CHECK(file == paths[i++]);
+
+        int result = iterator.advance();
+        if (result <= 0) {
+            CHECK(result == 0);
+            break;
+        }
     }
 }

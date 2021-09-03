@@ -3,7 +3,7 @@
 #include <errno.h>
 #include <cz/char_type.hpp>
 #include <cz/defer.hpp>
-#include <cz/try.hpp>
+#include <cz/heap.hpp>
 
 #ifdef TRACY_ENABLE
 #include <Tracy.hpp>
@@ -11,194 +11,170 @@
 #define ZoneScoped
 #endif
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <windows.h>
-
 #include <stdlib.h>
-
-#include <type_traits>
-static_assert(std::is_same<void*, HANDLE>::value, "HANDLE must be void* on windows");
+#include <string.h>
 
 namespace cz {
 
-static Result get_last_error() {
-    Result result;
-    result.code = GetLastError();
-    return result;
-}
-
-Result Directory_Iterator::advance(Allocator allocator, String* out) {
+int Directory_Iterator::init(const char* cstr_path) {
     ZoneScoped;
 
-    WIN32_FIND_DATA data;
-    if (FindNextFileA(_handle, &data)) {
-        Str file = data.cFileName;
-        out->reserve(allocator, file.len + 1);
-        out->append(file);
-        out->null_terminate();
-        return Result::ok();
-    } else if (GetLastError() == ERROR_NO_MORE_FILES) {
-        _done = true;
-        return Result::ok();
-    } else {
-        return get_last_error();
+#ifdef _WIN32
+    HANDLE handle;
+
+    {
+        // Windows doesn't list the files in a directory, it findes files matching criteria.
+        // Thus we must append `"\*"` to get all files in the directory `cstr_path`.
+        String path = {};
+        CZ_DEFER(path.drop(heap_allocator()));
+        Str str_path = cstr_path;
+        path.reserve_exact(heap_allocator(), str_path.len + 3);
+        path.append(str_path);
+        path.append("\\*");
+        path.null_terminate();
+
+        handle = FindFirstFileA(path.buffer, &entry);
     }
-}
-
-Result Directory_Iterator::drop() {
-    ZoneScoped;
-
-    if (FindClose(_handle)) {
-        return Result::ok();
-    } else {
-        return get_last_error();
-    }
-}
-
-Result Directory_Iterator::init(const char* cstr_path, Allocator allocator, String* out) {
-    ZoneScoped;
-
-    // Windows doesn't list the files in a directory, it findes files matching criteria.
-    // Thus we must append `"\*"` to get all files in the directory `cstr_path`.
-    Str str_path = cstr_path;
-    String path = {};
-    path.reserve(allocator, str_path.len + 3);
-    path.append(str_path);
-    path.append("\\*");
-    path.null_terminate();
-
-    WIN32_FIND_DATA data;
-    HANDLE handle = FindFirstFileA(path.buffer, &data);
-
-    path.drop(allocator);
 
     if (handle == INVALID_HANDLE_VALUE) {
-        return get_last_error();
+        return -1;
     }
 
-    _handle = handle;
+    directory = handle;
 
-    // skip "." and ".."
-    if (strcmp(data.cFileName, ".") == 0 && !FindNextFileA(handle, &data)) {
-        if (GetLastError() == ERROR_NO_MORE_FILES) {
-            _done = true;
-            return Result::ok();
-        } else {
-            drop();
-            return get_last_error();
+    // . and .. are always first if they are present.
+    if (!strcmp(entry.cFileName, ".")) {
+        if (!FindNextFileA(handle, &entry)) {
+            if (GetLastError() == ERROR_NO_MORE_FILES) {
+                return 0;
+            } else {
+                drop();
+                return -1;
+            }
         }
     }
-    if (strcmp(data.cFileName, "..") == 0 && !FindNextFileA(handle, &data)) {
-        if (GetLastError() == ERROR_NO_MORE_FILES) {
-            _done = true;
-            return Result::ok();
-        } else {
-            drop();
-            return get_last_error();
+    if (!strcmp(entry.cFileName, "..")) {
+        if (!FindNextFileA(handle, &entry)) {
+            if (GetLastError() == ERROR_NO_MORE_FILES) {
+                // Note: don't drop so we'll get the same error on `next`.
+                return 0;
+            } else {
+                drop();
+                return -1;
+            }
         }
     }
 
-    Str file = data.cFileName;
-    out->reserve(allocator, file.len + 1);
-    out->append(file);
-    out->null_terminate();
-    return Result::ok();
-}
-
-}
-
+    return 1;
 #else
-#include <dirent.h>
+    DIR* dir = opendir(path);
+    if (!dir) {
+        return -1;
+    }
+    directory = dir;
 
-namespace cz {
+    int result = advance();
 
-Result Directory_Iterator::advance(Allocator allocator, String* out) {
+    if (result < 0) {
+        drop();
+    }
+
+    return result;
+#endif
+}
+
+bool Directory_Iterator::drop() {
     ZoneScoped;
 
+#ifdef _WIN32
+    bool success = FindClose(directory);
+    return success;
+#else
+    int ret = closedir(directory);
+    return ret == 0;
+#endif
+}
+
+int Directory_Iterator::advance() {
+    ZoneScoped;
+
+#ifdef _WIN32
+    if (FindNextFileA(directory, &entry)) {
+        return 1;
+    } else if (GetLastError() == ERROR_NO_MORE_FILES) {
+        return 0;
+    } else {
+        return -1;
+    }
+#else
     errno = 0;
-    dirent* dirent = readdir((DIR*)_dir);
+    dirent* dirent = readdir(directory);
     if (dirent) {
-        Str file = dirent->d_name;
-        if (file == "." || file == "..") {
-            return advance(allocator, out);
+        // Skip . and ..
+        if (!strcmp(dirent->d_name, ".") || !strcmp(dirent->d_name, "..")) {
+            return advance();
         }
 
-        out->reserve(allocator, file.len + 1);
-        out->append(file);
-        out->null_terminate();
-        return Result::ok();
+        entry = dirent;
+        return 1;
     } else if (errno == 0) {
-        _done = true;
-        return Result::ok();
+        return 0;
     } else {
-        return Result::last_error();
+        return -1;
     }
-}
-
-Result Directory_Iterator::drop() {
-    ZoneScoped;
-
-    int ret = closedir((DIR*)_dir);
-    (void)ret;
-    CZ_DEBUG_ASSERT(ret == 0);
-    return Result::ok();
-}
-
-Result Directory_Iterator::init(const char* cstr_path, Allocator allocator, String* out) {
-    ZoneScoped;
-
-    DIR* dir = opendir(cstr_path);
-    if (!dir) {
-        return Result::last_error();
-    }
-
-    _dir = dir;
-
-    Result result = advance(allocator, out);
-    if (result.is_err()) {
-        closedir(dir);
-    }
-    return result;
-}
-
-}
 #endif
+}
 
-namespace cz {
+const char* Directory_Iterator::get_name() const {
+#ifdef _WIN32
+    return entry.cFileName;
+#else
+    return entry->d_name;
+#endif
+}
 
-#define define_files_function(STRING, NT)                                                        \
-    Result files##NT(Allocator paths_allocator, Allocator path_allocator, const char* cstr_path, \
-                     Vector<STRING>* files) {                                                    \
-        cz::String file = {};                                                                    \
-                                                                                                 \
-        Directory_Iterator iterator;                                                             \
-        CZ_TRY(iterator.init(cstr_path, path_allocator, &file));                                 \
-                                                                                                 \
-        while (!iterator.done()) {                                                               \
-            file.realloc##NT(path_allocator);                                                    \
-                                                                                                 \
-            files->reserve(paths_allocator, 1);                                                  \
-            files->push(file);                                                                   \
-                                                                                                 \
-            file = {};                                                                           \
-            Result result = iterator.advance(path_allocator, &file);                             \
-            if (result.is_err()) {                                                               \
-                /* Ignore errors in destruction */                                               \
-                iterator.drop();                                                                 \
-                return result;                                                                   \
-            }                                                                                    \
-        }                                                                                        \
-                                                                                                 \
-        return iterator.drop();                                                                  \
+Str Directory_Iterator::str_name() const {
+    return get_name();
+}
+
+void Directory_Iterator::append_name(Allocator allocator, String* string) const {
+    Str name = str_name();
+    string->reserve_exact(allocator, name.len + 1);
+    string->append(name);
+    string->null_terminate();
+}
+
+#define define_files_function(STRING, FIELD)                                          \
+    bool files(Allocator paths_allocator, Allocator path_allocator, const char* path, \
+               Vector<STRING>* files) {                                               \
+        Directory_Iterator iterator;                                                  \
+        int result = iterator.init(path);                                             \
+        if (result <= 0)                                                              \
+            return result == 0;                                                       \
+                                                                                      \
+        while (1) {                                                                   \
+            cz::String file = iterator.str_name().clone_null_terminate(path_allocator);              \
+            files->reserve(paths_allocator, 1);                                       \
+            files->push(file FIELD);                                                  \
+                                                                                      \
+            result = iterator.advance();                                              \
+            if (result <= 0) {                                                        \
+                if (result == 0) {                                                    \
+                    /* No more entries. */                                            \
+                    return iterator.drop();                                           \
+                } else {                                                              \
+                    /* Iteration failed in middle. */                                 \
+                    iterator.drop();                                                  \
+                    return false;                                                     \
+                }                                                                     \
+            }                                                                         \
+        }                                                                             \
     }
 
 // clang-format off
 define_files_function(String,)
 define_files_function(Str,)
-define_files_function(String, _null_terminate)
-define_files_function(Str, _null_terminate)
+define_files_function(const char*, .buffer)
 // clang-format on
 
 }
