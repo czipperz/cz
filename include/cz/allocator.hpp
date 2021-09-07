@@ -74,7 +74,7 @@ struct Allocator {
 
     /// Allocate zeroed memory to store an array of values of the given type using this allocator.
     template <class T>
-    T* alloc_zeroed(size_t count) const {
+    T* alloc_zeroed(size_t count = 1) const {
         AllocInfo info = alloc_info<T>();
         info.size *= count;
         T* ptr = (T*)alloc(info);
