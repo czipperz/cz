@@ -24,6 +24,7 @@
 #else
 #define ZoneScoped
 #define ZoneText(...)
+#define ZoneValue(...)
 #endif
 
 namespace cz {
@@ -171,6 +172,7 @@ int64_t File_Descriptor::get_size() {
 
 int64_t Input_File::read(void* buffer, size_t size) {
     ZoneScoped;
+    ZoneValue(size);
     CZ_DEBUG_ASSERT(is_open());
 
 #ifdef _WIN32
@@ -274,6 +276,7 @@ bool Output_File::open(const char* file) {
 
 int64_t Output_File::write(const void* buffer, size_t size) {
     ZoneScoped;
+    ZoneValue(size);
     CZ_DEBUG_ASSERT(is_open());
 
 #ifdef _WIN32
