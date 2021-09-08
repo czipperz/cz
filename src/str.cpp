@@ -109,37 +109,54 @@ const char* Str::rfind_case_insensitive(cz::Str infix) const {
     return nullptr;
 }
 
+static bool split_excluding_(Str str, const char* sep, Str* before, Str* after) {
+    if (!sep)
+        return false;
+
+    Str ta = str.slice_start(sep + 1);
+    *before = str.slice_end(sep);
+    *after = ta;
+    return true;
+}
+
+static bool split_before_(Str str, const char* sep, Str* before, Str* after) {
+    if (!sep)
+        return false;
+
+    Str ta = str.slice_start(sep);
+    *before = str.slice_end(sep);
+    *after = ta;
+    return true;
+}
+
+static bool split_after_(Str str, const char* sep, Str* before, Str* after) {
+    if (!sep)
+        return false;
+
+    Str ta = str.slice_start(sep + 1);
+    *before = str.slice_end(sep + 1);
+    *after = ta;
+    return true;
+}
+
 bool Str::split_excluding(char separator, Str* before, Str* after) const {
-    const char* sep = find(separator);
-    if (!sep)
-        return false;
-
-    Str ta = slice_start(sep + 1);
-    *before = slice_end(sep);
-    *after = ta;
-    return true;
+    return split_excluding_(*this, find(separator), before, after);
 }
-
 bool Str::split_before(char separator, Str* before, Str* after) const {
-    const char* sep = find(separator);
-    if (!sep)
-        return false;
-
-    Str ta = slice_start(sep);
-    *before = slice_end(sep);
-    *after = ta;
-    return true;
+    return split_before_(*this, find(separator), before, after);
+}
+bool Str::split_after(char separator, Str* before, Str* after) const {
+    return split_after_(*this, find(separator), before, after);
 }
 
-bool Str::split_after(char separator, Str* before, Str* after) const {
-    const char* sep = find(separator);
-    if (!sep)
-        return false;
-
-    Str ta = slice_start(sep + 1);
-    *before = slice_end(sep + 1);
-    *after = ta;
-    return true;
+bool Str::split_excluding_last(char separator, Str* before, Str* after) const {
+    return split_excluding_(*this, rfind(separator), before, after);
+}
+bool Str::split_before_last(char separator, Str* before, Str* after) const {
+    return split_before_(*this, rfind(separator), before, after);
+}
+bool Str::split_after_last(char separator, Str* before, Str* after) const {
+    return split_after_(*this, rfind(separator), before, after);
 }
 
 void Str::split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str>* values) const {

@@ -274,6 +274,16 @@ struct String {
         as_str().split_after(separator, before, after);
     }
 
+    void split_excluding_last(char separator, cz::Str* before, cz::Str* after) const {
+        as_str().split_excluding_last(separator, before, after);
+    }
+    void split_before_last(char separator, cz::Str* before, cz::Str* after) const {
+        as_str().split_before_last(separator, before, after);
+    }
+    void split_after_last(char separator, cz::Str* before, cz::Str* after) const {
+        as_str().split_after_last(separator, before, after);
+    }
+
     void split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str>* values) {
         as_str().split_into(separator, allocator, values);
     }
