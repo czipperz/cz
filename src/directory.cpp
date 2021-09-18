@@ -45,21 +45,20 @@ int Directory_Iterator::init(const char* cstr_path) {
     // . and .. are always first if they are present.
     if (!strcmp(entry.cFileName, ".")) {
         if (!FindNextFileA(handle, &entry)) {
+            drop();
             if (GetLastError() == ERROR_NO_MORE_FILES) {
                 return 0;
             } else {
-                drop();
                 return -1;
             }
         }
     }
     if (!strcmp(entry.cFileName, "..")) {
         if (!FindNextFileA(handle, &entry)) {
+            drop();
             if (GetLastError() == ERROR_NO_MORE_FILES) {
-                // Note: don't drop so we'll get the same error on `next`.
                 return 0;
             } else {
-                drop();
                 return -1;
             }
         }
@@ -75,7 +74,7 @@ int Directory_Iterator::init(const char* cstr_path) {
 
     int result = advance();
 
-    if (result < 0) {
+    if (result <= 0) {
         drop();
     }
 
