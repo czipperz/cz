@@ -143,31 +143,31 @@ void Directory_Iterator::append_name(Allocator allocator, String* string) const 
     string->null_terminate();
 }
 
-#define define_files_function(STRING, FIELD)                                          \
-    bool files(Allocator paths_allocator, Allocator path_allocator, const char* path, \
-               Vector<STRING>* files) {                                               \
-        Directory_Iterator iterator;                                                  \
-        int result = iterator.init(path);                                             \
-        if (result <= 0)                                                              \
-            return result == 0;                                                       \
-                                                                                      \
-        while (1) {                                                                   \
-            cz::String file = iterator.str_name().clone_null_terminate(path_allocator);              \
-            files->reserve(paths_allocator, 1);                                       \
-            files->push(file FIELD);                                                  \
-                                                                                      \
-            result = iterator.advance();                                              \
-            if (result <= 0) {                                                        \
-                if (result == 0) {                                                    \
-                    /* No more entries. */                                            \
-                    return iterator.drop();                                           \
-                } else {                                                              \
-                    /* Iteration failed in middle. */                                 \
-                    iterator.drop();                                                  \
-                    return false;                                                     \
-                }                                                                     \
-            }                                                                         \
-        }                                                                             \
+#define define_files_function(STRING, FIELD)                                            \
+    bool files(Allocator paths_allocator, Allocator path_allocator, const char* path,   \
+               Vector<STRING>* files) {                                                 \
+        Directory_Iterator iterator;                                                    \
+        int result = iterator.init(path);                                               \
+        if (result <= 0)                                                                \
+            return result == 0;                                                         \
+                                                                                        \
+        while (1) {                                                                     \
+            cz::String file = iterator.str_name().clone_null_terminate(path_allocator); \
+            files->reserve(paths_allocator, 1);                                         \
+            files->push(file FIELD);                                                    \
+                                                                                        \
+            result = iterator.advance();                                                \
+            if (result <= 0) {                                                          \
+                if (result == 0) {                                                      \
+                    /* No more entries. */                                              \
+                    return iterator.drop();                                             \
+                } else {                                                                \
+                    /* Iteration failed in middle. */                                   \
+                    iterator.drop();                                                    \
+                    return false;                                                       \
+                }                                                                       \
+            }                                                                           \
+        }                                                                               \
     }
 
 // clang-format off
