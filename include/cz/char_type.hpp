@@ -75,6 +75,10 @@ inline bool is_alnum(char ch) {
     return is_alpha(ch) || is_digit(ch);
 }
 
+#define CZ_SPACE_CASES ' ' : case '\f' : case '\n' : case '\r' : case '\t' : case '\v'
+#define CZ_SPACE_LINE_CASES '\f' : case '\n' : case '\r' : case '\v'
+#define CZ_BLANK_CASES ' ' : case '\t'
+
 #define CZ_DIGIT_CASES                                                                          \
     '0' : case '1' : case '2' : case '3' : case '4' : case '5' : case '6' : case '7' : case '8' \
         : case '9'
