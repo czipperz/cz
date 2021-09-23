@@ -3,7 +3,7 @@
 /// A `Coroutine` is a user-space thread that yields priority at
 /// will.  This is useful for when you need lightweight threads.
 ///
-/// Note that under the hood `CZ_CO_START` is a `swtich` statement and `CZ_CO_YIELD` is a `return`
+/// Note that under the hood `CZ_CO_START` is a `switch` statement and `CZ_CO_YIELD` is a `return`
 /// statement.  Using a local variable or `CZ_DEFER` in conjugation with a `Coroutine` is not a good
 /// idea.  Instead store the variables you want to use in the struct you derive from `Coroutine`.
 ///
