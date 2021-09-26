@@ -23,6 +23,10 @@ Iterator dedup(Iterator start, Iterator end, Is_Equal&& is_equal, Set&& set) {
             ++insert;
         }
     }
+    if (start < end) {
+        set(insert, start);
+        ++insert;
+    }
 
     return insert;
 }
