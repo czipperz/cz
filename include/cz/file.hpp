@@ -50,7 +50,7 @@ struct File_Descriptor {
 
     static constexpr void* const Null_ = (void*)-1;
 #else
-    int fd = Null_;
+    int handle = Null_;
 
     static constexpr const int Null_ = -1;
 #endif

@@ -36,17 +36,13 @@ void File_Descriptor::close() {
 #ifdef _WIN32
         CloseHandle(handle);
 #else
-        ::close(fd);
+        ::close(handle);
 #endif
     }
 }
 
 bool File_Descriptor::is_open() const {
-#ifdef _WIN32
     return handle != Null_;
-#else
-    return fd != Null_;
-#endif
 }
 
 bool Input_File::open(const char* file) {
@@ -67,8 +63,8 @@ bool Input_File::open(const char* file) {
     handle = h;
     return true;
 #else
-    fd = ::open(file, O_RDONLY);
-    return fd != -1;
+    handle = ::open(file, O_RDONLY);
+    return handle != -1;
 #endif
 }
 
@@ -80,11 +76,11 @@ bool File_Descriptor::set_non_blocking() {
     DWORD mode = PIPE_NOWAIT;
     return SetNamedPipeHandleState(handle, &mode, NULL, NULL);
 #else
-    int res = fcntl(fd, F_GETFL);
+    int res = fcntl(handle, F_GETFL);
     if (res < 0) {
         return false;
     }
-    if (fcntl(fd, F_SETFL, res | O_NONBLOCK) < 0) {
+    if (fcntl(handle, F_SETFL, res | O_NONBLOCK) < 0) {
         return false;
     }
     return true;
@@ -98,11 +94,11 @@ bool File_Descriptor::set_non_inheritable() {
 #ifdef _WIN32
     return SetHandleInformation(handle, HANDLE_FLAG_INHERIT, FALSE);
 #else
-    int res = fcntl(fd, F_GETFD);
+    int res = fcntl(handle, F_GETFD);
     if (res < 0) {
         return false;
     }
-    if (fcntl(fd, F_SETFD, res | O_CLOEXEC) < 0) {
+    if (fcntl(handle, F_SETFD, res | O_CLOEXEC) < 0) {
         return false;
     }
     return true;
@@ -147,7 +143,7 @@ int64_t File_Descriptor::set_position(int64_t value, Relative_To relative_to) {
             break;
     }
 
-    return lseek(fd, value, whence);
+    return lseek(handle, value, whence);
 #endif
 }
 
@@ -163,7 +159,7 @@ int64_t File_Descriptor::get_size() {
     return file_size.QuadPart;
 #else
     struct stat buf;
-    if (fstat(fd, &buf) < 0) {
+    if (fstat(handle, &buf) < 0) {
         return -1;
     }
     return buf.st_size;
@@ -192,7 +188,7 @@ int64_t Input_File::read(void* buffer, size_t size) {
         }
     }
 #else
-    return ::read(fd, buffer, size);
+    return ::read(handle, buffer, size);
 #endif
 }
 
@@ -269,8 +265,8 @@ bool Output_File::open(const char* file) {
     handle = h;
     return true;
 #else
-    fd = ::open(file, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-    return fd != -1;
+    handle = ::open(file, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    return handle != -1;
 #endif
 }
 
@@ -287,7 +283,7 @@ int64_t Output_File::write(const void* buffer, size_t size) {
         return -1;
     }
 #else
-    return ::write(fd, buffer, size);
+    return ::write(handle, buffer, size);
 #endif
 }
 
@@ -348,7 +344,7 @@ Input_File std_in_file() {
 #ifdef _WIN32
     file.handle = GetStdHandle(STD_INPUT_HANDLE);
 #else
-    file.fd = 0;
+    file.handle = 0;
 #endif
     return file;
 }
@@ -358,7 +354,7 @@ Output_File std_out_file() {
 #ifdef _WIN32
     file.handle = GetStdHandle(STD_OUTPUT_HANDLE);
 #else
-    file.fd = 1;
+    file.handle = 1;
 #endif
     return file;
 }
@@ -368,7 +364,7 @@ Output_File std_err_file() {
 #ifdef _WIN32
     file.handle = GetStdHandle(STD_ERROR_HANDLE);
 #else
-    file.fd = 2;
+    file.handle = 2;
 #endif
     return file;
 }
@@ -399,12 +395,7 @@ void Process_Options::close_all() {
 
     std_in.close();
     std_out.close();
-#ifdef _WIN32
-    if (std_out.handle != std_err.handle)
-#else
-    if (std_out.fd != std_err.fd)
-#endif
-    {
+    if (std_out.handle != std_err.handle) {
         std_err.close();
     }
 }
@@ -425,8 +416,8 @@ bool create_pipe(Input_File* input, Output_File* output) {
         return false;
     }
 
-    input->fd = fds[0];
-    output->fd = fds[1];
+    input->handle = fds[0];
+    output->handle = fds[1];
     return true;
 #endif
 }
@@ -835,14 +826,14 @@ bool Process::launch_program(cz::Slice<const cz::Str> args, const Process_Option
     if (pid < 0) {
         return false;
     } else if (pid == 0) {  // child process
-        bind_pipe(options.std_in.fd, 0);
-        bind_pipe(options.std_out.fd, 1);
-        bind_pipe(options.std_err.fd, 2);
+        bind_pipe(options.std_in.handle, 0);
+        bind_pipe(options.std_out.handle, 1);
+        bind_pipe(options.std_err.handle, 2);
 
-        close(options.std_in.fd);
-        close(options.std_out.fd);
-        if (options.std_err.fd != options.std_out.fd) {
-            close(options.std_err.fd);
+        close(options.std_in.handle);
+        close(options.std_out.handle);
+        if (options.std_err.handle != options.std_out.handle) {
+            close(options.std_err.handle);
         }
 
         if (options.working_directory) {
