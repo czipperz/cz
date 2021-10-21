@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include "ptr.hpp"
+#include "type_traits.hpp"
 
 namespace cz {
 struct Allocator;
@@ -27,7 +28,7 @@ struct Slice {
     constexpr operator Slice<const T>() const { return {elems, len}; }
 
     // Note the implementation for this is in vector.hpp.
-    Vector<T> clone(Allocator allocator) const;
+    Vector<Remove_CV<T> > clone(Allocator allocator) const;
 
     constexpr T* begin() const { return elems; }
     constexpr T* start() const { return elems; }
