@@ -58,7 +58,7 @@ bool has_component(Str path, Str component);
 /// The path must use forward slashes.
 void flatten(char* path, size_t* len);
 
-/// See `flatten_path(char*, size_t*)`.
+/// See `flatten(char*, size_t*)`.
 void flatten(String* path);
 
 /// Test if the path is absolute.
