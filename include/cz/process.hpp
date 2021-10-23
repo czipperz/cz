@@ -23,6 +23,11 @@ struct Process_Options {
     /// Detach from the parent process instead of becoming a child process.
     bool detach = false;
 
+#ifdef _WIN32
+    /// The Pseudo Console device to attach the child process to.
+    void* pseudo_console = nullptr;
+#endif
+
     void close_all();
 };
 

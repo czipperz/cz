@@ -578,17 +578,30 @@ bool Process::try_join(int* exit_code) {
 }
 
 #ifdef _WIN32
+static LPPROC_THREAD_ATTRIBUTE_LIST make_pseudo_console_attribute_list(HPCON pseudo_console);
+static void cleanup_pseudo_console_attribute_list(LPPROC_THREAD_ATTRIBUTE_LIST attributes);
+
 static bool launch_script_(char* script, const Process_Options& options, HANDLE* hProcess) {
     ZoneScoped;
 
-    STARTUPINFO si;
+    // Use STARTUPINFOEX to allow Pseudo Console support if we need it.
+    STARTUPINFOEX si;
     ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
-    si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
-    si.hStdError = options.std_err.handle;
-    si.hStdOutput = options.std_out.handle;
-    si.hStdInput = options.std_in.handle;
-    si.wShowWindow = SW_HIDE;
+    if (options.pseudo_console) {
+        si.StartupInfo.cb = sizeof(STARTUPINFOEX);
+        si.lpAttributeList = make_pseudo_console_attribute_list((HPCON)options.pseudo_console);
+        if (!si.lpAttributeList)
+            return false;
+    } else {
+        si.StartupInfo.cb = sizeof(STARTUPINFO);
+        si.StartupInfo.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
+        si.StartupInfo.hStdError = options.std_err.handle;
+        si.StartupInfo.hStdOutput = options.std_out.handle;
+        si.StartupInfo.hStdInput = options.std_in.handle;
+        si.StartupInfo.wShowWindow = SW_HIDE;
+    }
+
+    CZ_DEFER(cleanup_pseudo_console_attribute_list(si.lpAttributeList));
 
     PROCESS_INFORMATION pi;
     ZeroMemory(&pi, sizeof(pi));
@@ -597,15 +610,56 @@ static bool launch_script_(char* script, const Process_Options& options, HANDLE*
     if (options.detach) {
         creation_flags |= DETACHED_PROCESS;
     }
+    if (options.pseudo_console) {
+        creation_flags |= EXTENDED_STARTUPINFO_PRESENT;
+    }
 
-    if (!CreateProcessA(nullptr, script, nullptr, nullptr, TRUE, creation_flags, nullptr,
-                        options.working_directory, &si, &pi)) {
+    if (!CreateProcessA(nullptr, script, nullptr, nullptr, true, creation_flags, nullptr,
+                        options.working_directory, &si.StartupInfo, &pi)) {
         return false;
     }
 
     *hProcess = pi.hProcess;
     CloseHandle(pi.hThread);
     return true;
+}
+
+static LPPROC_THREAD_ATTRIBUTE_LIST make_pseudo_console_attribute_list(HPCON pseudo_console) {
+    // The size isn't static so we have to query the size...
+    size_t size = 0;
+    // Note: intentionally disregard errors, they are expected.
+    InitializeProcThreadAttributeList(nullptr, 1, 0, &size);
+
+    // Then dynamically allocate...
+    LPPROC_THREAD_ATTRIBUTE_LIST attributes =
+        (LPPROC_THREAD_ATTRIBUTE_LIST)cz::heap_allocator().alloc({size, alignof(max_align_t)});
+    if (!attributes)
+        goto err_alloc;
+
+    // And finally initialize our struct.
+    if (!InitializeProcThreadAttributeList(attributes, 1, 0, &size))
+        goto err_init;
+
+    // Tell the child process that is in inside a pseudo console.
+    if (!UpdateProcThreadAttribute(attributes, 0, PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE,
+                                   pseudo_console, sizeof(HPCON), nullptr, nullptr))
+        goto err_update;
+
+    return attributes;
+
+err_update:
+    DeleteProcThreadAttributeList(attributes);
+err_init:
+    cz::heap_allocator().dealloc({attributes, size});
+err_alloc:
+    return nullptr;
+}
+
+static void cleanup_pseudo_console_attribute_list(LPPROC_THREAD_ATTRIBUTE_LIST attributes) {
+    if (attributes) {
+        DeleteProcThreadAttributeList(attributes);
+        cz::heap_allocator().dealloc({attributes, 0});
+    }
 }
 
 static void escape_backslashes(cz::String* script, cz::Str arg, size_t i) {
