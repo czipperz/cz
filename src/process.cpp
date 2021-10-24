@@ -594,11 +594,10 @@ static bool launch_script_(char* script, const Process_Options& options, HANDLE*
             return false;
     } else {
         si.StartupInfo.cb = sizeof(STARTUPINFO);
-        si.StartupInfo.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
+        si.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
         si.StartupInfo.hStdError = options.std_err.handle;
         si.StartupInfo.hStdOutput = options.std_out.handle;
         si.StartupInfo.hStdInput = options.std_in.handle;
-        si.StartupInfo.wShowWindow = SW_HIDE;
     }
 
     CZ_DEFER(cleanup_pseudo_console_attribute_list(si.lpAttributeList));
