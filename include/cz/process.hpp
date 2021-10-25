@@ -23,6 +23,17 @@ struct Process_Options {
     /// Detach from the parent process instead of becoming a child process.
     bool detach = false;
 
+    /// Set the environment of the subprocess.
+#ifdef _WIN32
+    /// On Windows, make a string of the form:
+    /// `"KEY1=VALUE1\0KEY2=VALUE2\0...KEYn=VALUE2n\0\0"`.
+    char* environment = nullptr;
+#else
+    /// On Linux, make an array of strings of the form:
+    /// `{ "KEY1=VALUE1\0", "KEY2=VALUE2\0", ..., "KEYn=VALUEn\0", nullptr }`.
+    char** environment = nullptr;
+#endif
+
 #ifdef _WIN32
     /// The Pseudo Console device to attach the child process to.
     void* pseudo_console = nullptr;

@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+extern char** environ;
 #endif
 
 #include <stdlib.h>
@@ -614,8 +615,8 @@ static bool launch_script_(char* script, const Process_Options& options, HANDLE*
     }
     creation_flags |= CREATE_NO_WINDOW;
 
-    if (!CreateProcessA(nullptr, script, nullptr, nullptr, true, creation_flags, nullptr,
-                        options.working_directory, &si.StartupInfo, &pi)) {
+    if (!CreateProcessA(nullptr, script, nullptr, nullptr, true, creation_flags,
+                        options.environment, options.working_directory, &si.StartupInfo, &pi)) {
         return false;
     }
 
@@ -894,6 +895,10 @@ bool Process::launch_program(cz::Slice<const cz::Str> args, const Process_Option
 
         if (options.working_directory) {
             chdir(options.working_directory);
+        }
+
+        if (options.environment) {
+            environ = options.environment;
         }
 
         if (options.detach) {
