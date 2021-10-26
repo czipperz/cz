@@ -887,10 +887,16 @@ bool Process::launch_program(cz::Slice<const cz::Str> args, const Process_Option
         bind_pipe(options.std_out.handle, 1);
         bind_pipe(options.std_err.handle, 2);
 
-        close(options.std_in.handle);
-        close(options.std_out.handle);
-        if (options.std_err.handle != options.std_out.handle) {
-            close(options.std_err.handle);
+        if (options.std_in.handle != 0) {
+            close(options.std_in.handle);
+        }
+        if (options.std_out.handle != 1) {
+            close(options.std_out.handle);
+        }
+        if (options.std_err.handle != 2) {
+            if (options.std_err.handle != options.std_out.handle) {
+                close(options.std_err.handle);
+            }
         }
 
         if (options.working_directory) {
