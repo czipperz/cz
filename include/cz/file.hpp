@@ -170,6 +170,9 @@ struct Output_File : File_Descriptor {
 #endif
     }
     int64_t write_text(cz::Str str) { return write_text(str.buffer, str.len); }
+
+    /// Flush writes to the file.
+    bool flush();
 };
 
 int64_t write_loop(Output_File file, const char* buffer, size_t size);

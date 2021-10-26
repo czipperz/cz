@@ -324,6 +324,17 @@ int64_t Output_File::write_add_carriage_returns(const char* buffer, size_t size)
     }
 }
 
+bool Output_File::flush() {
+    ZoneScoped;
+    CZ_DEBUG_ASSERT(is_open());
+
+#ifdef _WIN32
+    return FlushFileBuffers(handle);
+#else
+    return fsync(handle) == 0;
+#endif
+}
+
 int64_t write_loop(Output_File file, const char* buffer, size_t size) {
     size_t written = 0;
     while (written < size) {
