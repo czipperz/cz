@@ -99,7 +99,7 @@ bool File_Descriptor::set_non_inheritable() {
     if (res < 0) {
         return false;
     }
-    if (fcntl(handle, F_SETFD, res | O_CLOEXEC) < 0) {
+    if (fcntl(handle, F_SETFD, res | FD_CLOEXEC) < 0) {
         return false;
     }
     return true;
