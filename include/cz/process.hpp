@@ -37,6 +37,12 @@ struct Process_Options {
 #ifdef _WIN32
     /// The Pseudo Console device to attach the child process to.
     void* pseudo_console = nullptr;
+
+    /// If `true` then the spawned window will be hidden.
+    /// Terminal applications should set this to hide the console window.
+    /// See `STARTUPINFO` referenced in:
+    /// https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showwindow#parameters
+    bool hide_window = false;
 #endif
 
     void close_all();
