@@ -279,7 +279,7 @@ int64_t Output_File::write(const void* buffer, size_t size) {
 #ifdef _WIN32
     DWORD bytes;
     if (WriteFile(handle, buffer, (DWORD)size, &bytes, NULL)) {
-        if (bytes == 0)
+        if (bytes == 0 && size != 0)
             return -1;  // No space left.
         return bytes;
     } else {
