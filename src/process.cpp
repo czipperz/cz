@@ -88,6 +88,25 @@ bool File_Descriptor::set_non_blocking() {
 #endif
 }
 
+bool File_Descriptor::set_blocking() {
+    ZoneScoped;
+    CZ_DEBUG_ASSERT(is_open());
+
+#ifdef _WIN32
+    DWORD mode = 0;
+    return SetNamedPipeHandleState(handle, &mode, NULL, NULL);
+#else
+    int res = fcntl(handle, F_GETFL);
+    if (res < 0) {
+        return false;
+    }
+    if (fcntl(handle, F_SETFL, res & ~O_NONBLOCK) < 0) {
+        return false;
+    }
+    return true;
+#endif
+}
+
 bool File_Descriptor::set_non_inheritable() {
     ZoneScoped;
     CZ_DEBUG_ASSERT(is_open());
@@ -100,6 +119,24 @@ bool File_Descriptor::set_non_inheritable() {
         return false;
     }
     if (fcntl(handle, F_SETFD, res | FD_CLOEXEC) < 0) {
+        return false;
+    }
+    return true;
+#endif
+}
+
+bool File_Descriptor::set_inheritable() {
+    ZoneScoped;
+    CZ_DEBUG_ASSERT(is_open());
+
+#ifdef _WIN32
+    return SetHandleInformation(handle, HANDLE_FLAG_INHERIT, TRUE);
+#else
+    int res = fcntl(handle, F_GETFD);
+    if (res < 0) {
+        return false;
+    }
+    if (fcntl(handle, F_SETFD, res & ~FD_CLOEXEC) < 0) {
         return false;
     }
     return true;
