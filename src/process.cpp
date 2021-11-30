@@ -628,8 +628,10 @@ static bool launch_script_(char* script, const Process_Options& options, HANDLE*
     }
     if (options.pseudo_console) {
         creation_flags |= EXTENDED_STARTUPINFO_PRESENT;
+    } else {
+        // CREATE_NO_WINDOW seems to cancel out the pseudo console flag.  Wacky stuff.
+        creation_flags |= CREATE_NO_WINDOW;
     }
-    creation_flags |= CREATE_NO_WINDOW;
 
     if (!CreateProcessA(nullptr, script, nullptr, nullptr, true, creation_flags,
                         options.environment, options.working_directory, &si.StartupInfo, &pi)) {
