@@ -71,6 +71,9 @@ struct Vector {
 
     /// Duplicate the vector.
     Vector<Remove_CV<T> > clone(Allocator allocator) const {
+        if (len == 0)
+            return {};
+
         Vector<Remove_CV<T> > result = {};
         result.reserve_exact_total(allocator, len);
         result.append(as_slice());
@@ -271,6 +274,9 @@ void Vector<T>::reserve_exact_total(Allocator allocator, size_t total) {
 
 template <class T>
 Vector<Remove_CV<T> > Slice<T>::clone(Allocator allocator) const {
+    if (len == 0)
+        return {};
+
     using U = Remove_CV<T>;
     U* ts = allocator.alloc<U>(len);
     CZ_ASSERT(ts);

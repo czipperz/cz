@@ -8,6 +8,9 @@
 namespace cz {
 
 String Str::clone(Allocator allocator) const {
+    if (len == 0)
+        return {};
+
     auto ptr = static_cast<char*>(allocator.alloc({len, 1}));
     CZ_ASSERT(ptr != nullptr);
     memcpy(ptr, buffer, len);
