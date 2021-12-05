@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+#include "assert.hpp"
 #include "ptr.hpp"
 #include "type_traits.hpp"
 
@@ -22,8 +23,11 @@ struct Slice {
     template <size_t len>
     constexpr Slice(T (&arr)[len]) : elems(arr), len(len) {}
 
-    constexpr T& operator[](size_t index) const { return elems[index]; }
-    constexpr T& get(size_t index) const { return elems[index]; }
+    T& operator[](size_t index) const { return get(index); }
+    T& get(size_t index) const {
+        CZ_DEBUG_ASSERT(index < len);
+        return elems[index];
+    }
 
     constexpr operator Slice<const T>() const { return {elems, len}; }
 
