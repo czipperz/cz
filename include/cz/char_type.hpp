@@ -106,4 +106,8 @@ inline bool is_alnum(char ch) {
     CZ_LOWER_CASES:    \
     case CZ_UPPER_CASES
 
+#define CZ_ALNUM_CASES \
+    CZ_ALPHA_CASES:    \
+    case CZ_DIGIT_CASES
+
 }
