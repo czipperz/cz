@@ -117,4 +117,12 @@ struct Allocator {
     }
 };
 
+/// Change the allocator that the thing is allocated in.
+template <class T>
+void change_allocator(cz::Allocator old_allocator, cz::Allocator new_allocator, T* thing) {
+    auto copy = thing->clone(new_allocator);
+    thing->drop(old_allocator);
+    *thing = copy;
+}
+
 }
