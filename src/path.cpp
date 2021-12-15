@@ -215,7 +215,7 @@ void flatten(String* string) {
 
 bool is_absolute(Str file) {
 #ifdef _WIN32
-    return file.len >= 3 && cz::is_alpha(file[0]) && file[1] == ':' && file[2] == '/';
+    return file.len >= 3 && cz::is_alpha(file[0]) && file[1] == ':' && (file[2] == '/' || file[2] == '\\');
 #else
     return file.len >= 1 && file[0] == '/';
 #endif
