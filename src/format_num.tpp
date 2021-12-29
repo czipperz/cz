@@ -2,6 +2,8 @@
 #error
 #endif
 
+#include <cz/stringify.hpp>
+
 void append(cz::Allocator allocator, cz::String* string, UNSIGNED x) {
     size_t start = string->len;
 
@@ -19,8 +21,8 @@ void append(cz::Allocator allocator, cz::String* string, UNSIGNED x) {
 }
 
 void append(cz::Allocator allocator, cz::String* string, SIGNED x) {
-    if (~x == 0) {
-        append(allocator, string, MIN);
+    if (x == MIN) {
+        append(allocator, string, CZ_STRINGIFY(MIN));
         return;
     }
 

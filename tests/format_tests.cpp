@@ -63,20 +63,32 @@ TEST_CASE("format number limits") {
 TEST_CASE("format number normal") {
     FORMAT_NUM_CHECK(int16_t, 0);
     FORMAT_NUM_CHECK(int16_t, 42);
+    FORMAT_NUM_CHECK(int16_t, 1);
+    FORMAT_NUM_CHECK(int16_t, -1);
     FORMAT_NUM_CHECK(uint16_t, 0);
     FORMAT_NUM_CHECK(uint16_t, 42);
+    FORMAT_NUM_CHECK(uint16_t, 1);
     FORMAT_NUM_CHECK(int32_t, 0);
     FORMAT_NUM_CHECK(int32_t, 42);
+    FORMAT_NUM_CHECK(int32_t, 1);
+    FORMAT_NUM_CHECK(int32_t, -1);
     FORMAT_NUM_CHECK(uint32_t, 0);
     FORMAT_NUM_CHECK(uint32_t, 42);
+    FORMAT_NUM_CHECK(uint32_t, 1);
     FORMAT_NUM_CHECK(int64_t, 0);
     FORMAT_NUM_CHECK(int64_t, 42);
+    FORMAT_NUM_CHECK(int64_t, 1);
+    FORMAT_NUM_CHECK(int64_t, -1);
     FORMAT_NUM_CHECK(uint64_t, 0);
     FORMAT_NUM_CHECK(uint64_t, 42);
+    FORMAT_NUM_CHECK(uint64_t, 1);
 #ifdef __SIZEOF_INT128__
     FORMAT_NUM_CHECK(__int128_t, 0);
     FORMAT_NUM_CHECK(__int128_t, 42);
+    FORMAT_NUM_CHECK(__int128_t, 1);
+    FORMAT_NUM_CHECK(__int128_t, -1);
     FORMAT_NUM_CHECK(__uint128_t, 0);
     FORMAT_NUM_CHECK(__uint128_t, 42);
+    FORMAT_NUM_CHECK(__uint128_t, 1);
 #endif
 }
