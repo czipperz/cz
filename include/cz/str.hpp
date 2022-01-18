@@ -216,7 +216,11 @@ struct Str {
                         cz::Vector<cz::Str>* values) const;
 
     /// Take a substring of the string.
-    cz::Str slice(size_t start, size_t end) const { return {buffer + start, end - start}; }
+    cz::Str slice(size_t start, size_t end) const {
+        CZ_DEBUG_ASSERT(start <= len);
+        CZ_DEBUG_ASSERT(end <= len);
+        return {buffer + start, end - start};
+    }
     cz::Str slice(const char* start, size_t end) const { return slice(start - buffer, end); }
     cz::Str slice(size_t start, const char* end) const { return slice(start, end - buffer); }
     cz::Str slice(const char* start, const char* end) const {
