@@ -215,7 +215,7 @@ void flatten(String* string) {
 
 bool is_absolute(Str file) {
 #ifdef _WIN32
-    return file.len >= 3 && cz::is_alpha(file[0]) && file[1] == ':' && (file[2] == '/' || file[2] == '\\');
+    return file.len >= 3 && cz::is_alpha(file[0]) && file[1] == ':' && is_dir_sep(file[2]);
 #else
     return file.len >= 1 && file[0] == '/';
 #endif
@@ -235,21 +235,28 @@ static bool generic_make_absolute(Str file, Allocator allocator, String* path, P
             return false;
 
 #ifdef _WIN32
-        // Handle X:relpath
         if (file.len >= 2 && cz::is_alpha(file[0]) && file[1] == ':') {
+            // Handle X:relpath
             CZ_DEBUG_ASSERT(path->len >= 2 && cz::is_alpha((*path)[0]) && (*path)[1] == ':');
+            if (path->len >= 2 && cz::is_alpha((*path)[0]) && (*path)[1] == ':') {
+                if (cz::to_lower((*path)[0]) != cz::to_lower(file[0])) {
+                    // The working directory is set on a different
+                    // drive so pretend this file is absolute.
+                    path->len = path_len;
+                    path->reserve(allocator, 3 + file.len + 1);
+                    path->append(file.slice_end(2));
+                }
 
-            if (cz::to_lower((*path)[0]) != cz::to_lower(file[0])) {
-                // The working directory is set on a different
-                // drive so pretend this file is absolute.
-                path->len = path_len;
-                path->reserve(allocator, 3 + file.len + 1);
-                path->append(file.slice_end(2));
+                // Remove X: prefix
+                file.buffer += 2;
+                file.len -= 2;
             }
-
-            // Remove X: prefix
-            file.buffer += 2;
-            file.len -= 2;
+        } else if (file.len >= 1 && is_dir_sep(file[0])) {
+            // Handle /drive/rel/path by only taking the X: from the 'path'.
+            CZ_DEBUG_ASSERT(path->len >= 2 && cz::is_alpha((*path)[0]) && (*path)[1] == ':');
+            if (path->len >= 2 && cz::is_alpha((*path)[0]) && (*path)[1] == ':') {
+                path->len = 2;
+            }
         }
 #endif
 
