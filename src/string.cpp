@@ -96,4 +96,17 @@ void String::remove_many(size_t index, size_t count) {
     len -= count;
 }
 
+void String::replace(char before, char after) {
+    cz::Str str = *this;
+    while (1) {
+        const char* ptr = str.find(before);
+        if (!ptr)
+            return;
+
+        *(char*)ptr = after;
+
+        str = str.slice_start(ptr + 1);
+    }
+}
+
 }

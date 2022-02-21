@@ -101,6 +101,9 @@ struct String {
         return remove_many(start, end - start);
     }
 
+    /// Replace all instances of before with after.
+    void replace(char before, char after);
+
     ///
     /// Miscellaneous commands.
     ///
