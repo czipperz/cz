@@ -22,6 +22,12 @@ bool is_directory_and_not_symlink(const char* path);
 /// On other failures returns 1.
 int create_directory(const char* path);
 
+/// Remove an empty directory.  Returns `true` if successful.
+bool remove_empty_directory(const char* path);
+
+/// Remove a non-directory file.  Returns `true` if successful.
+bool remove_file(const char* path);
+
 }
 
 namespace Relative_To_ {

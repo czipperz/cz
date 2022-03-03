@@ -90,5 +90,21 @@ int create_directory(const char* path) {
 #endif
 }
 
+bool remove_empty_directory(const char* path) {
+#ifdef _WIN32
+    return RemoveDirectoryA(path);
+#else
+    return rmdir(path) == 0;
+#endif
+}
+
+bool remove_file(const char* path) {
+#ifdef _WIN32
+    return DeleteFileA(path);
+#else
+    return unlink(path) == 0;
+#endif
+}
+
 }
 }
