@@ -81,6 +81,7 @@ struct Directory_Iterator {
     /// Create the iterator for the files in the directory `path`.
     /// Returns `-1` on error, `0` on empty directory, `1` on success.
     /// You only need to `drop` the `Directory_Iterator` if `1` is returned.
+    /// If `path` is null or empty then the current working directory is used.
     int init(const char* path);
 
     /// Should only be called if `init` succeeds.

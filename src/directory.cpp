@@ -19,11 +19,14 @@ namespace cz {
 int Directory_Iterator::init(const char* cstr_path) {
     ZoneScoped;
 
+    if (!cstr_path || cstr_path[0] == '\0')
+        cstr_path = ".";
+
 #ifdef _WIN32
     HANDLE handle;
 
     {
-        // Windows doesn't list the files in a directory, it findes files matching criteria.
+        // Windows doesn't list the files in a directory, it finds files matching criteria.
         // Thus we must append `"\*"` to get all files in the directory `cstr_path`.
         String path = {};
         CZ_DEFER(path.drop(heap_allocator()));
