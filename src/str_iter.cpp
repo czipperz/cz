@@ -47,56 +47,52 @@ void end_of_line(Str_Iter* iter) {
 }
 
 bool find(Str_Iter* iter, char needle) {
-    cz::Str after = iter->str.slice_start(iter->index);
-    const char* ptr = after.find(needle);
+    const char* ptr = iter->after().find(needle);
     if (ptr) {
-        iter->index = ptr - iter->str.buffer;
+        iter->go_to_ptr(ptr);
         return true;
     } else {
-        iter->index = iter->str.len;
+        iter->go_to(iter->str.len);
         return false;
     }
 }
 bool find(Str_Iter* iter, cz::Str needle) {
-    cz::Str after = iter->str.slice_start(iter->index);
-    const char* ptr = after.find(needle);
+    const char* ptr = iter->after().find(needle);
     if (ptr) {
-        iter->index = ptr - iter->str.buffer;
+        iter->go_to_ptr(ptr);
         return true;
     } else {
-        iter->index = iter->str.len;
+        iter->go_to(iter->str.len);
         return false;
     }
 }
 
 bool rfind(Str_Iter* iter, char needle) {
-    cz::Str before = iter->str.slice_end(iter->index);
-    const char* ptr = before.rfind(needle);
+    const char* ptr = iter->after().rfind(needle);
     if (ptr) {
-        iter->index = ptr - iter->str.buffer;
+        iter->go_to_ptr(ptr);
         return true;
     } else {
-        iter->index = 0;
+        iter->go_to(0);
         return false;
     }
 }
 bool rfind(Str_Iter* iter, cz::Str needle) {
-    cz::Str before = iter->str.slice_end(iter->index);
-    const char* ptr = before.rfind(needle);
+    const char* ptr = iter->before().rfind(needle);
     if (ptr) {
-        iter->index = ptr - iter->str.buffer;
+        iter->go_to_ptr(ptr);
         return true;
     } else {
-        iter->index = 0;
+        iter->go_to(0);
         return false;
     }
 }
 
 bool looking_at(Str_Iter* iter, char query) {
-    return iter->str.slice_start(iter->index).starts_with(query);
+    return iter->after().starts_with(query);
 }
 bool looking_at(Str_Iter* iter, cz::Str query) {
-    return iter->str.slice_start(iter->index).starts_with(query);
+    return iter->after().starts_with(query);
 }
 
 }

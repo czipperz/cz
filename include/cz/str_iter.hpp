@@ -28,6 +28,10 @@ struct Str_Iter {
         CZ_DEBUG_ASSERT(pos < str.len);
         index = pos;
     }
+    void go_to_ptr(const char* pos) { go_to(pos - str.buffer); }
+
+    cz::Str before() const { return str.slice_end(index); }
+    cz::Str after() const { return str.slice_start(index); }
 };
 
 void backward_char(Str_Iter* iter);
