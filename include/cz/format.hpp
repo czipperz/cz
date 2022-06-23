@@ -69,6 +69,15 @@ void append(Allocator allocator, String* string, uint32_t);
 void append(Allocator allocator, String* string, int64_t);
 void append(Allocator allocator, String* string, uint64_t);
 
+#if __APPLE__ && __SIZEOF_SIZE_T__ == 8
+inline void append(Allocator allocator, String* string, long value) {
+    return append(allocator, string, (int64_t)value);
+}
+inline void append(Allocator allocator, String* string, unsigned long value) {
+    return append(allocator, string, (uint64_t)value);
+}
+#endif
+
 #ifdef __SIZEOF_INT128__
 void append(Allocator allocator, String* string, __int128_t);
 void append(Allocator allocator, String* string, __uint128_t);
