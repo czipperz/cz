@@ -21,7 +21,10 @@ int64_t parse(cz::Str str, int32_t* out);
 int64_t parse(cz::Str str, int64_t* out);
 
 #if __APPLE__ && __SIZEOF_SIZE_T__ == 8
-inline int64_t parse(cz::Str str, size_t* out) {
+inline int64_t parse(cz::Str str, long* out) {
+    return parse(str, (int64_t*)out);
+}
+inline int64_t parse(cz::Str str, unsigned long* out) {
     return parse(str, (uint64_t*)out);
 }
 #endif
