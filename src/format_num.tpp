@@ -1,4 +1,4 @@
-#if !defined(UNSIGNED) || !defined(SIGNED) || !defined(MIN)
+#if !defined(UNSIGNED) || !defined(SIGNED) || !defined(MIN) || !defined(MINS)
 #error
 #endif
 
@@ -22,7 +22,7 @@ void append(cz::Allocator allocator, cz::String* string, UNSIGNED x) {
 
 void append(cz::Allocator allocator, cz::String* string, SIGNED x) {
     if (x == MIN) {
-        append(allocator, string, CZ_STRINGIFY(MIN));
+        append(allocator, string, MINS);
         return;
     }
 
@@ -36,3 +36,4 @@ void append(cz::Allocator allocator, cz::String* string, SIGNED x) {
 #undef UNSIGNED
 #undef SIGNED
 #undef MIN
+#undef MINS

@@ -125,23 +125,27 @@ void append_vsprintf(Heap_String* string, const char* format, va_list args) {
 
 #define SIGNED int16_t
 #define UNSIGNED uint16_t
-#define MIN -32768
+#define MIN ((int16_t)0x8000ull)
+#define MINS "-32768"
 #include "format_num.tpp"
 
 #define SIGNED int32_t
 #define UNSIGNED uint32_t
-#define MIN -2147483648
+#define MIN ((int32_t)0x80000000ull)
+#define MINS "-2147483648"
 #include "format_num.tpp"
 
 #define SIGNED int64_t
 #define UNSIGNED uint64_t
-#define MIN -9223372036854775808
+#define MIN ((int64_t)0x8000000000000000ull)
+#define MINS "-9223372036854775808"
 #include "format_num.tpp"
 
 #ifdef __SIZEOF_INT128__
 #define SIGNED __int128_t
 #define UNSIGNED __uint128_t
-#define MIN -170141183460469231731687303715884105728
+#define MIN ((__int128_t)((__uint128_t)0x8000000000000000ull << 64 | 0x8000000000000000ull))
+#define MINS "-170141183460469231731687303715884105728"
 #include "format_num.tpp"
 #endif
 
