@@ -43,7 +43,7 @@ inline uint64_t next_power_of_two(uint64_t value) {
 // distinct type from 'unsigned long long' which is how 'uint64_t' is defined.
 #if __APPLE__ && __SIZEOF_SIZE_T__ == 8
 inline uint64_t next_power_of_two(size_t value) {
-    return (uint64_t)value;
+    return next_power_of_two((uint64_t)value);
 }
 #endif
 
