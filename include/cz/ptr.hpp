@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stddef.h>
+
 namespace cz {
 
 #define CZ_DIM(ARRAY) (sizeof(ARRAY) / sizeof(*(ARRAY)))
