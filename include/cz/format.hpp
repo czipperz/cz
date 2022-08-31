@@ -2,10 +2,32 @@
 
 #include <stdarg.h>
 #include <stdint.h>
+#include <stdio.h>
 #include "heap_string.hpp"
 #include "string.hpp"
 
 namespace cz {
+
+template <class... Ts>
+void print(FILE* file, Allocator allocator, Ts... ts) {
+    String string = {};
+    CZ_DEFER(string.drop(allocator));
+    append(allocator, &string, ts...);
+    fwrite(string.buffer, 1, string.len, file);
+}
+
+template <class... Ts>
+void print(FILE* file, Ts... ts) {
+    print(file, cz::heap_allocator(), ts...);
+}
+template <class... Ts>
+void print(Allocator allocator, Ts... ts) {
+    print(stdout, allocator, ts...);
+}
+template <class... Ts>
+void print(Ts... ts) {
+    print(stdout, cz::heap_allocator(), ts...);
+}
 
 /// Run `sprintf` and make the result into a string; null terminates and truncates the string.
 String asprintf(Allocator allocator, const char* format, ...);
