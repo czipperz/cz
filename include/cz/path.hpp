@@ -70,6 +70,12 @@ void flatten(String* path);
 /// The path must use forward slashes.
 bool is_absolute(Str path);
 
+/// A UNC path is of the form `//server/share/path`.  UNC paths are used
+/// for network file shares, links, and sometimes for mounting disks.
+///
+/// This function is only relevant for paths on Windows.
+bool is_unc_path(Str file);
+
 /// Make an absolute path out of the relative path.
 ///
 /// If the input path is not absolute, we append it to the current working directory.

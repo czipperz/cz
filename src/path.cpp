@@ -122,6 +122,7 @@ bool has_component(Str path, Str component) {
 void flatten(char* buffer, size_t* len) {
     size_t index = 0;
     size_t protected_start = 0;
+    int directories = 0;
 
 #ifdef _WIN32
     // Handle \c X:abc by removing the drive here to standardize to the *nix
@@ -130,12 +131,24 @@ void flatten(char* buffer, size_t* len) {
         index += 2;
         protected_start = 2;
     }
+
+    if (is_unc_path({buffer, *len})) {
+        // Ignore ../ in protected part of a UNC path.  IE everything
+        // before path in: `//server/share/path`.
+        directories -= 2;
+    }
 #endif
 
     bool is_absolute = false;
     if (index < *len && buffer[index] == '/') {
         is_absolute = true;
         index += 1;
+
+#ifdef _WIN32
+        // UNC path
+        if (index == 1 && index < *len && buffer[index] == '/')
+            ++index;
+#endif
 
         // Remove multiple / in a row.
         size_t end = index;
@@ -147,8 +160,6 @@ void flatten(char* buffer, size_t* len) {
             *len -= end - index;
         }
     }
-
-    size_t directories = 0;
 
     while (1) {
         if (index + 1 < *len && buffer[index] == '.' && buffer[index + 1] == '.' &&
@@ -172,7 +183,7 @@ void flatten(char* buffer, size_t* len) {
                 *len -= end - start;
                 index = start;
                 --directories;
-            } else if (is_absolute) {
+            } else if (is_absolute && directories == 0) {
                 // Delete ../ at start if we are absolute.
                 size_t end = index + 2 + (index + 2 != *len);
                 memmove(buffer + index, buffer + end, *len - end);
@@ -213,8 +224,8 @@ void flatten(String* string) {
     flatten(string->buffer, &string->len);
 }
 
-static bool is_unc_path(Str file) {
-    // Test regex `//server/path`.
+bool is_unc_path(Str file) {
+    // Test file starts with `//server/`.
     if (file.len < 4 || !is_dir_sep(file[0]) || !is_dir_sep(file[1]))
         return false;
 

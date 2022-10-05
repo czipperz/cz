@@ -274,6 +274,42 @@ TEST_CASE("path::flatten() relative path with drive .. test") {
 
     REQUIRE(Str{buffer, size} == "x:def");
 }
+
+TEST_CASE("path::flatten() unc path basic test") {
+    char buffer[] = "//abc/def/123/../ok";
+    size_t size = sizeof(buffer) - 1;
+
+    flatten(buffer, &size);
+
+    REQUIRE(Str{buffer, size} == "//abc/def/ok");
+}
+
+TEST_CASE("path::flatten() unc path .. at start 1") {
+    char buffer[] = "//../abc/ok";
+    size_t size = sizeof(buffer) - 1;
+
+    flatten(buffer, &size);
+
+    REQUIRE(Str{buffer, size} == "//../abc/ok");
+}
+
+TEST_CASE("path::flatten() unc path .. at start 2") {
+    char buffer[] = "//abc/../ok";
+    size_t size = sizeof(buffer) - 1;
+
+    flatten(buffer, &size);
+
+    REQUIRE(Str{buffer, size} == "//abc/../ok");
+}
+
+TEST_CASE("path::flatten() unc path .. at start 3") {
+    char buffer[] = "//abc/def/../ok";
+    size_t size = sizeof(buffer) - 1;
+
+    flatten(buffer, &size);
+
+    REQUIRE(Str{buffer, size} == "//abc/def/ok");
+}
 #endif
 
 TEST_CASE("path::flatten() /// at start are collapsed") {
@@ -282,7 +318,12 @@ TEST_CASE("path::flatten() /// at start are collapsed") {
 
     flatten(buffer, &size);
 
+#ifdef _WIN32
+    // UNC paths are only handled on Windows.
+    REQUIRE(Str{buffer, size} == "//abc");
+#else
     REQUIRE(Str{buffer, size} == "/abc");
+#endif
 }
 
 TEST_CASE("path::flatten() /// in middle are collapsed") {
