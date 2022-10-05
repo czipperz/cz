@@ -213,8 +213,37 @@ void flatten(String* string) {
     flatten(string->buffer, &string->len);
 }
 
+static bool is_unc_path(Str file) {
+    // Test regex `//server/path`.
+    if (file.len < 4 || !is_dir_sep(file[0]) || !is_dir_sep(file[1]))
+        return false;
+
+    size_t i = 2;
+
+    // Advance over rest of forward slashes.
+    for (; i < file.len; ++i) {
+        if (!is_dir_sep(file[i]))
+            break;
+    }
+
+    // Advance over server.
+    for (; i < file.len; ++i) {
+        if (is_dir_sep(file[i]))
+            break;
+    }
+
+    // No server or / before path.
+    if (i == file.len)
+        return false;
+
+    return true;
+}
+
 bool is_absolute(Str file) {
 #ifdef _WIN32
+    if (is_unc_path(file)) {
+        return true;
+    }
     return file.len >= 3 && cz::is_alpha(file[0]) && file[1] == ':' && is_dir_sep(file[2]);
 #else
     return file.len >= 1 && file[0] == '/';
