@@ -420,7 +420,7 @@ Output_File std_err_file() {
     return file;
 }
 
-void read_to_string(Input_File file, cz::Allocator allocator, cz::String* out) {
+bool read_to_string(Input_File file, cz::Allocator allocator, cz::String* out) {
     ZoneScoped;
     CZ_DEBUG_ASSERT(file.is_open());
 
@@ -429,8 +429,7 @@ void read_to_string(Input_File file, cz::Allocator allocator, cz::String* out) {
     while (1) {
         int64_t read_result = file.read_text(buffer, sizeof(buffer), &carry);
         if (read_result < 0) {
-            // TODO: what do we do here?  I'm just ignoring the error for now
-            cz::dbreak();
+            return false;
         } else if (read_result == 0) {
             // End of file
             break;
@@ -439,6 +438,7 @@ void read_to_string(Input_File file, cz::Allocator allocator, cz::String* out) {
             out->append({buffer, (size_t)read_result});
         }
     }
+    return true;
 }
 
 void Process_Options::close_all() {
