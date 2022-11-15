@@ -1,5 +1,13 @@
-build
+# Editor files
+*~
 .vs
-CMakeSettings.json
+
+# Build files
+build
+
+# Generated files
+valgrind.txt
 compile_commands.json
-benchmark
+GPATH
+GRTAGS
+GTAGS
