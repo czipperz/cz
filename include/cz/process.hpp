@@ -51,10 +51,36 @@ struct Process_Options {
 /// Create a pipe where both ends are inheritable.
 bool create_pipe(Input_File*, Output_File*);
 
-/// Create a pipe where the writing side is non-inheritable.  Use this for `Process_Options::stdin`.
+/// Create a pipe where the writing side is non-inheritable.
+///
+/// ```
+/// Output_File std_in;
+/// CZ_DEFER(std_in.close());
+/// Process process;
+/// cz::Str args[] = { /* TODO */ };
+/// {
+///     Process_Options options;
+///     CZ_DEFER(options.std_in.close());
+///     create_process_input_pipe(&options.std_in, &std_in);
+///     process.launch_program(args, options);
+/// }
+/// ```
 bool create_process_input_pipe(Input_File*, Output_File*);
-/// Create a pipe where the reading side is non-inheritable.  Use this for `Process_Options::stdout`
-/// or `Process_Options::stderr`.
+
+/// Create a pipe where the reading side is non-inheritable.
+///
+/// ```
+/// Output_File std_out;
+/// CZ_DEFER(std_out.close());
+/// Process process;
+/// cz::Str args[] = { /* TODO */ };
+/// {
+///     Process_Options options;
+///     CZ_DEFER(options.std_out.close());
+///     create_process_output_pipe(&options.std_out, &std_out);
+///     process.launch_program(args, options);
+/// }
+/// ```
 bool create_process_output_pipe(Output_File*, Input_File*);
 
 struct Process_IOE {
