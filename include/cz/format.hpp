@@ -11,9 +11,9 @@ namespace cz {
 template <class... Ts>
 void print(FILE* file, Allocator allocator, Ts... ts) {
     String string = {};
-    CZ_DEFER(string.drop(allocator));
     append(allocator, &string, ts...);
     fwrite(string.buffer, 1, string.len, file);
+    string.drop(allocator);
 }
 
 template <class... Ts>
