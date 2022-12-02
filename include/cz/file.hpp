@@ -191,5 +191,6 @@ Output_File std_out_file();
 Output_File std_err_file();
 
 bool read_to_string(Input_File file, cz::Allocator allocator, cz::String* string);
+bool read_to_string(const char* path, cz::Allocator allocator, cz::String* string);
 
 }

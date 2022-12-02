@@ -551,4 +551,13 @@ bool read_to_string(Input_File file, cz::Allocator allocator, cz::String* out) {
     return true;
 }
 
+bool read_to_string(const char* path, cz::Allocator allocator, cz::String* out) {
+    Input_File file;
+    if (!file.open(path))
+        return false;
+
+    CZ_DEFER(file.close());
+    return read_to_string(file, allocator, out);
+}
+
 }
