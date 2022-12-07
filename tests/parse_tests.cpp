@@ -4,6 +4,25 @@
 
 using namespace cz;
 
+TEST_CASE("parse string") {
+    CHECK(parse("hello world", "hello") == 5);
+    CHECK(parse("hello world", "hell no") == 0);
+    CHECK(parse("hello world", "no") == 0);
+
+    CHECK(parse("hello world", 'h') == 1);
+    CHECK(parse("hello world", 'n') == 0);
+
+    CHECK(parse("hello 0world", "hello ", '0', "world") == 12);
+    int num = -1;
+    CHECK(parse("hello 0world", "hello ", &num, "world") == 12);
+    CHECK(num == 0);
+
+    int first = 0, second = 0;
+    CHECK(parse("10 - 20", &first, " - ", &second) == 7);
+    CHECK(first == 10);
+    CHECK(second == 20);
+}
+
 TEST_CASE("parse unsigned") {
     uint8_t u8;
     CHECK(parse("0", &u8) == 1);

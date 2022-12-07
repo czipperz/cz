@@ -6,6 +6,22 @@
 
 namespace cz {
 
+///////////////////////////////////////////////////////////////////////////////
+
+int64_t parse(cz::Str str, cz::Str pattern) {
+    if (str.starts_with(pattern))
+        return pattern.len;
+    return 0;
+}
+
+int64_t parse(cz::Str str, char pattern) {
+    if (str.starts_with(pattern))
+        return 1;
+    return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 template <class U>
 static int64_t parse_unsigned(cz::Str str, U* t) {
     U value = 0;
@@ -79,6 +95,8 @@ static int64_t parse_signed(cz::Str str, S* s) {
     return result + negative;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
 int64_t parse(cz::Str str, uint8_t* out) {
     return parse_unsigned(str, out);
 }
@@ -91,6 +109,8 @@ int64_t parse(cz::Str str, uint32_t* out) {
 int64_t parse(cz::Str str, uint64_t* out) {
     return parse_unsigned(str, out);
 }
+
+///////////////////////////////////////////////////////////////////////////////
 
 int64_t parse(cz::Str str, int8_t* out) {
     return parse_signed(str, out);
