@@ -33,6 +33,23 @@ TEST_CASE("path::directory_component() trailing slash returns input") {
     CHECK(dc == "abc/def");
 }
 
+TEST_CASE("path::directory_component() absolute path") {
+    cz::Str dc;
+    REQUIRE(directory_component("/abc/def/", &dc));
+    CHECK(dc == "/abc/def");
+
+    REQUIRE(directory_component("/abc", &dc));
+    CHECK(dc == "/");
+
+    REQUIRE(directory_component("/", &dc));
+    CHECK(dc == "/");
+
+#ifdef _WIN32
+    REQUIRE(directory_component("c:/abc", &dc));
+    CHECK(dc == "c:/");
+#endif
+}
+
 TEST_CASE("path::name_component() empty input no output") {
     cz::Str dc;
     REQUIRE(name_component("", &dc));

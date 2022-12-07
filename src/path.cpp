@@ -38,6 +38,17 @@ bool directory_component(Str path, size_t* directory_end) {
         return false;
     }
     *directory_end = ptr - path.buffer;
+
+    // directory_component("/a") should result in "/" not "".
+    if (*directory_end == 0)
+        ++*directory_end;
+
+    // directory_component("c:/a") should result in "c:/" not "c:".
+#ifdef _WIN32
+    if (*directory_end == 2 && cz::is_alpha(path.buffer[0]) && path.buffer[1] == ':')
+        ++*directory_end;
+#endif
+
     return true;
 }
 
