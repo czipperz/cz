@@ -1,6 +1,7 @@
 #include <cz/path.hpp>
 
 #include <cz/char_type.hpp>
+#include <cz/heap_string.hpp>
 #include <cz/working_directory.hpp>
 
 #ifdef _WIN32
@@ -43,7 +44,7 @@ bool directory_component(Str path, size_t* directory_end) {
     if (*directory_end == 0)
         ++*directory_end;
 
-    // directory_component("c:/a") should result in "c:/" not "c:".
+        // directory_component("c:/a") should result in "c:/" not "c:".
 #ifdef _WIN32
     if (*directory_end == 2 && cz::is_alpha(path.buffer[0]) && path.buffer[1] == ':')
         ++*directory_end;
@@ -84,6 +85,20 @@ bool pop_name(Str* path) {
 
 bool pop_name(String* path) {
     return pop_name(*path, &path->len);
+}
+
+void push_component(Allocator allocator, String* path, Str name) {
+    if (path->ends_with('/')) {
+        path->reserve(allocator, name.len);
+        path->append(name);
+    } else {
+        path->reserve(allocator, name.len + 1);
+        path->push('/');
+        path->append(name);
+    }
+}
+void push_component(Heap_String* path, Str name) {
+    push_component(cz::heap_allocator(), path, name);
 }
 
 bool name_component(Str path, size_t* name_start) {

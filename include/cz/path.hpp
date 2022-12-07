@@ -9,6 +9,8 @@
 #include "string.hpp"
 
 namespace cz {
+class Heap_String;
+
 namespace path {
 
 /// Get the max length of a path on the current platform.  On failure
@@ -33,6 +35,11 @@ bool pop_component(String* path);
 bool pop_name(Str path, size_t* end);
 bool pop_name(Str* path);
 bool pop_name(String* path);
+
+/// Add a component to the string.  This generally will append `/name`,
+/// but if the `path` has a trailing `/` then it'll just append `name`.
+void push_component(Allocator allocator, String* path, Str name);
+void push_component(Heap_String* path, Str name);
 
 /// Get the name component of the path.
 ///
