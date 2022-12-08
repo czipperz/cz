@@ -152,21 +152,16 @@ inline void append(Allocator allocator, String* string, Vector<T> vector) {
 // Custom formatters.
 ///////////////////////////////////////////////////////////////////////////////
 
-struct Format_Address {
-    void* x;
-};
-inline Format_Address address(void* x) {
-    return Format_Address{x};
-}
+// clang-format off
+
+struct Format_Address { void* x; };
+inline Format_Address address(void* x) { return Format_Address{x}; }
 void append(Allocator allocator, String* string, Format_Address);
 
-struct Format_Many {
-    char ch;
-    size_t count;
-};
-inline Format_Many many(char ch, size_t count) {
-    return Format_Many{ch, count};
-}
+struct Format_Many { char ch; size_t count; };
+inline Format_Many many(char ch, size_t count) { return Format_Many{ch, count}; }
 void append(Allocator allocator, String* string, Format_Many);
+
+// clang-format on
 
 }
