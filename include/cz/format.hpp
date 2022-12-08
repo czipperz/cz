@@ -3,10 +3,15 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
+#include "file.hpp"
 #include "heap_string.hpp"
 #include "string.hpp"
 
 namespace cz {
+
+///////////////////////////////////////////////////////////////////////////////
+// print using the format library
+///////////////////////////////////////////////////////////////////////////////
 
 template <class... Ts>
 void print(FILE* file, Allocator allocator, Ts... ts) {
@@ -15,7 +20,6 @@ void print(FILE* file, Allocator allocator, Ts... ts) {
     append(allocator, &string, ts...);
     fwrite(string.buffer, 1, string.len, file);
 }
-
 template <class... Ts>
 void print(FILE* file, Ts... ts) {
     print(file, cz::heap_allocator(), ts...);
@@ -29,6 +33,22 @@ void print(Ts... ts) {
     print(stdout, cz::heap_allocator(), ts...);
 }
 
+template <class... Ts>
+void print(Output_File file, Allocator allocator, Ts... ts) {
+    String string = {};
+    CZ_DEFER(string.drop(allocator));
+    append(allocator, &string, ts...);
+    file.write(string);
+}
+template <class... Ts>
+void print(Output_File file, Ts... ts) {
+    print(file, cz::heap_allocator(), ts...);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// sprintf into a string
+///////////////////////////////////////////////////////////////////////////////
+
 /// Run `sprintf` and make the result into a string; null terminates and truncates the string.
 String asprintf(Allocator allocator, const char* format, ...);
 Heap_String asprintf(const char* format, ...);
@@ -40,6 +60,10 @@ void append_sprintf(Allocator allocator, String* string, const char* format, ...
 void append_sprintf(Heap_String* string, const char* format, ...);
 void append_vsprintf(Allocator allocator, String* string, const char* format, va_list args);
 void append_vsprintf(Heap_String* string, const char* format, va_list args);
+
+///////////////////////////////////////////////////////////////////////////////
+// format -- Concatenate inputs into a string.
+///////////////////////////////////////////////////////////////////////////////
 
 /// Format a bunch of things to a string; null terminates and truncates the string.
 template <class... Ts>
@@ -60,6 +84,10 @@ Heap_String format(Ts... ts) {
     return string;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Concatenate and append inputs into a string.
+///////////////////////////////////////////////////////////////////////////////
+
 /// Append a bunch of things to a string.
 template <class T1, class T2, class... Ts>
 void append(Allocator allocator, String* string, T1 t1, T2 t2, Ts... ts) {
@@ -73,7 +101,10 @@ inline void append(Heap_String* string, Ts... ts) {
     append(heap_allocator(), string, ts...);
 }
 
-/// Default implementations for basic types.
+///////////////////////////////////////////////////////////////////////////////
+// Append implementations for basic types.
+///////////////////////////////////////////////////////////////////////////////
+
 inline void append(Allocator allocator, String* string, Str str) {
     string->reserve(allocator, str.len);
     string->append(str);
@@ -107,6 +138,10 @@ void append(Allocator allocator, String* string, __uint128_t);
 
 void append(Allocator allocator, String* string, AllocInfo);
 void append(Allocator allocator, String* string, MemSlice);
+
+///////////////////////////////////////////////////////////////////////////////
+// Custom formatters.
+///////////////////////////////////////////////////////////////////////////////
 
 struct Format_Address {
     void* x;
