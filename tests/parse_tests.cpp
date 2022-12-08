@@ -132,3 +132,35 @@ TEST_CASE("parse bogus makes no progress") {
     CHECK(parse("", &i64) == 0);
     CHECK(parse("hello world", &i64) == 0);
 }
+
+TEST_CASE("parse rest") {
+    cz::Str temp = "default";
+    CHECK(parse("", rest(&temp)) == 0);
+    CHECK(temp == "");
+    CHECK(parse("hi", rest(&temp)) == 2);
+    CHECK(temp == "hi");
+}
+
+TEST_CASE("parse until") {
+    cz::Str temp = "default";
+    CHECK(parse("", until(&temp, "hello")) == 0);
+    CHECK(temp == "");
+    CHECK(parse("hello", until(&temp, "hello")) == 5);
+    CHECK(temp == "");
+    CHECK(parse("hi hello", until(&temp, "hello")) == 8);
+    CHECK(temp == "hi ");
+    CHECK(parse("hi", until(&temp, "hello")) == 2);
+    CHECK(temp == "hi");
+}
+
+TEST_CASE("parse before") {
+    cz::Str temp = "default";
+    CHECK(parse("", before(&temp, "hello")) == 0);
+    CHECK(temp == "default");
+    CHECK(parse("hello", before(&temp, "hello")) == 5);
+    CHECK(temp == "");
+    CHECK(parse("hi hello", before(&temp, "hello")) == 8);
+    CHECK(temp == "hi ");
+    CHECK(parse("hi", before(&temp, "hello")) == 0);
+    CHECK(temp == "hi ");
+}

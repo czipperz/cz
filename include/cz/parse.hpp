@@ -62,4 +62,33 @@ inline int64_t parse(cz::Str str, unsigned long* out) {
 }
 #endif
 
+///////////////////////////////////////////////////////////////////////////////
+
+// clang-format off
+
+/// Capture the rest of the output.
+struct Parse_Rest { cz::Str* out; };
+inline Parse_Rest rest(cz::Str* out) { return {out}; }
+int64_t parse(cz::Str str, Parse_Rest rest);
+
+/// Find `pattern` and capture the output before it.  If `pattern` is found then advances
+/// to after the end of `pattern`.  If `pattern` isn't found, eat the entire string.
+struct Parse_Until_Char { cz::Str* out; char pattern; };
+struct Parse_Until_Str  { cz::Str* out; cz::Str pattern; };
+inline Parse_Until_Char until(cz::Str* out, char pattern) { return {out, pattern}; }
+inline Parse_Until_Str  until(cz::Str* out, cz::Str pattern) { return {out, pattern}; }
+int64_t parse(cz::Str str, Parse_Until_Char until);
+int64_t parse(cz::Str str, Parse_Until_Str  until);
+
+/// Find `pattern` and capture the output before it.  If `pattern` is found then advances to after
+/// the end of `pattern`.  If `pattern` isn't found, parse will fail and won't capture anything.
+struct Parse_Before_Char { cz::Str* out; char pattern; };
+struct Parse_Before_Str  { cz::Str* out; cz::Str pattern; };
+inline Parse_Before_Char before(cz::Str* out, char pattern) { return {out, pattern}; }
+inline Parse_Before_Str  before(cz::Str* out, cz::Str pattern) { return {out, pattern}; }
+int64_t parse(cz::Str str, Parse_Before_Char before);
+int64_t parse(cz::Str str, Parse_Before_Str  before);
+
+// clang-format on
+
 }

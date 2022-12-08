@@ -125,4 +125,49 @@ int64_t parse(cz::Str str, int64_t* out) {
     return parse_signed(str, out);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+int64_t parse(cz::Str str, Parse_Rest rest) {
+    *rest.out = str;
+    return str.len;
+}
+
+int64_t parse(cz::Str str, Parse_Until_Char until) {
+    size_t end = str.find_index(until.pattern);
+    *until.out = str.slice_end(end);
+    if (end < str.len)
+        end += 1;
+    return end;
+}
+
+int64_t parse(cz::Str str, Parse_Until_Str until) {
+    size_t end = str.find_index(until.pattern);
+    *until.out = str.slice_end(end);
+    if (end < str.len)
+        end += until.pattern.len;
+    return end;
+}
+
+int64_t parse(cz::Str str, Parse_Before_Char until) {
+    const char* end = str.find(until.pattern);
+    if (end) {
+        *until.out = str.slice_end(end);
+        end += 1;
+        return end - str.buffer;
+    } else {
+        return 0;
+    }
+}
+
+int64_t parse(cz::Str str, Parse_Before_Str until) {
+    const char* end = str.find(until.pattern);
+    if (end) {
+        *until.out = str.slice_end(end);
+        end += until.pattern.len;
+        return end - str.buffer;
+    } else {
+        return 0;
+    }
+}
+
 }
