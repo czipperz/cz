@@ -139,6 +139,22 @@ void append(Allocator allocator, String* string, __uint128_t);
 void append(Allocator allocator, String* string, AllocInfo);
 void append(Allocator allocator, String* string, MemSlice);
 
+template <class T>
+void append(Allocator allocator, String* string, Slice<T> slice) {
+    append(allocator, string, '[');
+    for (size_t i = 0; i < slice.len; ++i) {
+        if (i != 0)
+            append(allocator, string, ", ");
+        append(allocator, string, slice[i]);
+    }
+    append(allocator, string, ']');
+}
+
+template <class T>
+inline void append(Allocator allocator, String* string, Vector<T> vector) {
+    return append(allocator, string, vector.as_slice());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Custom formatters.
 ///////////////////////////////////////////////////////////////////////////////

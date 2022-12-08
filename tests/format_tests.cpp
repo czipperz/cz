@@ -4,6 +4,7 @@
 #include <cz/arena.hpp>
 #include <cz/defer.hpp>
 #include <cz/format.hpp>
+#include <cz/heap_vector.hpp>
 
 using namespace cz;
 
@@ -91,4 +92,25 @@ TEST_CASE("format number normal") {
     FORMAT_NUM_CHECK(__uint128_t, 42);
     FORMAT_NUM_CHECK(__uint128_t, 1);
 #endif
+}
+
+TEST_CASE("format slice") {
+    cz::Heap_Vector<int> vector = {};
+
+    cz::Heap_String string0 = format(vector);
+    CZ_DEFER(string0.drop());
+    CHECK(string0 == "[]");
+
+    vector.reserve(4);
+    vector.push(10);
+
+    cz::Heap_String string1 = format(vector);
+    CZ_DEFER(string1.drop());
+    CHECK(string1 == "[10]");
+
+    vector.push(21);
+
+    cz::Heap_String string2 = format(vector);
+    CZ_DEFER(string2.drop());
+    CHECK(string2 == "[10, 21]");
 }
