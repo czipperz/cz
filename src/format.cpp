@@ -93,35 +93,7 @@ void append_vsprintf(Heap_String* string, const char* format, va_list args) {
     append_vsprintf_impl(heap_allocator(), string, format, args, false);
 }
 
-#define APPEND_NUM(SIGNED, UNSIGNED, MIN)                                  \
-    void append(Allocator allocator, String* string, UNSIGNED x) { \
-        size_t start = string->len();                                      \
-                                                                           \
-        while (x >= 10) {                                                  \
-            append(allocator, string, '0' + x % 10);                       \
-            x /= 10;                                                       \
-        }                                                                  \
-        CZ_DEBUG_ASSERT(x < 10);                                           \
-        append(allocator, string, '0' + x);                                \
-                                                                           \
-        size_t end = (string->len() - start) / 2;                          \
-        for (size_t i = 0; i < end; ++i) {                                 \
-            swap((*string)[i], (*string)[string->len() - i - 1]);      \
-        }                                                                  \
-    }                                                                      \
-                                                                           \
-    void append(Allocator allocator, String* string, SIGNED x) {   \
-        if (~x == 0) {                                                     \
-            append(allocator, string, #MIN);                               \
-            return;                                                        \
-        }                                                                  \
-                                                                           \
-        if (x < 0) {                                                       \
-            append(allocator, string, '-', (UNSIGNED)-x);                  \
-        } else {                                                           \
-            append(allocator, string, (UNSIGNED)x);                        \
-        }                                                                  \
-    }
+///////////////////////////////////////////////////////////////////////////////
 
 #define SIGNED int16_t
 #define UNSIGNED uint16_t
@@ -148,6 +120,76 @@ void append_vsprintf(Heap_String* string, const char* format, va_list args) {
 #define MINS "-170141183460469231731687303715884105728"
 #include "format_num.tpp"
 #endif
+
+void append(Allocator allocator, String* string, short x) {
+    if (sizeof(x) == 2)
+        return append_num(allocator, string, (int16_t)x);
+    else if (sizeof(x) == 4)
+        return append_num(allocator, string, (int32_t)x);
+    else if (sizeof(x) == 8)
+        return append_num(allocator, string, (int64_t)x);
+}
+void append(Allocator allocator, String* string, unsigned short x) {
+    if (sizeof(x) == 2)
+        return append_num(allocator, string, (uint16_t)x);
+    else if (sizeof(x) == 4)
+        return append_num(allocator, string, (uint32_t)x);
+    else if (sizeof(x) == 8)
+        return append_num(allocator, string, (uint64_t)x);
+}
+
+void append(Allocator allocator, String* string, int x) {
+    if (sizeof(x) == 2)
+        return append_num(allocator, string, (int16_t)x);
+    else if (sizeof(x) == 4)
+        return append_num(allocator, string, (int32_t)x);
+    else if (sizeof(x) == 8)
+        return append_num(allocator, string, (int64_t)x);
+}
+void append(Allocator allocator, String* string, unsigned int x) {
+    if (sizeof(x) == 2)
+        return append_num(allocator, string, (uint16_t)x);
+    else if (sizeof(x) == 4)
+        return append_num(allocator, string, (uint32_t)x);
+    else if (sizeof(x) == 8)
+        return append_num(allocator, string, (uint64_t)x);
+}
+
+void append(Allocator allocator, String* string, long x) {
+    if (sizeof(x) == 2)
+        return append_num(allocator, string, (int16_t)x);
+    else if (sizeof(x) == 4)
+        return append_num(allocator, string, (int32_t)x);
+    else if (sizeof(x) == 8)
+        return append_num(allocator, string, (int64_t)x);
+}
+void append(Allocator allocator, String* string, unsigned long x) {
+    if (sizeof(x) == 2)
+        return append_num(allocator, string, (uint16_t)x);
+    else if (sizeof(x) == 4)
+        return append_num(allocator, string, (uint32_t)x);
+    else if (sizeof(x) == 8)
+        return append_num(allocator, string, (uint64_t)x);
+}
+
+void append(Allocator allocator, String* string, long long x) {
+    if (sizeof(x) == 2)
+        return append_num(allocator, string, (int16_t)x);
+    else if (sizeof(x) == 4)
+        return append_num(allocator, string, (int32_t)x);
+    else if (sizeof(x) == 8)
+        return append_num(allocator, string, (int64_t)x);
+}
+void append(Allocator allocator, String* string, unsigned long long x) {
+    if (sizeof(x) == 2)
+        return append_num(allocator, string, (uint16_t)x);
+    else if (sizeof(x) == 4)
+        return append_num(allocator, string, (uint32_t)x);
+    else if (sizeof(x) == 8)
+        return append_num(allocator, string, (uint64_t)x);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 void append(Allocator allocator, String* string, AllocInfo x) {
     append(allocator, string, "AllocInfo { size: ", x.size, ", alignment: ", x.alignment, " }");

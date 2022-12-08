@@ -4,7 +4,7 @@
 
 #include <cz/stringify.hpp>
 
-void append(cz::Allocator allocator, cz::String* string, UNSIGNED x) {
+inline void append_num(cz::Allocator allocator, cz::String* string, UNSIGNED x) {
     size_t start = string->len;
 
     while (x >= 10) {
@@ -20,16 +20,17 @@ void append(cz::Allocator allocator, cz::String* string, UNSIGNED x) {
     }
 }
 
-void append(cz::Allocator allocator, cz::String* string, SIGNED x) {
+inline void append_num(cz::Allocator allocator, cz::String* string, SIGNED x) {
     if (x == MIN) {
         append(allocator, string, MINS);
         return;
     }
 
     if (x < 0) {
-        append(allocator, string, '-', (UNSIGNED)-x);
+        append(allocator, string, '-');
+        append_num(allocator, string, (UNSIGNED)-x);
     } else {
-        append(allocator, string, (UNSIGNED)x);
+        append_num(allocator, string, (UNSIGNED)x);
     }
 }
 

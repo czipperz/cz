@@ -94,6 +94,22 @@ TEST_CASE("format number normal") {
 #endif
 }
 
+TEST_CASE("format number primitive types") {
+    // This doesn't work and shouldn't work; (char)1 should be formatted as '\01'.
+    // FORMAT_NUM_CHECK(char, 1);
+
+    FORMAT_NUM_CHECK(unsigned char, 1);
+    FORMAT_NUM_CHECK(signed char, 1);
+    FORMAT_NUM_CHECK(short, 1);
+    FORMAT_NUM_CHECK(unsigned short, 1);
+    FORMAT_NUM_CHECK(int, 1);
+    FORMAT_NUM_CHECK(unsigned int, 1);
+    FORMAT_NUM_CHECK(long, 1);
+    FORMAT_NUM_CHECK(unsigned long, 1);
+    FORMAT_NUM_CHECK(long long, 1);
+    FORMAT_NUM_CHECK(unsigned long long, 1);
+}
+
 TEST_CASE("format slice") {
     cz::Heap_Vector<int> vector = {};
 
