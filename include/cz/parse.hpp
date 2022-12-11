@@ -144,6 +144,11 @@ inline Parse_Before_Str  before(cz::Str* out, cz::Str pattern) { return {out, pa
 int64_t parse(cz::Str str, Parse_Before_Char before);
 int64_t parse(cz::Str str, Parse_Before_Str  before);
 
+/// `char*` gets converted to `cz::Str` so we need a custom overload for just one character.
+struct Parse_Char { char* out; };
+inline Parse_Char p_char(char* out) { return {out}; }
+int64_t parse(cz::Str str, Parse_Char ch);
+
 // clang-format on
 
 }

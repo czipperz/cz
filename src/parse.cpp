@@ -170,4 +170,13 @@ int64_t parse(cz::Str str, Parse_Before_Str until) {
     }
 }
 
+int64_t parse(cz::Str str, Parse_Char ch) {
+    if (str.len > 0) {
+        *ch.out = str[0];
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 }
