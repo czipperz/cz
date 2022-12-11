@@ -5,7 +5,16 @@
 
 namespace cz {
 
-/// Parse combinator.  Example usage:
+/// The `parse` module.
+/// As a user, use one of the combinators directly below.
+/// To implement parsing the type T, overload `int64_t cz::parse(cz::Str str, T* out)`.
+///
+/// # Return value
+/// The magnitude (absolute value) of the return value is the number of bytes that were consumed.
+/// The sign is whether there was success.
+/// 0 is returned if no bytes were consumed (total failure).
+
+/// Basic parse combinator.
 ///
 /// ```
 /// int first, second;
@@ -24,6 +33,52 @@ int64_t parse(cz::Str str, T1 t1, T2 t2, Ts... ts) {
         return -r1 + r2;
 
     return r1 + r2;
+}
+
+/// Same as `parse` but asserts that the entire string is consumed.
+///
+/// ```
+/// int first, second;
+/// cz::Str str = "10 - 23";
+/// must_parse(str, &first, " - ", &second);
+/// ```
+template <class T1, class... Ts>
+void must_parse(cz::Str str, T1 t1, Ts... ts) {
+    int64_t result = parse(str, t1, ts...);
+    CZ_ASSERT(result == str.len);
+}
+
+/// Same as `parse` but modifies `*str` to point to after the parsed region.
+///
+/// ```
+/// int first, second;
+/// cz::Str str = "10 - 23";
+/// int64_t result = parse_advance(&str, &first, " - ");
+/// CZ_ASSERT(result == strlen("10 - "));
+/// must_parse(str, &second);
+/// ```
+template <class T1, class... Ts>
+int64_t parse_advance(cz::Str* str, T1 t1, Ts... ts) {
+    int64_t result = parse(*str, t1, ts...);
+    if (result > 0)
+        *str = str->slice_start(result);
+    else
+        *str = str->slice_start(-result);
+    return result;
+}
+
+/// Same as `parse_advance` but asserts that there were no errors and some bytes were consumed.
+///
+/// ```
+/// int first, second;
+/// cz::Str str = "10 - 23";
+/// must_parse_advance(&str, &first, " - ");
+/// must_parse(str, &second);
+/// ```
+template <class T1, class... Ts>
+void must_parse_advance(cz::Str* str, T1 t1, Ts... ts) {
+    int64_t result = parse_advance(str, t1, ts...);
+    CZ_ASSERT(result > 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
