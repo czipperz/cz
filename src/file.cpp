@@ -6,6 +6,7 @@
 #include <windows.h>
 #else
 #include <errno.h>
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
