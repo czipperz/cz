@@ -10,7 +10,9 @@ struct Heap_String : String {
     void reserve_total(size_t total) { String::reserve_total(cz::heap_allocator(), total); }
 
     void reserve_exact(size_t extra) { reserve_exact_total(len + extra); }
-    void reserve_exact_total(size_t total);
+    void reserve_exact_total(size_t total) {
+        String::reserve_exact_total(cz::heap_allocator(), total);
+    }
 
     void realloc() { String::realloc(cz::heap_allocator()); }
     void realloc_null_terminate() { String::realloc_null_terminate(cz::heap_allocator()); }
