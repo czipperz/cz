@@ -21,17 +21,18 @@ bool get_max_len(size_t* size);
 ///
 /// If the path doesn't contain a forward slash, returns `false`.
 /// Otherwise, returns the section before the last forward slash.
+/// Note: the result will include a trailing forward slash if it is a root directory (`/` or `X:/`).
 ///
 /// The path must use forward slashes.
 bool directory_component(Str path, size_t* directory_end);
 bool directory_component(Str path, Str* directory);
 
-/// Run `directory_component` inline on the path.
+/// Run `directory_component` inline on the path.  Doesn't null terminate the string.
 bool pop_component(Str* path);
 bool pop_component(String* path);
 
-/// Same as `pop_component` but keeps the trailing `/`.  Note that
-/// calling `pop_name` more than one time will do nothing.
+/// Same as `pop_component` but keeps the trailing `/`.  Note that calling `pop_name`
+/// more than one time will do nothing.  Doesn't null terminate the string.
 bool pop_name(Str path, size_t* end);
 bool pop_name(Str* path);
 bool pop_name(String* path);
@@ -68,17 +69,30 @@ void flatten(char* path, size_t* len);
 /// See `flatten(char*, size_t*)`.
 void flatten(String* path);
 
-/// Test if the path is absolute.
+/// Test if the path is absolute and to the root.
 ///
-/// On *nix, this means that it starts with `/`.  On Windows, this means that
-/// it starts with `X:/` where `X` is an alphabetic character (drive name).
-/// See [https://docs.microsoft.com/en-us/dotnet/standard/io/file-path-formats].
+/// On *nix, this means that it is `/`.
+///
+/// On Windows, this means that it is `X:/` where `X` is an alphabetic character
+/// (drive name) or that it is `//server/share/` (see `is_unc_path`).  See
+/// [https://docs.microsoft.com/en-us/dotnet/standard/io/file-path-formats].
+///
+/// The path must use forward slashes.
+bool is_root_path(Str path);
+
+/// Test if the path starts with a root path.
+///
+/// On *nix, this means that it starts with `/`.
+///
+/// On Windows, this means that it starts with `X:/` where `X` is an alphabetic
+/// character (drive name) or that it is a UNC path (see `is_unc_path`).  See
+/// [https://docs.microsoft.com/en-us/dotnet/standard/io/file-path-formats].
 ///
 /// The path must use forward slashes.
 bool is_absolute(Str path);
 
-/// A UNC path is of the form `//server/share/path`.  UNC paths are used
-/// for network file shares, links, and sometimes for mounting disks.
+/// A UNC path is of the form `//server/share/path`.  UNC paths are used on
+/// Windows for network file shares, links, and sometimes for mounting disks.
 ///
 /// This function is only relevant for paths on Windows.
 bool is_unc_path(Str file);

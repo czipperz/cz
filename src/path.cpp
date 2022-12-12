@@ -40,15 +40,10 @@ bool directory_component(Str path, size_t* directory_end) {
     }
     *directory_end = ptr - path.buffer;
 
-    // directory_component("/a") should result in "/" not "".
-    if (*directory_end == 0)
+    // Keep the trailing `/` with a root path.
+    // For example: `/`, `C:/`, and `//server/share/`.
+    if (is_root_path(path.slice_end(*directory_end + 1)))
         ++*directory_end;
-
-        // directory_component("c:/a") should result in "c:/" not "c:".
-#ifdef _WIN32
-    if (*directory_end == 2 && cz::is_alpha(path.buffer[0]) && path.buffer[1] == ':')
-        ++*directory_end;
-#endif
 
     return true;
 }
@@ -74,8 +69,12 @@ bool pop_name(Str path, size_t* end) {
     if (!directory_component(path, &len)) {
         return false;
     }
-    // Include the trailing slash.
-    *end = len + 1;
+
+    // Include the trailing slash if directory_component didn't.
+    *end = len;
+    if (!is_root_path(path.slice_end(len)))
+        ++*end;
+
     return true;
 }
 
@@ -250,29 +249,58 @@ void flatten(String* string) {
     flatten(string->buffer, &string->len);
 }
 
-bool is_unc_path(Str file) {
-    // Test file starts with `//server/`.
-    if (file.len < 4 || !is_dir_sep(file[0]) || !is_dir_sep(file[1]))
-        return false;
+/// Test file starts with `//server/share/`.  If not,
+/// return 0.  If yes, return the length of this prefix.
+static size_t unc_path_prefix_length(Str file) {
+    if (file.len < strlen("//a/b/") || !is_dir_sep(file[0]) || !is_dir_sep(file[1]))
+        return 0;
 
     size_t i = 2;
 
-    // Advance over rest of forward slashes.
+    // Advance over any extra slashes before the `//[server]/share/`.
     for (; i < file.len; ++i) {
         if (!is_dir_sep(file[i]))
             break;
     }
 
-    // Advance over server.
+    // Advance over `//[server]/share/`.
     for (; i < file.len; ++i) {
         if (is_dir_sep(file[i]))
             break;
     }
 
-    // No server or / before path.
-    if (i == file.len)
-        return false;
+    // Advance over `//server[/]share/`.
+    for (; i < file.len; ++i) {
+        if (!is_dir_sep(file[i]))
+            break;
+    }
 
+    // Advance over `//server/[share]/`.
+    for (; i < file.len; ++i) {
+        if (is_dir_sep(file[i]))
+            break;
+    }
+
+    // If i at end of string then there is no `//server/share/[/]` so fail.
+    if (i == file.len)
+        return 0;
+
+    CZ_DEBUG_ASSERT(is_dir_sep(file[i]));
+    return i;
+}
+
+bool is_unc_path(Str file) {
+    size_t result = unc_path_prefix_length(file);
+    return result != 0;
+}
+
+static bool is_unc_root_path(Str file) {
+    size_t unc_i = unc_path_prefix_length(file);
+    for (size_t i = unc_i; i < file.len; ++i) {
+        if (!is_dir_sep(file[i])) {
+            return false;
+        }
+    }
     return true;
 }
 
@@ -284,6 +312,17 @@ bool is_absolute(Str file) {
     return file.len >= 3 && cz::is_alpha(file[0]) && file[1] == ':' && is_dir_sep(file[2]);
 #else
     return file.len >= 1 && file[0] == '/';
+#endif
+}
+
+bool is_root_path(Str file) {
+#ifdef _WIN32
+    if (is_unc_root_path(file)) {
+        return true;
+    }
+    return file.len == 3 && cz::is_alpha(file[0]) && file[1] == ':' && is_dir_sep(file[2]);
+#else
+    return file == "/";
 #endif
 }
 

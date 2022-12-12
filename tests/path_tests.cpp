@@ -38,6 +38,9 @@ TEST_CASE("path::directory_component() absolute path") {
     REQUIRE(directory_component("/abc/def/", &dc));
     CHECK(dc == "/abc/def");
 
+    REQUIRE(directory_component("/abc/def", &dc));
+    CHECK(dc == "/abc");
+
     REQUIRE(directory_component("/abc", &dc));
     CHECK(dc == "/");
 
@@ -47,6 +50,33 @@ TEST_CASE("path::directory_component() absolute path") {
 #ifdef _WIN32
     REQUIRE(directory_component("c:/abc", &dc));
     CHECK(dc == "c:/");
+#endif
+}
+
+TEST_CASE("path::pop_name() absolute path") {
+    cz::Str input;
+    size_t end;
+
+    input = "/abc/def/";
+    REQUIRE(pop_name(input, &end));
+    CHECK(input.slice_end(end) == "/abc/def/");
+
+    input = "/abc/def";
+    REQUIRE(pop_name(input, &end));
+    CHECK(input.slice_end(end) == "/abc/");
+
+    input = "/abc";
+    REQUIRE(pop_name(input, &end));
+    CHECK(input.slice_end(end) == "/");
+
+    input = "/";
+    REQUIRE(pop_name(input, &end));
+    CHECK(input.slice_end(end) == "/");
+
+#ifdef _WIN32
+    input = "c:/abc";
+    REQUIRE(pop_name(input, &end));
+    CHECK(input.slice_end(end) == "c:/");
 #endif
 }
 
