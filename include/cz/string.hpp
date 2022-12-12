@@ -302,6 +302,9 @@ struct String {
                         cz::Vector<cz::Str>* values) const {
         as_str().split_clone_nt(separator, vector_allocator, string_allocator, values);
     }
+    void lines(cz::Allocator allocator, cz::Vector<cz::Str>* values) {
+        as_str().lines(allocator, values);
+    }
 
     /// Take a substring of the string.
     cz::Str slice(size_t start, size_t end) const { return as_str().slice(start, end); }

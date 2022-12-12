@@ -214,6 +214,8 @@ struct Str {
                         cz::Allocator vector_allocator,
                         cz::Allocator string_allocator,
                         cz::Vector<cz::Str>* values) const;
+    /// Split string into lines, discarding a trailing newline.
+    void lines(cz::Allocator allocator, cz::Vector<cz::Str>* values) const;
 
     /// Take a substring of the string.
     cz::Str slice(size_t start, size_t end) const {

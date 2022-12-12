@@ -210,4 +210,11 @@ void Str::split_clone_nt(char separator,
     }
 }
 
+void Str::lines(cz::Allocator allocator, cz::Vector<cz::Str>* values) const {
+    cz::Str str = *this;
+    if (str.ends_with('\n'))
+        str = str.slice_end(str.len - 1);
+    str.split_into('\n', allocator, values);
+}
+
 }
