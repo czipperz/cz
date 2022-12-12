@@ -93,6 +93,14 @@ struct Vector {
         ++len;
     }
 
+    /// Push an element multiple times.
+    void push_many(T t, size_t count) {
+        CZ_DEBUG_ASSERT(cap - len >= count);
+        for (size_t i = 0; i < count; ++i)
+            elems[len + i] = t;
+        len += count;
+    }
+
     /// Append many elements.
     void append(Slice<const T> slice) {
         CZ_DEBUG_ASSERT(cap - len >= slice.len);
