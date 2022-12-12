@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
+#include "defer.hpp"
 #include "file.hpp"
 #include "heap_string.hpp"
 #include "string.hpp"
