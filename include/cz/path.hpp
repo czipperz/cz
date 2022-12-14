@@ -34,6 +34,7 @@ bool pop_component(String* path);
 /// Same as `pop_component` but keeps the trailing `/`.  Note that calling `pop_name`
 /// more than one time will do nothing.  Doesn't null terminate the string.
 bool pop_name(Str path, size_t* end);
+bool pop_name(Str path, Str* out);
 bool pop_name(Str* path);
 bool pop_name(String* path);
 

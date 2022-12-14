@@ -78,6 +78,15 @@ bool pop_name(Str path, size_t* end) {
     return true;
 }
 
+bool pop_name(Str path, Str* out) {
+    size_t len;
+    if (!pop_name(path, &len)) {
+        return false;
+    }
+    *out = {path.buffer, len};
+    return true;
+}
+
 bool pop_name(Str* path) {
     return pop_name(*path, &path->len);
 }
