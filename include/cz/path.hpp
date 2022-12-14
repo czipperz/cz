@@ -9,7 +9,7 @@
 #include "string.hpp"
 
 namespace cz {
-class Heap_String;
+struct Heap_String;
 
 namespace path {
 
