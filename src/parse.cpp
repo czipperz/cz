@@ -179,4 +179,24 @@ int64_t parse(cz::Str str, Parse_Char ch) {
     }
 }
 
+int64_t parse(cz::Str str, Parse_Word word) {
+    size_t start = parse(str, skip_space());
+    size_t end = start;
+    for (; end < str.len; ++end) {
+        if (cz::is_space(str[end]))
+            break;
+    }
+    *word.out = str.slice(start, end);
+    return end;
+}
+
+int64_t parse(cz::Str str, Parse_Skip_Space skip) {
+    size_t i = 0;
+    for (; i < str.len; ++i) {
+        if (!cz::is_space(str[i]))
+            break;
+    }
+    return i;
+}
+
 }

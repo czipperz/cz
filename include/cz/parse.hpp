@@ -149,6 +149,17 @@ struct Parse_Char { char* out; };
 inline Parse_Char p_char(char* out) { return {out}; }
 int64_t parse(cz::Str str, Parse_Char ch);
 
+/// Ignore leading whitespace, then eat up until a whitespace
+/// character (doesn't eat the whitespace character).
+struct Parse_Word { cz::Str* out; };
+inline Parse_Word word(cz::Str* out) { return {out}; }
+int64_t parse(cz::Str str, Parse_Word word);
+
+/// Ignore whitespace.
+struct Parse_Skip_Space {};
+inline Parse_Skip_Space skip_space() { return {}; }
+int64_t parse(cz::Str str, Parse_Skip_Space skip);
+
 // clang-format on
 
 }
