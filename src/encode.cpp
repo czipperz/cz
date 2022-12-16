@@ -72,12 +72,12 @@ void encode_base64(cz::Str input, cz::Allocator allocator, cz::String* output) {
         for (size_t j = 0; j < 3; ++j, ++digits) {
             if (i + j >= input.len)
                 break;
-            uint8_t shift = 16 - 8 * j;
+            size_t shift = 16 - 8 * j;
             num |= ((uint8_t)input[i + j] << shift);
         }
 
         for (size_t j = 0; j < digits; ++j) {
-            uint8_t shift = 18 - 6 * j;
+            size_t shift = 18 - 6 * j;
             uint8_t digit = (num >> shift) & 0x3f;
             output->push(encode_base64_digit(digit));
         }
@@ -104,12 +104,12 @@ void decode_base64(cz::Str input, cz::Allocator allocator, cz::String* output) {
             if (ch == '=')
                 break;
 
-            uint8_t shift = 6 * (3 - j);
+            size_t shift = 6 * (3 - j);
             num |= (decode_base64_digit(ch) << shift);
         }
 
         for (size_t j = 0; j < digits; ++j) {
-            uint8_t shift = 8 * (2 - j);;
+            size_t shift = 8 * (2 - j);;
             uint8_t digit = (num >> shift) & 0xff;
             output->push(digit);
         }
