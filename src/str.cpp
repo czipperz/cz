@@ -112,17 +112,17 @@ const char* Str::rfind_case_insensitive(cz::Str infix) const {
     return nullptr;
 }
 
-static bool split_excluding_(Str str, const char* sep, Str* before, Str* after) {
+static bool split_excluding_(Str str, const char* sep, size_t len, Str* before, Str* after) {
     if (!sep)
         return false;
 
-    Str ta = str.slice_start(sep + 1);
+    Str ta = str.slice_start(sep + len);
     *before = str.slice_end(sep);
     *after = ta;
     return true;
 }
 
-static bool split_before_(Str str, const char* sep, Str* before, Str* after) {
+static bool split_before_(Str str, const char* sep, size_t len, Str* before, Str* after) {
     if (!sep)
         return false;
 
@@ -132,34 +132,54 @@ static bool split_before_(Str str, const char* sep, Str* before, Str* after) {
     return true;
 }
 
-static bool split_after_(Str str, const char* sep, Str* before, Str* after) {
+static bool split_after_(Str str, const char* sep, size_t len, Str* before, Str* after) {
     if (!sep)
         return false;
 
-    Str ta = str.slice_start(sep + 1);
-    *before = str.slice_end(sep + 1);
+    Str ta = str.slice_start(sep + len);
+    *before = str.slice_end(sep + len);
     *after = ta;
     return true;
 }
 
 bool Str::split_excluding(char separator, Str* before, Str* after) const {
-    return split_excluding_(*this, find(separator), before, after);
+    return split_excluding_(*this, find(separator), 1, before, after);
 }
 bool Str::split_before(char separator, Str* before, Str* after) const {
-    return split_before_(*this, find(separator), before, after);
+    return split_before_(*this, find(separator), 1, before, after);
 }
 bool Str::split_after(char separator, Str* before, Str* after) const {
-    return split_after_(*this, find(separator), before, after);
+    return split_after_(*this, find(separator), 1, before, after);
 }
 
 bool Str::split_excluding_last(char separator, Str* before, Str* after) const {
-    return split_excluding_(*this, rfind(separator), before, after);
+    return split_excluding_(*this, rfind(separator), 1, before, after);
 }
 bool Str::split_before_last(char separator, Str* before, Str* after) const {
-    return split_before_(*this, rfind(separator), before, after);
+    return split_before_(*this, rfind(separator), 1, before, after);
 }
 bool Str::split_after_last(char separator, Str* before, Str* after) const {
-    return split_after_(*this, rfind(separator), before, after);
+    return split_after_(*this, rfind(separator), 1, before, after);
+}
+
+bool Str::split_excluding(cz::Str separator, Str* before, Str* after) const {
+    return split_excluding_(*this, find(separator), separator.len, before, after);
+}
+bool Str::split_before(cz::Str separator, Str* before, Str* after) const {
+    return split_before_(*this, find(separator), separator.len, before, after);
+}
+bool Str::split_after(cz::Str separator, Str* before, Str* after) const {
+    return split_after_(*this, find(separator), separator.len, before, after);
+}
+
+bool Str::split_excluding_last(cz::Str separator, Str* before, Str* after) const {
+    return split_excluding_(*this, rfind(separator), separator.len, before, after);
+}
+bool Str::split_before_last(cz::Str separator, Str* before, Str* after) const {
+    return split_before_(*this, rfind(separator), separator.len, before, after);
+}
+bool Str::split_after_last(cz::Str separator, Str* before, Str* after) const {
+    return split_after_(*this, rfind(separator), separator.len, before, after);
 }
 
 void Str::split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str>* values) const {
@@ -194,6 +214,40 @@ void Str::split_clone(char separator,
 }
 
 void Str::split_clone_nt(char separator,
+                         cz::Allocator vector_allocator,
+                         cz::Allocator string_allocator,
+                         cz::Vector<cz::Str>* values) const {
+    cz::Str remaining = *this;
+    while (1) {
+        cz::Str value = remaining;
+        bool split = remaining.split_excluding(separator, &value, &remaining);
+
+        values->reserve(vector_allocator, 1);
+        values->push(value.clone_null_terminate(string_allocator));
+
+        if (!split)
+            break;
+    }
+}
+
+void Str::split_clone(cz::Str separator,
+                      cz::Allocator vector_allocator,
+                      cz::Allocator string_allocator,
+                      cz::Vector<cz::Str>* values) const {
+    cz::Str remaining = *this;
+    while (1) {
+        cz::Str value = remaining;
+        bool split = remaining.split_excluding(separator, &value, &remaining);
+
+        values->reserve(vector_allocator, 1);
+        values->push(value.clone(string_allocator));
+
+        if (!split)
+            break;
+    }
+}
+
+void Str::split_clone_nt(cz::Str separator,
                          cz::Allocator vector_allocator,
                          cz::Allocator string_allocator,
                          cz::Vector<cz::Str>* values) const {

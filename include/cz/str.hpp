@@ -194,23 +194,38 @@ struct Str {
     ///
     /// You can safely pass `this` as either `before` or `after`.
     bool split_excluding(char separator, cz::Str* before, cz::Str* after) const;
+    bool split_excluding(cz::Str separator, cz::Str* before, cz::Str* after) const;
     bool split_before(char separator, cz::Str* before, cz::Str* after) const;
+    bool split_before(cz::Str separator, cz::Str* before, cz::Str* after) const;
     bool split_after(char separator, cz::Str* before, cz::Str* after) const;
+    bool split_after(cz::Str separator, cz::Str* before, cz::Str* after) const;
 
     /// Same as above except divides by the last occurrence of the separator.
     bool split_excluding_last(char separator, cz::Str* before, cz::Str* after) const;
+    bool split_excluding_last(cz::Str separator, cz::Str* before, cz::Str* after) const;
     bool split_before_last(char separator, cz::Str* before, cz::Str* after) const;
+    bool split_before_last(cz::Str separator, cz::Str* before, cz::Str* after) const;
     bool split_after_last(char separator, cz::Str* before, cz::Str* after) const;
+    bool split_after_last(cz::Str separator, cz::Str* before, cz::Str* after) const;
 
     /// Split the string into pieces excluding the separator.
     void split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str>* values) const;
+    void split_into(cz::Str separator, cz::Allocator allocator, cz::Vector<cz::Str>* values) const;
     /// Same as `split_into` except clones each piece using `string_allocator`.
     void split_clone(char separator,
                      cz::Allocator vector_allocator,
                      cz::Allocator string_allocator,
                      cz::Vector<cz::Str>* values) const;
+    void split_clone(cz::Str separator,
+                     cz::Allocator vector_allocator,
+                     cz::Allocator string_allocator,
+                     cz::Vector<cz::Str>* values) const;
     /// Same as `split_into` except clones each piece using `string_allocator` and null terminates.
     void split_clone_nt(char separator,
+                        cz::Allocator vector_allocator,
+                        cz::Allocator string_allocator,
+                        cz::Vector<cz::Str>* values) const;
+    void split_clone_nt(cz::Str separator,
                         cz::Allocator vector_allocator,
                         cz::Allocator string_allocator,
                         cz::Vector<cz::Str>* values) const;

@@ -267,39 +267,72 @@ struct String {
         return as_str().rfind_index_case_insensitive(pattern);
     }
 
-    void split_excluding(char separator, cz::Str* before, cz::Str* after) const {
-        as_str().split_excluding(separator, before, after);
+    bool split_excluding(char separator, cz::Str* before, cz::Str* after) const {
+        return as_str().split_excluding(separator, before, after);
     }
-    void split_before(char separator, cz::Str* before, cz::Str* after) const {
-        as_str().split_before(separator, before, after);
+    bool split_excluding(cz::Str separator, cz::Str* before, cz::Str* after) const {
+        return as_str().split_excluding(separator, before, after);
     }
-    void split_after(char separator, cz::Str* before, cz::Str* after) const {
-        as_str().split_after(separator, before, after);
+    bool split_before(char separator, cz::Str* before, cz::Str* after) const {
+        return as_str().split_before(separator, before, after);
+    }
+    bool split_before(cz::Str separator, cz::Str* before, cz::Str* after) const {
+        return as_str().split_before(separator, before, after);
+    }
+    bool split_after(char separator, cz::Str* before, cz::Str* after) const {
+        return as_str().split_after(separator, before, after);
+    }
+    bool split_after(cz::Str separator, cz::Str* before, cz::Str* after) const {
+        return as_str().split_after(separator, before, after);
     }
 
-    void split_excluding_last(char separator, cz::Str* before, cz::Str* after) const {
-        as_str().split_excluding_last(separator, before, after);
+    bool split_excluding_last(char separator, cz::Str* before, cz::Str* after) const {
+        return as_str().split_excluding_last(separator, before, after);
     }
-    void split_before_last(char separator, cz::Str* before, cz::Str* after) const {
-        as_str().split_before_last(separator, before, after);
+    bool split_excluding_last(cz::Str separator, cz::Str* before, cz::Str* after) const {
+        return as_str().split_excluding_last(separator, before, after);
     }
-    void split_after_last(char separator, cz::Str* before, cz::Str* after) const {
-        as_str().split_after_last(separator, before, after);
+    bool split_before_last(char separator, cz::Str* before, cz::Str* after) const {
+        return as_str().split_before_last(separator, before, after);
+    }
+    bool split_before_last(cz::Str separator, cz::Str* before, cz::Str* after) const {
+        return as_str().split_before_last(separator, before, after);
+    }
+    bool split_after_last(char separator, cz::Str* before, cz::Str* after) const {
+        return as_str().split_after_last(separator, before, after);
+    }
+    bool split_after_last(cz::Str separator, cz::Str* before, cz::Str* after) const {
+        return as_str().split_after_last(separator, before, after);
     }
 
     void split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str>* values) {
         as_str().split_into(separator, allocator, values);
     }
+    void split_into(cz::Str separator, cz::Allocator allocator, cz::Vector<cz::Str>* values) {
+        as_str().split_into(separator, allocator, values);
+    }
     void split_clone(char separator,
                      cz::Allocator vector_allocator,
                      cz::Allocator string_allocator,
-                     cz::Vector<cz::Str>* values) const {
+                     cz::Vector<cz::Str>* values) {
+        as_str().split_clone(separator, vector_allocator, string_allocator, values);
+    }
+    void split_clone(cz::Str separator,
+                     cz::Allocator vector_allocator,
+                     cz::Allocator string_allocator,
+                     cz::Vector<cz::Str>* values) {
         as_str().split_clone(separator, vector_allocator, string_allocator, values);
     }
     void split_clone_nt(char separator,
                         cz::Allocator vector_allocator,
                         cz::Allocator string_allocator,
-                        cz::Vector<cz::Str>* values) const {
+                        cz::Vector<cz::Str>* values) {
+        as_str().split_clone_nt(separator, vector_allocator, string_allocator, values);
+    }
+    void split_clone_nt(cz::Str separator,
+                        cz::Allocator vector_allocator,
+                        cz::Allocator string_allocator,
+                        cz::Vector<cz::Str>* values) {
         as_str().split_clone_nt(separator, vector_allocator, string_allocator, values);
     }
     void lines(cz::Allocator allocator, cz::Vector<cz::Str>* values) {
