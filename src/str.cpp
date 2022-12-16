@@ -196,7 +196,38 @@ void Str::split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str
     }
 }
 
+void Str::split_into(cz::Str separator, cz::Allocator allocator, cz::Vector<cz::Str>* values) const {
+    cz::Str remaining = *this;
+    while (1) {
+        cz::Str value = remaining;
+        bool split = remaining.split_excluding(separator, &value, &remaining);
+
+        values->reserve(allocator, 1);
+        values->push(value);
+
+        if (!split)
+            break;
+    }
+}
+
 void Str::split_clone(char separator,
+                      cz::Allocator vector_allocator,
+                      cz::Allocator string_allocator,
+                      cz::Vector<cz::Str>* values) const {
+    cz::Str remaining = *this;
+    while (1) {
+        cz::Str value = remaining;
+        bool split = remaining.split_excluding(separator, &value, &remaining);
+
+        values->reserve(vector_allocator, 1);
+        values->push(value.clone(string_allocator));
+
+        if (!split)
+            break;
+    }
+}
+
+void Str::split_clone(cz::Str separator,
                       cz::Allocator vector_allocator,
                       cz::Allocator string_allocator,
                       cz::Vector<cz::Str>* values) const {
@@ -224,23 +255,6 @@ void Str::split_clone_nt(char separator,
 
         values->reserve(vector_allocator, 1);
         values->push(value.clone_null_terminate(string_allocator));
-
-        if (!split)
-            break;
-    }
-}
-
-void Str::split_clone(cz::Str separator,
-                      cz::Allocator vector_allocator,
-                      cz::Allocator string_allocator,
-                      cz::Vector<cz::Str>* values) const {
-    cz::Str remaining = *this;
-    while (1) {
-        cz::Str value = remaining;
-        bool split = remaining.split_excluding(separator, &value, &remaining);
-
-        values->reserve(vector_allocator, 1);
-        values->push(value.clone(string_allocator));
 
         if (!split)
             break;
