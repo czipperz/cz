@@ -64,4 +64,46 @@ bool binary_search(cz::Slice<T> slice, const T& element, size_t* index, Comparat
     return start < end && comparator(slice[start], element) == 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Overloads without index
+////////////////////////////////////////////////////////////////////////////////
+
+template <class T>
+bool binary_search(cz::Slice<T> slice, const T& element) {
+    size_t index;
+    return binary_search(vector, element, &index);
+}
+
+template <class T, class Comparator>
+bool binary_search(cz::Slice<T> slice, const T& element, Comparator&& comparator) {
+    size_t index;
+    return binary_search(vector, element, &index, comparator);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Overloads for vector
+////////////////////////////////////////////////////////////////////////////////
+
+template <class T>
+bool binary_search(cz::Vector<T> vector, const T& element) {
+    size_t index;
+    return binary_search(vector.as_slice(), element, &index);
+}
+
+template <class T, class Comparator>
+bool binary_search(cz::Vector<T> vector, const T& element, Comparator&& comparator) {
+    size_t index;
+    return binary_search(vector.as_slice(), element, &index, comparator);
+}
+
+template <class T>
+bool binary_search(cz::Vector<T> vector, const T& element, size_t* index) {
+    return binary_search(vector.as_slice(), element, index);
+}
+
+template <class T, class Comparator>
+bool binary_search(cz::Vector<T> vector, const T& element, size_t* index, Comparator&& comparator) {
+    return binary_search(vector.as_slice(), element, index, comparator);
+}
+
 }
