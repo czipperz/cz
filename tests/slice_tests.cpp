@@ -44,6 +44,21 @@ TEST_CASE("Slice ==") {
     CHECK(cz::slice(arr3).slice_end((size_t)0) == cz::slice(arr3).slice(2, 2));
 }
 
+TEST_CASE("Slice::find") {
+    int arr3[] = {1, 2, 3};
+    int arr4[] = {1, 2, 3, 4};
+    CHECK(cz::slice(arr3).find_index(cz::slice(arr4)) == 3);
+    CHECK(cz::slice(arr3).find_index({arr4, 3}) == 0);
+    CHECK(cz::slice(arr3).find_index({arr4 + 1, 3}) == 3);
+    CHECK(cz::slice(arr3).find_index({arr4 + 1, 2}) == 1);
+    CHECK(cz::slice(arr3).find_index({arr4, 0}) == 0);
+    CHECK(cz::slice(arr3).rfind_index(cz::slice(arr4)) == 3);
+    CHECK(cz::slice(arr3).rfind_index({arr4, 3}) == 0);
+    CHECK(cz::slice(arr3).rfind_index({arr4 + 1, 3}) == 3);
+    CHECK(cz::slice(arr3).rfind_index({arr4 + 1, 2}) == 1);
+    CHECK(cz::slice(arr3).rfind_index({arr4, 0}) == 3);
+}
+
 TEST_CASE("MemSlice()") {
     cz::MemSlice slice;
     REQUIRE(slice.buffer == nullptr);

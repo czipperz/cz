@@ -35,12 +35,12 @@ T* Slice<T>::find(Slice<T> infix) const {
 template <class T>
 T* Slice<T>::rfind(Slice<T> infix) const {
     if (infix.len == 0) {
-        return len;
+        return nullptr;
     }
 
-    for (size_t i = infix.len; i-- >= infix.len; ++i) {
-        if (slice(i, i + infix.len) == infix) {
-            return &get(i);
+    for (size_t i = len; i >= infix.len; --i) {
+        if (slice(i - infix.len, i) == infix) {
+            return &get(i - infix.len);
         }
     }
     return nullptr;
