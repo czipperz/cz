@@ -252,3 +252,5 @@ struct Str {
 };
 
 }
+
+#include <cz/string.hpp>
