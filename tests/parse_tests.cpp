@@ -151,6 +151,13 @@ TEST_CASE("parse until") {
     CHECK(temp == "hi ");
     CHECK(parse("hi", until(&temp, "hello")) == 2);
     CHECK(temp == "hi");
+
+    CHECK(parse("hi", until(&temp, 'h')) == 1);
+    CHECK(temp == "");
+    CHECK(parse("hi", until(&temp, 'i')) == 2);
+    CHECK(temp == "h");
+    CHECK(parse("hi", until(&temp, 'x')) == 2);
+    CHECK(temp == "hi");
 }
 
 TEST_CASE("parse before") {
@@ -163,4 +170,12 @@ TEST_CASE("parse before") {
     CHECK(temp == "hi ");
     CHECK(parse("hi", before(&temp, "hello")) == 0);
     CHECK(temp == "hi ");
+
+    CHECK(parse("hi", before(&temp, 'h')) == 1);
+    CHECK(temp == "");
+    CHECK(parse("hi", before(&temp, 'i')) == 2);
+    CHECK(temp == "h");
+    temp = "dummy";
+    CHECK(parse("hi", before(&temp, 'x')) == 0);
+    CHECK(temp == "dummy");
 }
