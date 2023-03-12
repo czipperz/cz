@@ -114,6 +114,16 @@ void make_absolute(Str relative_path,
                    Allocator allocator,
                    String* absolute_path_out);
 
+/// Standardize the path so there is one exact way to spell each path.
+///
+/// This is done by making the path absolute, converting back slashes
+/// to forward slashes, and then dereferencing all symbolic links.
+///
+/// If the path starts with `~` then the `~` is replaced with the user home directory.
+///
+/// This also standardizes the capitalization of the path on Windows.
+String standardize_path(Allocator allocator, Str path);
+
 /// Convert the path to use forward slashes (`'/'`) instead of backward slashes (`'\\'`).
 ///
 /// This is only relevant on Windows as other platforms only use forward slashes.
