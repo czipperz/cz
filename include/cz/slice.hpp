@@ -82,6 +82,16 @@ struct Slice {
     size_t find_index(Slice<T> element) const { return find_or(element, len); }
     size_t rfind_index(Slice<T> element) const { return rfind_or(element, len); }
 
+    /// Compare the start or end of the sequence.  Returns `false` if not enough elements.
+    bool starts_with(const T& elem) const { return len > 0 && elems[0] == elem; }
+    bool starts_with(Slice<T> infix) const {
+        return len >= infix.len && slice_end(infix.len) == infix;
+    }
+    bool ends_with(const T& elem) const { return len > 0 && last() == elem; }
+    bool ends_with(Slice<T> infix) const {
+        return len >= infix.len && slice_start(len - infix.len) == infix;
+    }
+
     /// Comparator operators.  Length and all elements must match to be considered equal.
     /// For ordering operators (ex. `<`), see comparators.hpp.
     bool operator==(Slice<T> other) const;
