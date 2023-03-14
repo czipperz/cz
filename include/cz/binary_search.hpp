@@ -71,13 +71,13 @@ bool binary_search(cz::Slice<T> slice, const T& element, size_t* index, Comparat
 template <class T>
 bool binary_search(cz::Slice<T> slice, const T& element) {
     size_t index;
-    return binary_search(vector, element, &index);
+    return binary_search(slice, element, &index);
 }
 
 template <class T, class Comparator>
 bool binary_search(cz::Slice<T> slice, const T& element, Comparator&& comparator) {
     size_t index;
-    return binary_search(vector, element, &index, comparator);
+    return binary_search(slice, element, &index, comparator);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -249,9 +249,9 @@ struct Vector {
     size_t rfind_index(Slice<T> infix) const { return as_slice().rfind_index(infix); }
 
     bool starts_with(const T& elem) const { return as_slice().starts_with(elem); }
-    bool starts_with(Slice<T> infix) const { return as_slice().starts_with(elem); }
+    bool starts_with(Slice<T> infix) const { return as_slice().starts_with(infix); }
     bool ends_with(const T& elem) const { return as_slice().ends_with(elem); }
-    bool ends_with(Slice<T> infix) const { return as_slice().ends_with(elem); }
+    bool ends_with(Slice<T> infix) const { return as_slice().ends_with(infix); }
 
     bool operator==(Slice<T> other) const { return as_slice() == other; }
     bool operator!=(Slice<T> other) const { return as_slice() != other; }
