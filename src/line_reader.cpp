@@ -17,9 +17,9 @@ void Line_Reader::reset() {
     carry = {};
 }
 
-void Line_Reader::read_input(cz::Input_File* file,
-                             cz::Allocator allocator,
-                             cz::Vector<cz::Str>* results) {
+void Line_Reader::read_and_append_lines(cz::Input_File* file,
+                                        cz::Allocator allocator,
+                                        cz::Vector<cz::Str>* results) {
     while (1) {
         int64_t read_len = file->read_text(read_buffer.buffer, read_buffer.cap, &carry);
         if (read_len <= 0)
@@ -27,25 +27,26 @@ void Line_Reader::read_input(cz::Input_File* file,
 
         read_buffer.len = read_len;
 
-        ///////////////////////////////////////////////
+        append_lines(read_buffer, allocator, results);
+    }
+}
 
-        cz::Str str = read_buffer;
-        size_t eol = str.find_index('\n');
+void Line_Reader::append_lines(cz::Str str, cz::Allocator allocator, cz::Vector<cz::Str>* results) {
+    size_t eol = str.find_index('\n');
+    between_buffer.reserve_exact(allocator, eol);
+    between_buffer.append(str.slice_end(eol));
+
+    ///////////////////////////////////////////////
+
+    while (eol != str.len) {
+        results->reserve(cz::heap_allocator(), 1);
+        results->push(between_buffer);
+        between_buffer = {};
+
+        str = str.slice_start(eol + 1);
+        eol = str.find_index('\n');
         between_buffer.reserve_exact(allocator, eol);
         between_buffer.append(str.slice_end(eol));
-
-        ///////////////////////////////////////////////
-
-        while (eol != str.len) {
-            results->reserve(cz::heap_allocator(), 1);
-            results->push(between_buffer);
-            between_buffer = {};
-
-            str = str.slice_start(eol + 1);
-            eol = str.find_index('\n');
-            between_buffer.reserve_exact(allocator, eol);
-            between_buffer.append(str.slice_end(eol));
-        }
     }
 }
 

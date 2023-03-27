@@ -33,7 +33,13 @@ struct Line_Reader {
     /// Read as much from the file as possible and put completed lines into
     /// results.  The last line's contents are put into between_buffer and
     /// should be flushed via `finish` when the file has closed.
-    void read_input(cz::Input_File* file, cz::Allocator allocator, cz::Vector<cz::Str>* results);
+    void read_and_append_lines(cz::Input_File* file,
+                               cz::Allocator allocator,
+                               cz::Vector<cz::Str>* results);
+
+    /// Split the string into lines and put completed lines into results.  The last line's contents
+    /// are put into between_buffer and should be flushed via `finish` when the input is complete.
+    void append_lines(cz::Str str, cz::Allocator allocator, cz::Vector<cz::Str>* results);
 
     /// Flush the last line's contents.
     void finish(cz::Vector<cz::Str>* results);
