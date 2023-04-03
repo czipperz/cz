@@ -28,6 +28,13 @@ bool remove_empty_directory(const char* path);
 /// Remove a non-directory file.  Returns `true` if successful.
 bool remove_file(const char* path);
 
+/// Move a file to a new path.  Returns `true` if successful.
+///
+/// I have observed:
+/// On Windows, if `new_path` already exists, does nothing and returns `false`.
+/// On Linux, if `new_path` already exists, replaces the file at `new_path` and returns `true`.
+bool rename_file(const char* old_path, const char* new_path);
+
 }
 
 namespace Relative_To_ {

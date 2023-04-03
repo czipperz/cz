@@ -119,6 +119,10 @@ bool remove_file(const char* path) {
 #endif
 }
 
+bool rename_file(const char* old_path, const char* new_path) {
+    return rename(old_path, new_path) == 0;
+}
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
