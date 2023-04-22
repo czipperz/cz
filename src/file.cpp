@@ -20,6 +20,7 @@
 #define ZoneValue(...)
 #endif
 
+#include <stdio.h>
 #include <cz/defer.hpp>
 
 namespace cz {

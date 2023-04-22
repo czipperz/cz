@@ -1,5 +1,6 @@
 #pragma once
 
+#include "heap.hpp"
 #include "queue.hpp"
 
 namespace cz {

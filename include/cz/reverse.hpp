@@ -1,6 +1,7 @@
 #pragma once
 
 #include "slice.hpp"
+#include "util.hpp"
 
 namespace cz {
 
