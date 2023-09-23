@@ -44,13 +44,14 @@ struct String {
     }
     void reserve_exact_total(Allocator allocator, size_t total);
 
-    /// Reallocate the buffer so that the length is the same as the capacity.
-    /// If the reallocation fails, nothing happens.
-    void realloc(Allocator);
+    /// Reallocate the buffer so that the capacity matches the `new_cap`, which
+    /// is `len` by default.  If the reallocation fails, nothing happens.
+    void realloc(Allocator allocator) { realloc(allocator, len); }
+    void realloc(Allocator allocator, size_t new_cap);
 
     /// Reallocate the buffer so that the capacity is one greater than the length.
     /// Panics if the reallocation fails.
-    void realloc_null_terminate(Allocator);
+    void realloc_null_terminate(Allocator allocator);
 
     /// Create a new `String` with the same contents in a unique memory buffer.
     String clone(Allocator allocator) const { return as_str().clone(allocator); }

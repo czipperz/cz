@@ -35,11 +35,11 @@ void String::reserve_exact_total(Allocator allocator, size_t total) {
     }
 }
 
-void String::realloc(Allocator allocator) {
-    char* res = allocator.realloc(buffer, cap, len);
+void String::realloc(Allocator allocator, size_t new_cap) {
+    char* res = allocator.realloc(buffer, cap, new_cap);
     if (res) {
         buffer = res;
-        cap = len;
+        cap = new_cap;
     }
 }
 
