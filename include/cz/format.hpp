@@ -163,6 +163,10 @@ struct Format_Many { char ch; size_t count; };
 inline Format_Many many(char ch, size_t count) { return Format_Many{ch, count}; }
 void append(Allocator allocator, String* string, Format_Many);
 
+struct Format_DebugString { cz::Str str; };
+inline Format_DebugString dbg(cz::Str str) { return Format_DebugString{str}; }
+void append(Allocator allocator, String *string, Format_DebugString);
+
 // clang-format on
 
 }

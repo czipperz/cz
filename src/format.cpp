@@ -207,4 +207,32 @@ void append(Allocator allocator, String* string, Format_Many many) {
     string->push_many(many.ch, many.count);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Debug format string
+////////////////////////////////////////////////////////////////////////////////
+
+void append(Allocator allocator, String* string, Format_DebugString dbg) {
+    size_t total = 2 /* "" */;
+    for (size_t i = 0; i < dbg.str.len; ++i) {
+        if (dbg.str[i] == '\\' || dbg.str[i] == '\n' || dbg.str[i] == '"')
+            total += 2;
+        else
+            total += 1;
+    }
+
+    string->reserve(allocator, total);
+    string->push('"');
+    for (size_t i = 0; i < dbg.str.len; ++i) {
+        if (dbg.str[i] == '\\')
+            string->append("\\\\");
+        else if (dbg.str[i] == '\n')
+            string->append("\\n");
+        else if (dbg.str[i] == '"')
+            string->append("\\\"");
+        else
+            string->push(dbg.str[i]);
+    }
+    string->push('"');
+}
+
 }
