@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.3)
 
 project(cz)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 file(GLOB_RECURSE SRCS src/*.cpp)
