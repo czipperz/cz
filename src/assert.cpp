@@ -5,7 +5,7 @@
 
 #ifdef TRACY_ENABLE
 #include <stdio.h>
-#include <Tracy.hpp>
+#include <tracy/Tracy.hpp>
 #include <algorithm>
 #endif
 

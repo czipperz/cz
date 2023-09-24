@@ -6,7 +6,7 @@
 #include <cz/heap.hpp>
 
 #ifdef TRACY_ENABLE
-#include <Tracy.hpp>
+#include <tracy/Tracy.hpp>
 #else
 #define ZoneScoped
 #endif

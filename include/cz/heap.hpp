@@ -5,7 +5,7 @@
 #include "assert.hpp"
 
 #ifdef TRACY_ENABLE
-#include <Tracy.hpp>
+#include <tracy/Tracy.hpp>
 #else
 #define TracyAlloc(x, y)
 #define TracyFree(x)
