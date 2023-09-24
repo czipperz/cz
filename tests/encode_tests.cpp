@@ -23,8 +23,8 @@ TEST_CASE("encode_hex ascii") {
 TEST_CASE("encode_hex binary") {
     cz::String output = {};
     CZ_DEFER(output.drop(cz::heap_allocator()));
-    char input[] = {0x00, 0xab, 0x12, 0x01, 0x10};
-    encode_hex({input, sizeof(input)}, cz::heap_allocator(), &output);
+    uint8_t input[] = {0x00, 0xab, 0x12, 0x01, 0x10};
+    encode_hex({(const char*)input, sizeof(input)}, cz::heap_allocator(), &output);
     CHECK(output == "00ab120110");
 }
 
@@ -50,7 +50,7 @@ TEST_CASE("decode_hex binary") {
     cz::String output = {};
     CZ_DEFER(output.drop(cz::heap_allocator()));
     decode_hex("00ab120110", cz::heap_allocator(), &output);
-    char expected[] = {0x00, 0xab, 0x12, 0x01, 0x10};
+    uint8_t expected[] = {0x00, 0xab, 0x12, 0x01, 0x10};
     CHECK(output.len == sizeof(expected));
     CHECK(memcmp(output.buffer, expected, sizeof(expected)) == 0);
 }
@@ -59,7 +59,7 @@ TEST_CASE("decode_hex odd length") {
     cz::String output = {};
     CZ_DEFER(output.drop(cz::heap_allocator()));
     decode_hex("abc", cz::heap_allocator(), &output);
-    char expected[] = {0xab, 0xc0};
+    uint8_t expected[] = {0xab, 0xc0};
     CHECK(output.len == sizeof(expected));
     CHECK(memcmp(output.buffer, expected, sizeof(expected)) == 0);
 }
@@ -85,16 +85,16 @@ TEST_CASE("encode_base64 ascii") {
 TEST_CASE("encode_base64 binary") {
     cz::String output = {};
     CZ_DEFER(output.drop(cz::heap_allocator()));
-    char input[] = {0x00, 0xab, 0x12, 0x01, 0x10};
-    encode_base64({input, sizeof(input)}, cz::heap_allocator(), &output);
+    uint8_t input[] = {0x00, 0xab, 0x12, 0x01, 0x10};
+    encode_base64({(const char*)input, sizeof(input)}, cz::heap_allocator(), &output);
     CHECK(output == "AKsSARA=");
 }
 
 TEST_CASE("encode_base64 binary 2") {
     cz::String output = {};
     CZ_DEFER(output.drop(cz::heap_allocator()));
-    char input[] = {0x00, 0xab, 0x12, 0x01};
-    encode_base64({input, sizeof(input)}, cz::heap_allocator(), &output);
+    uint8_t input[] = {0x00, 0xab, 0x12, 0x01};
+    encode_base64({(const char*)input, sizeof(input)}, cz::heap_allocator(), &output);
     CHECK(output == "AKsSAQ==");
 }
 
@@ -120,7 +120,7 @@ TEST_CASE("decode_base64 binary") {
     cz::String output = {};
     CZ_DEFER(output.drop(cz::heap_allocator()));
     decode_base64("AKsSARA=", cz::heap_allocator(), &output);
-    char expected[] = {0x00, 0xab, 0x12, 0x01, 0x10};
+    uint8_t expected[] = {0x00, 0xab, 0x12, 0x01, 0x10};
     CHECK(output.len == sizeof(expected));
     CHECK(memcmp(output.buffer, expected, sizeof(expected)) == 0);
 }
@@ -129,7 +129,7 @@ TEST_CASE("decode_base64 binary 2") {
     cz::String output = {};
     CZ_DEFER(output.drop(cz::heap_allocator()));
     decode_base64("AKsSAQ==", cz::heap_allocator(), &output);
-    char expected[] = {0x00, 0xab, 0x12, 0x01};
+    uint8_t expected[] = {0x00, 0xab, 0x12, 0x01};
     CHECK(output.len == sizeof(expected));
     CHECK(memcmp(output.buffer, expected, sizeof(expected)) == 0);
 }
@@ -138,7 +138,7 @@ TEST_CASE("decode_base64 binary 3") {
     cz::String output = {};
     CZ_DEFER(output.drop(cz::heap_allocator()));
     decode_base64("AKsSAQ", cz::heap_allocator(), &output);
-    char expected[] = {0x00, 0xab, 0x12, 0x01};
+    uint8_t expected[] = {0x00, 0xab, 0x12, 0x01};
     CHECK(output.len == sizeof(expected));
     CHECK(memcmp(output.buffer, expected, sizeof(expected)) == 0);
 }
