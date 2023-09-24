@@ -13141,28 +13141,3 @@ namespace Catch {
 
 #endif // CATCH_ALL_HPP_INCLUDED
 #endif // CATCH_AMALGAMATED_HPP_INCLUDED
-HEN(desc)
-#define THEN(desc)
-#define AND_THEN(desc)
-
-using Catch::Detail::Approx;
-
-#endif
-
-#endif  // ! CATCH_CONFIG_IMPL_ONLY
-
-// start catch_reenable_warnings.h
-
-#ifdef __clang__
-#ifdef __ICC  // icpc defines the __clang__ macro
-#pragma warning(pop)
-#else
-#pragma clang diagnostic pop
-#endif
-#elif defined __GNUC__
-#pragma GCC diagnostic pop
-#endif
-
-// end catch_reenable_warnings.h
-// end catch.hpp
-#endif  // TWOBLUECUBES_SINGLE_INCLUDE_CATCH_HPP_INCLUDED
