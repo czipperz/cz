@@ -23,7 +23,7 @@ static Data** make_datas(int iterations, size_t length, int order, Rand&& rand) 
     for (int i = 0; i < iterations; ++i) {
         datas[i] = (Data*)malloc(sizeof(Data) * length);
         CZ_ASSERT(datas[i]);
-        for (int j = 0; j < length; ++j) {
+        for (size_t j = 0; j < length; ++j) {
             datas[i][j] = j;
         }
     }

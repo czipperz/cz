@@ -13,12 +13,12 @@ TEST_CASE("utf8::is_valid() ascii is true") {
 }
 
 TEST_CASE("utf8::is_valid() greek letters is true") {
-    const char* str = u8"μα";
+    const char8_t* str = u8"μα";
     REQUIRE(utf8::is_valid((const uint8_t*)str, strlen(str)));
 }
 
 TEST_CASE("utf8::is_valid() half a greek letter is false") {
-    const char* str = u8"μ";
+    const char8_t* str = u8"μ";
     REQUIRE_FALSE(utf8::is_valid((const uint8_t*)str, 1));
 }
 
