@@ -6,4 +6,4 @@ cd "$(dirname "$0")"
 
 ./run-build.sh build/debug Debug -DCZ_BUILD_TESTS=1
 
-./build/debug/cz-test --use-colour=no
+./build/debug/cz-test --colour-mode=none
