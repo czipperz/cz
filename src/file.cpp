@@ -382,7 +382,7 @@ void strip_trailing_carriage_return(char* buffer, size_t* size, Carriage_Return_
     if (has_trailing_carriage_return) {
         --*size;
     }
-    *carry->carrying = has_trailing_carriage_return;
+    carry->carrying = has_trailing_carriage_return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

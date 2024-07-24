@@ -220,10 +220,10 @@ bool read_to_string(const char* path, cz::Allocator allocator, cz::String* strin
 ////////////////////////////////////////////////////////////////////////////////
 
 inline static void strip_carriage_returns(String* string) {
-    return strip_carriage_returns(string->buffer, &string->size);
+    return strip_carriage_returns(string->buffer, &string->len);
 }
 inline static void strip_trailing_carriage_return(String* string, Carriage_Return_Carry* carry) {
-    return strip_trailing_carriage_return(string->buffer, &string->size, carry);
+    return strip_trailing_carriage_return(string->buffer, &string->len, carry);
 }
 inline static void strip_carriage_returns(char* buffer,
                                           size_t* size,
@@ -232,7 +232,7 @@ inline static void strip_carriage_returns(char* buffer,
     strip_trailing_carriage_return(buffer, size, carry);
 }
 inline static void strip_carriage_returns(cz::String* string, Carriage_Return_Carry* carry) {
-    return strip_carriage_returns(string->buffer, &string->size, carry);
+    return strip_carriage_returns(string->buffer, &string->len, carry);
 }
 
 }
