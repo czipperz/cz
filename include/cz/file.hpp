@@ -97,7 +97,9 @@ struct File_Descriptor {
     int64_t set_position(int64_t value, Relative_To relative_to);
 
     /// Get the position of the file or `-1` on error.
-    int64_t get_position() { return set_position(0, Relative_To::CURRENT); }
+    int64_t get_position() {
+        return set_position(0, Relative_To::CURRENT);
+    }
 
     /// Get the size of the file or `-1` on error.
     int64_t get_size();
@@ -182,7 +184,9 @@ struct Output_File : File_Descriptor {
         return write(buffer, size);
 #endif
     }
-    int64_t write_text(cz::Str str) { return write_text(str.buffer, str.len); }
+    int64_t write_text(cz::Str str) {
+        return write_text(str.buffer, str.len);
+    }
 
     /// Flush writes to the file.
     bool flush();
