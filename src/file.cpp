@@ -355,20 +355,11 @@ int64_t Input_File::read_strip_carriage_returns(char* buffer,
         end = buffer + size;
     }
 
-    strip_carriage_returns(buffer, &size);
-
-    if (size > 0 && buffer[size - 1] == '\r') {
-        carry->carrying = true;
-        return size - 1;
-    } else {
-        carry->carrying = false;
-        return size;
-    }
+    strip_carriage_returns(buffer, &size, carry);
+    return size;
 }
 
 void strip_carriage_returns(char* buffer, size_t* size) {
-    ZoneScoped;
-
     char* start = buffer + 1;
     while (start < buffer + *size) {
         char* spot = (char*)memchr(start, '\n', buffer + *size - start);
@@ -386,8 +377,12 @@ void strip_carriage_returns(char* buffer, size_t* size) {
     }
 }
 
-void strip_carriage_returns(String* string) {
-    strip_carriage_returns(string->buffer, &string->len);
+void strip_trailing_carriage_return(char* buffer, size_t* size, Carriage_Return_Carry* carry) {
+    bool has_trailing_carriage_return = *size > 0 && buffer[*size - 1] == '\r';
+    if (has_trailing_carriage_return) {
+        --*size;
+    }
+    *carry->carrying = has_trailing_carriage_return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

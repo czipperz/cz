@@ -109,8 +109,19 @@ struct Carriage_Return_Carry {
     bool carrying = false;
 };
 
+/// Strip carriage returns from the given string.  Doesn't handle trailing carriage returns.
 void strip_carriage_returns(char* buffer, size_t* size);
-void strip_carriage_returns(String* string);
+inline static void strip_carriage_returns(String* string);
+
+/// Attempts to strip a trailing carriage return.  Stores into
+/// `carry` whether there was a trailing return or not.
+void strip_trailing_carriage_return(char* buffer, size_t* size, Carriage_Return_Carry* carry);
+inline static void strip_trailing_carriage_return(String* string, Carriage_Return_Carry* carry);
+
+/// Strip carriage returns from the string, storing into
+/// `carry` whether there was a trailing carriage return.
+inline static void strip_carriage_returns(char* buffer, size_t* size, Carriage_Return_Carry* carry);
+inline static void strip_carriage_returns(cz::String* string, Carriage_Return_Carry* carry);
 
 struct Input_File : File_Descriptor {
     /// Try to open a file for reading.
@@ -203,5 +214,25 @@ Output_File std_err_file();
 
 bool read_to_string(Input_File file, cz::Allocator allocator, cz::String* string);
 bool read_to_string(const char* path, cz::Allocator allocator, cz::String* string);
+
+////////////////////////////////////////////////////////////////////////////////
+// Inline implementations
+////////////////////////////////////////////////////////////////////////////////
+
+inline static void strip_carriage_returns(String* string) {
+    return strip_carriage_returns(string->buffer, &string->size);
+}
+inline static void strip_trailing_carriage_return(String* string, Carriage_Return_Carry* carry) {
+    return strip_trailing_carriage_return(string->buffer, &string->size, carry);
+}
+inline static void strip_carriage_returns(char* buffer,
+                                          size_t* size,
+                                          Carriage_Return_Carry* carry) {
+    strip_carriage_returns(buffer, size);
+    strip_trailing_carriage_return(buffer, size, carry);
+}
+inline static void strip_carriage_returns(cz::String* string, Carriage_Return_Carry* carry) {
+    return strip_carriage_returns(string->buffer, &string->size, carry);
+}
 
 }
