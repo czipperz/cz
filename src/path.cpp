@@ -445,10 +445,10 @@ cz::String standardize_path(cz::Allocator allocator, cz::Str user_path) {
     }
 
 #ifndef _WIN32
-    // Don't dereference any symbolic links in `/proc` because the symbolic
-    // links are often broken.  Example usage is `mag <(git diff)` will open
-    // `/proc/self/fd/%d` with the result of the subcommand (`git diff`).
-    if (user_path_nt.starts_with("/proc/")) {
+    // Don't dereference any symbolic links in `/proc` or `/dev` because the
+    // symbolic links are often broken.  Example usage is `mag <(git diff)` will
+    // open `/proc/self/fd/%d` or `/dev/fd/%d` with the result of the subcommand (`git diff`).
+    if (user_path_nt.starts_with("/proc/") || user_path_nt.starts_with("/dev/")) {
         cz::path::convert_to_forward_slashes(&user_path_nt);
 
         cz::String path = {};
