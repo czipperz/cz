@@ -61,10 +61,13 @@ struct File_Descriptor {
 #ifdef _WIN32
     void* handle = Null_;
 
+    /// Initialize the `HANDLE` to `INVALID_HANDLE_VALUE`.  Note that `nullptr` is also an invalid
+    /// `HANDLE` but we don't check for that because it's uncommon for Win32 to return `NULL`.
     static constexpr void* const Null_ = (void*)-1;
 #else
     int handle = Null_;
 
+    /// Any fd < 0 is invalid on Unix systems.
     static constexpr const int Null_ = -1;
 #endif
 
