@@ -1,7 +1,7 @@
 #pragma once
 
-#include "slice.hpp"
 #include "alloc_info.hpp"
+#include "slice.hpp"
 
 namespace cz {
 

@@ -5,8 +5,8 @@
 
 #ifdef TRACY_ENABLE
 #include <stdio.h>
-#include <tracy/Tracy.hpp>
 #include <algorithm>
+#include <tracy/Tracy.hpp>
 #endif
 
 namespace cz {

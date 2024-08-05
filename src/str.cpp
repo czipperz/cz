@@ -196,7 +196,9 @@ void Str::split_into(char separator, cz::Allocator allocator, cz::Vector<cz::Str
     }
 }
 
-void Str::split_into(cz::Str separator, cz::Allocator allocator, cz::Vector<cz::Str>* values) const {
+void Str::split_into(cz::Str separator,
+                     cz::Allocator allocator,
+                     cz::Vector<cz::Str>* values) const {
     cz::Str remaining = *this;
     while (1) {
         cz::Str value = remaining;

@@ -48,9 +48,13 @@ struct Allocator {
     // When compiled in release mode call the virtual function without any checks.
 
     /// Allocate memory using this allocator.
-    void* alloc(AllocInfo new_info) const { return reallocate(data, {}, new_info); }
+    void* alloc(AllocInfo new_info) const {
+        return reallocate(data, {}, new_info);
+    }
     /// Deallocate memory allocated using this allocator.
-    void dealloc(MemSlice old_mem) const { deallocate(data, old_mem); }
+    void dealloc(MemSlice old_mem) const {
+        deallocate(data, old_mem);
+    }
     /// Reallocate memory allocated using this allocator or
     /// allocate memory (if `old_mem.buffer` is `nullptr`).
     void* realloc(MemSlice old_mem, AllocInfo new_info) const {

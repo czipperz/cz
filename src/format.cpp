@@ -82,10 +82,7 @@ Heap_String avsprintf(const char* format, va_list args) {
     return string;
 }
 
-void append_vsprintf(Allocator allocator,
-                     String* string,
-                     const char* format,
-                     va_list args) {
+void append_vsprintf(Allocator allocator, String* string, const char* format, va_list args) {
     append_vsprintf_impl(allocator, string, format, args, false);
 }
 

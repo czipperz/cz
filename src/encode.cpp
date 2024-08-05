@@ -109,7 +109,7 @@ void decode_base64(cz::Str input, cz::Allocator allocator, cz::String* output) {
         }
 
         for (size_t j = 0; j < digits; ++j) {
-            size_t shift = 8 * (2 - j);;
+            size_t shift = 8 * (2 - j);
             uint8_t digit = (num >> shift) & 0xff;
             output->push(digit);
         }

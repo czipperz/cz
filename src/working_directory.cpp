@@ -4,8 +4,8 @@
 #include <cz/path.hpp>
 #include <cz/string.hpp>
 
-#include <cz/char_type.hpp>
 #include <errno.h>
+#include <cz/char_type.hpp>
 
 // Although the headers are different, we can use the Windows "Posix"
 // implementation to get similar semantics.  We just have to alias the system

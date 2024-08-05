@@ -4,8 +4,8 @@
 #include "../heap_vector.hpp"
 #include "../str.hpp"
 
-#include "../defer.hpp"
 #include <stdio.h>
+#include "../defer.hpp"
 
 namespace cz {
 namespace dwim {

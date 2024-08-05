@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cz/template_generic.hpp>
 #include <cz/slice.hpp>
+#include <cz/template_generic.hpp>
 #include <cz/vector.hpp>
 
 namespace cz {
