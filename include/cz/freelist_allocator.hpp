@@ -11,9 +11,7 @@ struct Freelist_Node {
 struct Freelist_Common {
     Freelist_Node* head;
 
-// #ifndef NDEBUG
     size_t list_size;
-// #endif
 
     void drop(Allocator allocator);
 };
