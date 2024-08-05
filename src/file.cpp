@@ -493,6 +493,15 @@ int64_t write_loop(Output_File file, const char* buffer, size_t size) {
     return written;
 }
 
+bool write_file(const char* path, cz::Str str) {
+    cz::Output_File file;
+    if (!file.open(path))
+        return false;
+    CZ_DEFER(file.close());
+    int64_t write_result = write_loop(file, str);
+    return write_result == (int64_t)str.len;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Stdio files
 ///////////////////////////////////////////////////////////////////////////////
