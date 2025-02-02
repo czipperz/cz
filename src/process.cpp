@@ -18,6 +18,7 @@ extern char** environ;
 #include <cz/debug.hpp>
 #include <cz/defer.hpp>
 #include <cz/heap.hpp>
+#include <cz/util.hpp>
 
 #ifdef TRACY_ENABLE
 #include <tracy/Tracy.hpp>
@@ -397,9 +398,13 @@ bool Process::launch_program(cz::Slice<const cz::Str> args, const Process_Option
 
 #else
 
-static bool shell_escape_inside(char c) {
+static bool shell_must_single_quote(char c) {
+    // POSIX requires that '\!' is passed through.  Thus we must escape ! via single quotes.
+    return c == '!';
+}
+
+static bool shell_escape_double_quote(char c) {
     switch (c) {
-        case '!':
         case '"':
         case '$':
         case '\\':
@@ -414,7 +419,6 @@ static bool shell_escape_inside(char c) {
 static bool shell_escape_outside(char c) {
     switch (c) {
         case ' ':
-        case '!':
         case '"':
         case '#':
         case '$':
@@ -446,46 +450,72 @@ static bool shell_escape_outside(char c) {
 void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocator) {
     ZoneScoped;
 
-    size_t escaped_outside = 0;
-    size_t escaped_inside = 0;
-    bool use_string = false;
+    size_t cost_outside = 0;
+    size_t cost_single_quote = strlen("''");
+    size_t cost_double_quote = strlen("\"\"");
     for (size_t i = 0; i < arg.len; ++i) {
-        bool out = shell_escape_outside(arg[i]);
-        bool in = shell_escape_inside(arg[i]);
-        if (out) {
-            escaped_outside++;
+        if (shell_must_single_quote(arg[i])) {
+            cost_outside += strlen("'!'");
+        } else if (shell_escape_outside(arg[i])) {
+            cost_outside += 2;
+        } else {
+            cost_outside += 1;
         }
-        if (in) {
-            escaped_inside++;
+
+        if (arg[i] == '\'') {
+            cost_single_quote += strlen("'\''");
+        } else {
+            cost_single_quote += 1;
         }
-        if (out && !in) {
-            use_string = true;
+
+        if (shell_must_single_quote(arg[i])) {
+            cost_double_quote += strlen("\"'!'\"");
+        } else if (shell_escape_double_quote(arg[i])) {
+            cost_double_quote += 2;
+        } else {
+            cost_double_quote += 1;
         }
     }
+    script->reserve(allocator, min(cost_outside, min(cost_single_quote, cost_double_quote)));
 
-    if (use_string) {
-        script->reserve(allocator, 3 + arg.len + escaped_inside);
-        script->push('"');
+    size_t outside_handicap = 2;  // I prefer quotes instead of backlashes.
+    size_t best_cost =
+        min(cost_outside + outside_handicap, min(cost_single_quote, cost_double_quote));
 
+    if (cost_outside + outside_handicap == best_cost) {
         for (size_t i = 0; i < arg.len; ++i) {
-            if (shell_escape_inside(arg[i])) {
-                script->push('\\');
+            if (shell_must_single_quote(arg[i])) {
+                script->append("'!'");
+                continue;
             }
-
-            script->push(arg[i]);
-        }
-
-        script->push('"');
-    } else {
-        script->reserve(allocator, 1 + arg.len + escaped_outside);
-
-        for (size_t i = 0; i < arg.len; ++i) {
             if (shell_escape_outside(arg[i])) {
                 script->push('\\');
             }
-
             script->push(arg[i]);
         }
+    } else if (cost_single_quote == best_cost) {
+        script->push('\'');
+        for (size_t i = 0; i < arg.len; ++i) {
+            if (arg[i] == '\'') {
+                script->append("'\''");
+                continue;
+            }
+            script->push(arg[i]);
+        }
+        script->push('\'');
+    } else {
+        script->push('"');
+        for (size_t i = 0; i < arg.len; ++i) {
+            if (shell_must_single_quote(arg[i])) {
+                script->append("\"'!'\"");
+                continue;
+            }
+            if (shell_escape_double_quote(arg[i])) {
+                script->push('\\');
+            }
+            script->push(arg[i]);
+        }
+        script->push('"');
     }
 }
 
