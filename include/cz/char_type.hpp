@@ -24,6 +24,18 @@ inline bool is_space(char ch) {
     }
 }
 
+inline bool is_space_line(char ch) {
+    switch (ch) {
+        case '\f':
+        case '\n':
+        case '\r':
+        case '\v':
+            return true;
+        default:
+            return false;
+    }
+}
+
 inline bool is_blank(char ch) {
     return ch == '\t' || ch == ' ';
 }
