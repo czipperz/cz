@@ -476,13 +476,13 @@ void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocato
             cost_double_quote += 1;
         }
     }
-    script->reserve(allocator, min(cost_outside, min(cost_single_quote, cost_double_quote)));
 
     size_t outside_handicap = 2;  // I prefer quotes instead of backlashes.
     size_t best_cost =
         min(cost_outside + outside_handicap, min(cost_single_quote, cost_double_quote));
 
     if (cost_outside + outside_handicap == best_cost) {
+        script->reserve(allocator, cost_outside);
         for (size_t i = 0; i < arg.len; ++i) {
             if (shell_must_single_quote(arg[i])) {
                 script->append("'!'");
@@ -494,6 +494,7 @@ void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocato
             script->push(arg[i]);
         }
     } else if (cost_single_quote == best_cost) {
+        script->reserve(allocator, cost_single_quote);
         script->push('\'');
         for (size_t i = 0; i < arg.len; ++i) {
             if (arg[i] == '\'') {
@@ -504,6 +505,7 @@ void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocato
         }
         script->push('\'');
     } else {
+        script->reserve(allocator, cost_double_quote);
         script->push('"');
         for (size_t i = 0; i < arg.len; ++i) {
             if (shell_must_single_quote(arg[i])) {
