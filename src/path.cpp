@@ -312,6 +312,7 @@ bool is_unc_path(Str file) {
     return result != 0;
 }
 
+#ifdef _WIN32
 static bool is_unc_root_path(Str file) {
     size_t unc_i = unc_path_prefix_length(file);
     for (size_t i = unc_i; i < file.len; ++i) {
@@ -321,6 +322,7 @@ static bool is_unc_root_path(Str file) {
     }
     return true;
 }
+#endif
 
 bool is_absolute(Str file) {
 #ifdef _WIN32
