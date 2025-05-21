@@ -206,6 +206,7 @@ struct Vector {
 
     Slice<T> as_slice() { return *this; }
     constexpr Slice<const T> as_slice() const { return *this; }
+    constexpr Slice<const T> as_const_slice() const { return *this; }
 
     Slice<T> slice(size_t start, size_t end) const { return {elems + start, end - start}; }
     Slice<T> slice(const T* start, size_t end) const { return slice(start - elems, end); }
@@ -255,6 +256,8 @@ struct Vector {
 
     bool operator==(Slice<T> other) const { return as_slice() == other; }
     bool operator!=(Slice<T> other) const { return as_slice() != other; }
+    bool operator==(const Vector<T>& other) const { return as_slice() == other.as_slice(); }
+    bool operator!=(const Vector<T>& other) const { return as_slice() != other.as_slice(); }
 };
 
 template <class T>
