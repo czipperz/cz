@@ -119,6 +119,15 @@ public:
                             cz::String* script,
                             cz::Allocator allocator);
 
+    /// Helpers for cz::append/format.
+    struct Format_Escape_Arg {
+        cz::Str str;
+    };
+    static inline Format_Escape_Arg escape_arg(cz::Str str) {
+        return Format_Escape_Arg{str};
+    }
+    friend void append(Allocator allocator, String* string, Format_Escape_Arg);
+
     /// Launch a program.  The first argument must be the same the path to invoke.
     ///
     /// The process's `stdin`, `stdout`, and `stderr` streams are bound to the `options`' streams.

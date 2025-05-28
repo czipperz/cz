@@ -619,4 +619,8 @@ void Process::escape_args(cz::Slice<const cz::Str> args,
     script->null_terminate();
 }
 
+void append(Allocator allocator, String* string, Process::Format_Escape_Arg fmt) {
+    cz::Process::escape_arg(fmt.str, string, allocator);
+}
+
 }
