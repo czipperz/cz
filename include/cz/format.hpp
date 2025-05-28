@@ -165,7 +165,7 @@ void append(Allocator allocator, String* string, Format_Many);
 
 struct Format_DebugString { cz::Str str; };
 inline Format_DebugString dbg(cz::Str str) { return Format_DebugString{str}; }
-void append(Allocator allocator, String *string, Format_DebugString);
+void append(Allocator allocator, String* string, Format_DebugString);
 
 // clang-format on
 
