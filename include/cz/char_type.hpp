@@ -41,7 +41,7 @@ inline bool is_blank(char ch) {
 }
 
 inline bool is_graph(char ch) {
-    return ch >= 33 && ch < 127;
+    return ch >= 33 && ch < 127;  // Same as is_print except returns false for ' '.
 }
 
 inline bool is_punct(char ch) {
