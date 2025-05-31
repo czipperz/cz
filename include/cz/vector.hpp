@@ -208,7 +208,11 @@ struct Vector {
     constexpr Slice<const T> as_slice() const { return *this; }
     constexpr Slice<const T> as_const_slice() const { return *this; }
 
-    Slice<T> slice(size_t start, size_t end) const { return {elems + start, end - start}; }
+    Slice<T> slice(size_t start, size_t end) const {
+        CZ_DEBUG_ASSERT(start <= end);
+        CZ_DEBUG_ASSERT(end <= len);
+        return {elems + start, end - start};
+    }
     Slice<T> slice(const T* start, size_t end) const { return slice(start - elems, end); }
     Slice<T> slice(size_t start, const T* end) const { return slice(start, end - elems); }
     Slice<T> slice(const T* start, const T* end) const { return slice(start - elems, end - elems); }

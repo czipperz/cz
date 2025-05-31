@@ -41,7 +41,11 @@ struct Slice {
     T& first() const { return elems[0]; }
     T& last() const { return elems[len - 1]; }
 
-    Slice slice(size_t start, size_t end) const { return {elems + start, end - start}; }
+    Slice slice(size_t start, size_t end) const {
+        CZ_DEBUG_ASSERT(start <= end);
+        CZ_DEBUG_ASSERT(end <= len);
+        return {elems + start, end - start};
+    }
     Slice slice(const T* start, size_t end) const { return slice(start - elems, end); }
     Slice slice(size_t start, const T* end) const { return slice(start, end - elems); }
     Slice slice(const T* start, const T* end) const { return slice(start - elems, end - elems); }

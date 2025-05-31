@@ -234,7 +234,7 @@ struct Str {
 
     /// Take a substring of the string.
     cz::Str slice(size_t start, size_t end) const {
-        CZ_DEBUG_ASSERT(start <= len);
+        CZ_DEBUG_ASSERT(start <= end);
         CZ_DEBUG_ASSERT(end <= len);
         return {buffer + start, end - start};
     }
