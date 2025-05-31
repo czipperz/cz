@@ -612,6 +612,7 @@ void Process::escape_args(cz::Slice<const cz::Str> args,
 
     for (size_t i = 0; i < args.len; ++i) {
         escape_arg(args[i], script, allocator);
+        script->reserve(allocator, 1);
         script->push(' ');
     }
 
