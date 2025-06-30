@@ -319,7 +319,7 @@ static void escape_backslashes(cz::String* script, cz::Str arg, size_t i) {
 void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocator) {
     ZoneScoped;
 
-    bool any_special = false;
+    bool any_special = (arg.len == 0);
     for (size_t i = 0; i < arg.len; ++i) {
         if (!isalnum(arg[i]) && arg[i] != '/' && arg[i] != '\\' && arg[i] != ':' && arg[i] != '-' &&
             arg[i] != '.') {
@@ -449,6 +449,12 @@ static bool shell_escape_outside(char c) {
 
 void Process::escape_arg(cz::Str arg, cz::String* script, cz::Allocator allocator) {
     ZoneScoped;
+
+    if (arg.len == 0) {
+        script->reserve(allocator, 2);
+        script->append("''");
+        return;
+    }
 
     size_t cost_outside = 0;
     size_t cost_single_quote = strlen("''");
