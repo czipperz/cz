@@ -167,6 +167,10 @@ struct Format_DebugString { cz::Str str; };
 inline Format_DebugString dbg(cz::Str str) { return Format_DebugString{str}; }
 void append(Allocator allocator, String* string, Format_DebugString);
 
+struct Format_NullTerminate { explicit Format_NullTerminate() = default; };
+inline Format_NullTerminate null_terminate() { return Format_NullTerminate{}; }
+void append(Allocator allocator, String* string, Format_NullTerminate);
+
 // clang-format on
 
 }

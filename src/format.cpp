@@ -232,4 +232,13 @@ void append(Allocator allocator, String* string, Format_DebugString dbg) {
     string->push('"');
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Null terminate
+////////////////////////////////////////////////////////////////////////////////
+
+void append(Allocator allocator, String* string, Format_NullTerminate) {
+    string->reserve_exact(allocator, 1);
+    string->null_terminate();
+}
+
 }
