@@ -55,8 +55,13 @@ struct String {
 
     /// Create a new `String` with the same contents in a unique memory buffer.
     String clone(Allocator allocator) const { return as_str().clone(allocator); }
+    /// Same as `clone` but allocates an extra zeroed byte.
     String clone_null_terminate(Allocator allocator) const {
         return as_str().clone_null_terminate(allocator);
+    }
+    /// If `buffer == nullptr` then returns `String{}`, otherwise same as `clone_null_terminate`.
+    String clone_null_terminate_or_propagate_null(Allocator allocator) const {
+        return as_str().clone_null_terminate_or_propagate_null(allocator);
     }
 
     ///

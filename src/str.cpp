@@ -25,6 +25,13 @@ String Str::clone_null_terminate(Allocator allocator) const {
     return String{ptr, len, len + 1};
 }
 
+String Str::clone_null_terminate_or_propagate_null(Allocator allocator) const {
+    if (buffer == nullptr) {
+        return {};
+    }
+    return clone_null_terminate(allocator);
+}
+
 static inline bool matches_case_insensitive_unbounded(const char* str, cz::Str piece) {
     for (size_t i = 0; i < piece.len; ++i) {
         if (cz::to_lower(str[i]) != cz::to_lower(piece[i])) {

@@ -30,11 +30,12 @@ struct Str {
         return {str, len - 1};
     }
 
-    /// Create a new \c String with the same contents in a unique memory buffer.
+    /// Create a new `String` with the same contents in a unique memory buffer.
     String clone(Allocator) const;
-    /// Create a new \c String with the same contents in a unique memory buffer
-    /// and allocate space for a null terminator.
+    /// Same as `clone` but allocates an extra zeroed byte.
     String clone_null_terminate(Allocator) const;
+    /// If `buffer == nullptr` then returns `String{}`, otherwise same as `clone_null_terminate`.
+    String clone_null_terminate_or_propagate_null(Allocator allocator) const;
 
     constexpr const char* start() const { return buffer; }
     constexpr const char* end() const { return buffer + len; }
