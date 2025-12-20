@@ -76,6 +76,16 @@ struct Allocator {
         return (T*)alloc(info);
     }
 
+    /// Allocate memory to store an array of values of the given type using this allocator.
+    template <class T>
+    cz::Slice<T> alloc_slice(size_t count) const {
+        AllocInfo info = alloc_info<T>();
+        info.size *= count;
+        T* ptr = (T*)alloc(info);
+        CZ_ASSERT(ptr);
+        return {ptr, count};
+    }
+
     /// Allocate zeroed memory to store an array of values of the given type using this allocator.
     template <class T>
     T* alloc_zeroed(size_t count = 1) const {
