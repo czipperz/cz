@@ -544,7 +544,7 @@ bool read_to_string(Input_File file, cz::Allocator allocator, cz::String* out) {
     ZoneScoped;
     CZ_DEBUG_ASSERT(file.is_open());
 
-    char buffer[1024];
+    char buffer[4096];
     Carriage_Return_Carry carry;
     while (1) {
         int64_t read_result = file.read_text(buffer, sizeof(buffer), &carry);
