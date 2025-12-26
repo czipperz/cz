@@ -103,6 +103,9 @@ public:
     /// Create another weak reference to the pointer.
     Arc_Weak<T> clone_downgrade() const noexcept;
 
+    bool is_null() const noexcept;
+    bool is_not_null() const noexcept;
+
     /// Test if both objects point to the same object.
     bool ptr_equal(Arc<T> other) const noexcept { return pointer == other.pointer; }
     bool ptr_equal(Arc_Weak<T> other) const noexcept { return pointer == other.pointer; }
@@ -257,6 +260,16 @@ bool Arc_Weak<T>::still_alive() const noexcept {
 template <class T>
 void Arc_Weak<T>::drop() noexcept {
     decrement_total(pointer);
+}
+
+template <class T>
+bool Arc_Weak<T>::is_null() const noexcept {
+    return pointer == nullptr;
+}
+
+template <class T>
+bool Arc_Weak<T>::is_not_null() const noexcept {
+    return pointer != nullptr;
 }
 
 }
