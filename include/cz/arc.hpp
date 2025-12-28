@@ -67,6 +67,10 @@ public:
     /// Test if both objects point to the same object.
     bool ptr_equal(Arc<T> other) const noexcept { return pointer == other.pointer; }
     bool ptr_equal(Arc_Weak<T> other) const noexcept { return pointer == other.pointer; }
+
+    /// Get an `Arc<T>` that controls the given pointer.  Assumes that the object is
+    /// alive and controlled by an `Arc`.  Does not increment the reference count.
+    static Arc<T> cast_to_arc_no_inc(const T* pointer);
 };
 
 /// A weak reference to the reference counted pointer.  A weak reference can be
@@ -225,6 +229,13 @@ bool Arc<T>::is_null() const noexcept {
 template <class T>
 bool Arc<T>::is_not_null() const noexcept {
     return pointer != nullptr;
+}
+
+template <class T>
+Arc<T> Arc<T>::cast_to_arc_no_inc(const T* pointer) {
+    Arc<T> result;
+    result.pointer = (Arc_Value<T>*)((const char*)pointer - offsetof(Arc_Value<T>, value));
+    return result;
 }
 
 template <class T>
