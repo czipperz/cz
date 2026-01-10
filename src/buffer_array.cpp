@@ -39,7 +39,7 @@ static char* get_starting_point(Buffer_Array* buffer_array, MemSlice old_mem) {
 
     // If we don't match exactly then we must be deallocating from the previous buffer.
     if (old_mem.end() != buffer_array->buffer_pointer) {
-#ifndef NDEBUG
+#ifdef CZ_DEBUG_ASSERTIONS
         {
             // Note to the reader: deallocation from a `Buffer_Array` will panic if it
             // is not the most recently allocated object.  We do this to catch "hole"s
@@ -155,7 +155,7 @@ void* Buffer_Array::realloc(void* _buffer_array, MemSlice old_mem, AllocInfo new
 }
 
 void Buffer_Array::restore(Save_Point sp) {
-#ifndef NDEBUG
+#ifdef CZ_DEBUG_ASSERTIONS
     const unsigned char dealloc_fill = 0xDD;
 
     // Fill each buffer that is completely deallocated.

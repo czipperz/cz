@@ -33,7 +33,7 @@ struct Allocator {
 
     void* data;
 
-#ifndef NDEBUG
+#ifdef CZ_DEBUG_ASSERTIONS
     // When compiled in debug mode we have out of line handlers that check preconditions
     // and fill uninitialized memory with random values to try to find bugs.
 

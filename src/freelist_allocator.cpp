@@ -21,7 +21,7 @@ static void* freelist_realloc(void* freelist_,
 
     new_info.size = cz::max(new_info.size, sizeof(Freelist_Node));
 
-#ifndef NDEBUG
+#ifdef CZ_DEBUG_ASSERTIONS
     // Cannot realloc because all allocations must be the same size.
     if (old_mem.buffer != nullptr) {
         CZ_PANIC("Freelist cannot realloc");
@@ -30,7 +30,7 @@ static void* freelist_realloc(void* freelist_,
 
     if (freelist->common.head) {
         // Check that size requested and size provided are equal.
-#ifndef NDEBUG
+#ifdef CZ_DEBUG_ASSERTIONS
         if (new_info.size != freelist->common.list_size) {
             CZ_PANIC("Freelist requires all allocations are of the same size");
         }
@@ -63,7 +63,7 @@ void Freelist::dealloc(void* freelist_, MemSlice old_mem) {
     old_mem.size = cz::max(old_mem.size, sizeof(Freelist_Node));
 
     if (freelist_common->head) {
-#ifndef NDEBUG
+#ifdef CZ_DEBUG_ASSERTIONS
         if (old_mem.size != freelist_common->list_size) {
             CZ_PANIC("Freelist requires all allocations are of the same size");
         }

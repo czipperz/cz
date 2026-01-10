@@ -4,10 +4,10 @@
 #include "source_location.hpp"
 #include "stringify.hpp"
 
-#ifdef NDEBUG
-#define CZ_DEBUG_ASSERT(ignore) ((void)0)
-#else
+#ifdef CZ_DEBUG_ASSERTIONS
 #define CZ_DEBUG_ASSERT(val) CZ_ASSERT(val)
+#else
+#define CZ_DEBUG_ASSERT(ignore) ((void)0)
 #endif
 
 #define CZ_ASSERT(val) ((val) ? ((void)0) : CZ_PANIC("Assertion failed: " CZ_STRINGIFY(val)))

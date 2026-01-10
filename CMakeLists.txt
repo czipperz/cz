@@ -17,6 +17,13 @@ target_link_libraries(${TEST_BASE_NAME} ${PROJECT_NAME})
 target_include_directories(${TEST_BASE_NAME} PUBLIC include)
 export(TARGETS ${TEST_BASE_NAME} FILE ${TEST_BASE_NAME}LibraryConfig.cmake)
 
+if (NOT DEFINED CZ_DEBUG_ASSERTIONS AND CMAKE_BUILD_TYPE MATCHES Debug)
+  set(CZ_DEBUG_ASSERTIONS 1)
+endif()
+if (CZ_DEBUG_ASSERTIONS EQUAL 1)
+  add_definitions(-DCZ_DEBUG_ASSERTIONS=1)
+endif()
+
 if (CZ_BUILD_TESTS)
   file(GLOB_RECURSE TEST_SRCS tests/*.cpp)
   set(TEST_EXECUTABLE cz-test)

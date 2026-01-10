@@ -4,7 +4,7 @@
 
 namespace cz {
 
-#ifndef NDEBUG
+#ifdef CZ_DEBUG_ASSERTIONS
 static const unsigned char alloc_fill = 0xCD;
 static const unsigned char dealloc_fill = 0xDD;
 
