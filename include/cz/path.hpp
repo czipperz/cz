@@ -114,7 +114,7 @@ void make_absolute(Str relative_path,
                    Allocator allocator,
                    String* absolute_path_out);
 
-/// Standardize the path so there is one exact way to spell each path.
+/// Standardize the path so there is one exact way to spell each path. Appends a null terminator.
 ///
 /// This is done by making the path absolute, converting back slashes
 /// to forward slashes, and then dereferencing all symbolic links.
